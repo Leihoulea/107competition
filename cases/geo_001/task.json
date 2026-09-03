@@ -1,0 +1,7 @@
+{
+  "case_id": "GEO-001",
+  "title": "Unexpected spatial disagreement between two scientific products",
+  "task": "A scientific comparison process completed successfully, but two spatial scientific products show unexpectedly low agreement. Determine whether a scientific silent failure exists. Use available computational experiments to gather evidence, identify the most likely root cause, and validate a repair.",
+  "budget": 30,
+  "expected_quality_threshold": 0.8
+}

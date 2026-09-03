@@ -1,0 +1,6 @@
+{
+  "fault": true,
+  "fault_family": "spatial_alignment",
+  "root_cause": "orientation_mismatch",
+  "expected_transform": "rot180"
+}

@@ -1,0 +1,83 @@
+"""Provider-independent agents; no hidden case data is read here."""
+from __future__ import annotations
+import json
+from typing import Any
+from urllib import error, request
+from .config import Settings
+from .models import AgentAction, DiagnosisState
+
+SYSTEM_PROMPT = """You are a scientific computing diagnosis agent. Do not guess root causes.
+Choose one available tool only when actual computational evidence is needed. Never claim an
+experiment was run unless it appears in state.experiments; do not cite invented experiment IDs.
+Use results and budget carefully. A large improvement requires validation, not speculation.
+Do not return decision=fault before at least one cited experiment reaches the task's
+expected_quality_threshold, unless the explicit force_final instruction says the step limit was reached.
+When same-shape 2-D fields have similar value statistics but low pixel agreement, prioritize
+systematic global orientation tests before one-pixel shifts: test rotations (including rot180)
+and reflections as general diagnostic operations. Do not infer a case-specific answer from this policy.
+Return exactly one JSON object matching the supplied action schema. You may decide no_fault.
+For a tool call use exactly {"type":"tool_call","tool":"inspect","arguments":{},"reason":"..."}.
+For a conclusion use exactly {"type":"final","reason":"...","final":{"decision":"fault","fault_family":"...","root_cause":"...","confidence":0.0,"evidence_experiment_ids":[],"recommended_repair":{}}}.
+Allowed tools are inspect, compare, transform_and_compare (identity, flip_x, flip_y, rot90,
+rot180, rot270, transpose), and shift_and_compare (integer dr/dc from -5 to 5)."""
+
+class AgentAPIError(RuntimeError): pass
+
+class OpenAICompatibleAgent:
+    """Minimal stdlib client for school endpoints implementing /chat/completions."""
+    def __init__(self, settings: Settings | None = None, timeout: int = 60) -> None:
+        self.settings=settings or Settings(); self.timeout=timeout
+        if not (self.settings.base_url and self.settings.model_name and self.settings.api_key):
+            raise AgentAPIError("SCIDIAG_BASE_URL, SCIDIAG_MODEL_NAME, and SCIDIAG_API_KEY are required for API mode")
+    def decide(self,state:DiagnosisState,task:dict[str,object])->AgentAction:
+        schema={"type":"tool_call|final","tool":"inspect|compare|transform_and_compare|shift_and_compare (tool_call only)","arguments":{},"reason":"short evidence-based rationale","final":{"decision":"fault|no_fault","fault_family":"string","root_cause":"string","confidence":"0..1","evidence_experiment_ids":["EXP_001"],"recommended_repair":{}}}
+        visible={"task":task,"state":{"case_id":state.case_id,"budget_remaining":state.budget_remaining,"observations":state.observations,"experiments":[{"experiment_id":x["experiment_id"],"tool":x["tool"],"arguments":x["arguments"],"result":x["result"]} for x in state.experiments]},"action_schema":schema}
+        if task.get("force_final"):
+            visible["instruction"] = "Tool budget/step limit reached. Return type=final now. Do not request a tool call. Base the conclusion only on real experiment IDs already in state."
+        payload={"model":self.settings.model_name,"messages":[{"role":"system","content":SYSTEM_PROMPT},{"role":"user","content":json.dumps(visible)}],"temperature":0,"response_format":{"type":"json_object"}}
+        url=self.settings.base_url.rstrip("/")+"/chat/completions"; body=json.dumps(payload).encode(); req=request.Request(url,body,headers={"Authorization":f"Bearer {self.settings.api_key}","Content-Type":"application/json"},method="POST")
+        try:
+            with request.urlopen(req,timeout=self.timeout) as response: data=json.loads(response.read())
+        except (error.URLError,error.HTTPError,json.JSONDecodeError) as exc: raise AgentAPIError(f"School LLM API request failed: {exc}") from exc
+        try: raw=data["choices"][0]["message"]["content"]; action=json.loads(raw); return self._validate(action)
+        except (KeyError,IndexError,TypeError,json.JSONDecodeError,ValueError) as exc: raise AgentAPIError(f"School LLM API returned an invalid action: {exc}") from exc
+    @staticmethod
+    def _validate(value:dict[str,Any])->AgentAction:
+        # Tolerate common model wrappers while normalizing to SciDiagnose's contract.
+        if isinstance(value.get("action"), dict): value = {**value, **value["action"]}
+        if isinstance(value.get("action"), str) and "type" not in value: value["type"] = value["action"]
+        if "type" not in value and ("tool" in value or "tool_name" in value): value["type"] = "tool_call"
+        if "type" not in value and ("decision" in value or "final_diagnosis" in value): value["type"] = "final"
+        kind=value.get("type")
+        if kind in {"tool", "tool_call", "call_tool"}:
+            tool=value.get("tool", value.get("tool_name")); args=value.get("arguments", value.get("args", {}))
+            if tool not in {"inspect","compare","transform_and_compare","shift_and_compare"} or not isinstance(args,dict): raise ValueError("invalid tool action")
+            return AgentAction("tool_call",tool,OpenAICompatibleAgent._normalize_arguments(tool,args),str(value.get("reason","")))
+        if kind in {"final", "diagnosis", "conclusion"}:
+            final=value.get("final", value.get("final_diagnosis"))
+            if not isinstance(final,dict): final={key:value[key] for key in ("decision","fault_family","root_cause","confidence","evidence_experiment_ids","recommended_repair") if key in value}
+            required={"decision","fault_family","root_cause","confidence","evidence_experiment_ids","recommended_repair"}
+            if required <= final.keys(): return AgentAction("final",reason=str(value.get("reason","")),final=final)
+        raise ValueError("action type must be tool_call or final")
+
+    @staticmethod
+    def _normalize_arguments(tool:str, arguments:dict[str,Any])->dict[str,Any]:
+        if tool in {"inspect","compare"}: return {}
+        if tool == "transform_and_compare":
+            operation=arguments.get("operation",arguments.get("transform",arguments.get("transformation")))
+            if not isinstance(operation,str): raise ValueError("transform operation is required")
+            normalized=operation.strip().lower().replace("-","_").replace(" ","_")
+            aliases={"rotate90":"rot90","rotate_90":"rot90","rotation_90":"rot90","rotate180":"rot180","rotate_180":"rot180","rotation_180":"rot180","rotate270":"rot270","rotate_270":"rot270","rotation_270":"rot270","horizontal_flip":"flip_x","flip_horizontal":"flip_x","vertical_flip":"flip_y","flip_vertical":"flip_y"}
+            normalized=aliases.get(normalized,normalized)
+            if normalized not in {"identity","flip_x","flip_y","rot90","rot180","rot270","transpose"}: raise ValueError("unsupported transform operation")
+            return {"operation":normalized}
+        dr,dc=arguments.get("dr",arguments.get("row_shift")),arguments.get("dc",arguments.get("col_shift"))
+        if type(dr) is not int or type(dc) is not int or not -5<=dr<=5 or not -5<=dc<=5: raise ValueError("shift dr and dc must be integers in [-5, 5]")
+        return {"dr":dr,"dc":dc}
+class ManualAgent:
+    """Deterministic demonstration policy that reacts only to visible experiment evidence."""
+    def decide(self,state:DiagnosisState,task:dict[str,object])->AgentAction:
+        if not state.experiments: return AgentAction("tool_call","inspect",reason="Establish array structure and value ranges before testing hypotheses.")
+        if len(state.experiments)==1: return AgentAction("tool_call","transform_and_compare",{"operation":"rot180"},"Test one general 2-D transform and measure whether agreement changes materially.")
+        latest=state.experiments[-1]["result"].get("metrics",{}); improved=float(latest.get("agreement",0))>=float(task["expected_quality_threshold"])
+        return AgentAction("final",reason="Two real experiments supplied the evidence.",final={"decision":"fault" if improved else "no_fault","fault_family":"spatial_alignment" if improved else "undetermined","root_cause":"orientation_mismatch" if improved else "insufficient_evidence","confidence":.95 if improved else .4,"evidence_experiment_ids":[item["experiment_id"] for item in state.experiments],"recommended_repair":{"operation":"rot180"} if improved else {}})
