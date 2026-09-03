@@ -1,0 +1,7 @@
+{
+  "case_id": "B03",
+  "title": "Unexpected spatial disagreement between scientific products",
+  "task": "A completed scientific comparison may contain a silent failure. Use available experiments to determine whether a fault exists and validate any repair.",
+  "budget": 30,
+  "expected_quality_threshold": 0.85
+}

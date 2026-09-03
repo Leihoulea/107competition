@@ -1,0 +1,9 @@
+{
+  "fault": false,
+  "fault_family": "no_fault",
+  "injected_recipe": [],
+  "repair_recipe": [],
+  "clean_baseline": {
+    "agreement": 0.9357452392578125
+  }
+}

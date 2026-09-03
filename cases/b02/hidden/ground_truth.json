@@ -1,0 +1,29 @@
+{
+  "fault": true,
+  "fault_family": "compound_spatial_misalignment",
+  "injected_recipe": [
+    {
+      "type": "shift",
+      "dr": 1,
+      "dc": -2
+    },
+    {
+      "type": "transform",
+      "operation": "rot180"
+    }
+  ],
+  "repair_recipe": [
+    {
+      "type": "transform",
+      "operation": "rot180"
+    },
+    {
+      "type": "shift",
+      "dr": 1,
+      "dc": -2
+    }
+  ],
+  "clean_baseline": {
+    "agreement": 0.9372711181640625
+  }
+}

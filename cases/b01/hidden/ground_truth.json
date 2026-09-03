@@ -1,0 +1,19 @@
+{
+  "fault": true,
+  "fault_family": "spatial_transform",
+  "injected_recipe": [
+    {
+      "type": "transform",
+      "operation": "rot180"
+    }
+  ],
+  "repair_recipe": [
+    {
+      "type": "transform",
+      "operation": "rot180"
+    }
+  ],
+  "clean_baseline": {
+    "agreement": 0.935272216796875
+  }
+}
