@@ -8,12 +8,19 @@ ROOT=Path(__file__).resolve().parents[1]
 def shift(a:np.ndarray,dr:int,dc:int)->np.ndarray:
     out=np.zeros_like(a);sr=slice(max(0,-dr),min(a.shape[0],a.shape[0]-dr));drs=slice(max(0,dr),min(a.shape[0],a.shape[0]+dr));sc=slice(max(0,-dc),min(a.shape[1],a.shape[1]-dc));dcs=slice(max(0,dc),min(a.shape[1],a.shape[1]+dc));out[drs,dcs]=a[sr,sc];return out
 def agreement(a:np.ndarray,b:np.ndarray)->float:return float((a==b).mean())
-def base(seed:int)->tuple[np.ndarray,np.ndarray]:
+def base(seed:int,fine:bool=False)->tuple[np.ndarray,np.ndarray]:
     y,x=np.mgrid[-1:1:256j,-1:1:256j];f=np.zeros((256,256));
     for cx,cy,sx,sy,amp in [(-.58,-.36,.17,.11,1.3),(.41,.30,.24,.15,1.0),(-.18,.56,.12,.18,.9),(.62,-.60,.09,.12,.8)]:f+=amp*np.exp(-(((x-cx)/sx)**2+((y-cy)/sy)**2)/2)
-    rng=np.random.default_rng(seed);ref=(f+rng.normal(0,.025,f.shape)>.06).astype(np.uint8);clean=(f+rng.normal(0,.025,f.shape)>.065).astype(np.uint8);return ref,clean
+    rng=np.random.default_rng(seed)
+    if fine:
+        f=np.zeros_like(f)
+        for cx,cy in rng.uniform(-.9,.9,(180,2)):
+            f+=.75*np.exp(-(((x-cx)/.035)**2+((y-cy)/.035)**2)/2)
+        threshold=.18
+    else: threshold=.06
+    ref=(f+rng.normal(0,.025,f.shape)>threshold).astype(np.uint8);clean=(f+rng.normal(0,.025,f.shape)>threshold+.005).astype(np.uint8);return ref,clean
 def write_case(name:str,recipe:list[dict[str,object]],repair:list[dict[str,object]],seed:int)->dict[str,float]:
-    ref,clean=base(seed);target=clean.copy()
+    ref,clean=base(seed,recipe and len(recipe)>1);target=clean.copy()
     for step in recipe:
         target=np.rot90(target,2) if step["type"]=="transform" else shift(target,int(step["dr"]),int(step["dc"]))
     case=ROOT/"cases"/name;data=case/"public"/"data";data.mkdir(parents=True,exist_ok=True);(case/"hidden").mkdir(exist_ok=True)
