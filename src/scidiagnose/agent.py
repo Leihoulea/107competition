@@ -12,9 +12,6 @@ experiment was run unless it appears in state.experiments; do not cite invented 
 Use results and budget carefully. A large improvement requires validation, not speculation.
 Do not return decision=fault before at least one cited experiment reaches the task's
 expected_quality_threshold, unless the explicit force_final instruction says the step limit was reached.
-When same-shape 2-D fields have similar value statistics but low pixel agreement, prioritize
-systematic global orientation tests before one-pixel shifts: test rotations (including rot180)
-and reflections as general diagnostic operations. Do not infer a case-specific answer from this policy.
 Return exactly one JSON object matching the supplied action schema. You may decide no_fault.
 For a tool call use exactly {"type":"tool_call","tool":"inspect","arguments":{},"reason":"..."}.
 For a conclusion use exactly {"type":"final","reason":"...","final":{"decision":"fault","fault_family":"...","root_cause":"...","confidence":0.0,"evidence_experiment_ids":[],"recommended_repair":{}}}.
