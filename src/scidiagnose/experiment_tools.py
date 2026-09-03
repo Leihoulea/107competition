@@ -15,7 +15,9 @@ class ExperimentTools:
         if self.uploaded:return
         if not isinstance(self.executor,SSHDirectExecutor): raise NotImplementedError("ExperimentTools remote workflow currently requires SSHDirectExecutor")
         base=f"{self.executor.workspace}/inputs/{self.case_dir.name}"; self.executor._ssh(f"mkdir -p {base}")
-        for name in ("reference.npy","target_faulty.npy"): self.executor.upload(self.case_dir/"public"/"data"/name,f"{base}/{name}")
+        for name in ("reference.npy","target_faulty.npy","target_valid.npy"):
+            path=self.case_dir/"public"/"data"/name
+            if path.exists(): self.executor.upload(path,f"{base}/{name}")
         self.executor.upload(Path(__file__).resolve().parents[2]/"remote"/"run_experiment.py",f"{self.executor.workspace}/scripts/run_experiment.py"); self.uploaded=True
     def execute(self, tool: str, arguments: dict[str,Any] | None=None) -> dict[str,Any]:
         if tool not in COSTS: raise ValueError(f"Unsupported tool: {tool}")

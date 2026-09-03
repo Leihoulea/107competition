@@ -4,8 +4,8 @@
   "injected_recipe": [
     {
       "type": "shift",
-      "dr": 1,
-      "dc": -2
+      "dr": 5,
+      "dc": -5
     },
     {
       "type": "transform",
@@ -19,8 +19,8 @@
     },
     {
       "type": "shift",
-      "dr": 1,
-      "dc": -2
+      "dr": -5,
+      "dc": 5
     }
   ],
   "clean_baseline": {
