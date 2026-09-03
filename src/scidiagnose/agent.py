@@ -97,6 +97,7 @@ class OpenAICompatibleAgent:
     def reflect(self, context: dict[str, Any]) -> dict[str, Any]:
         schema={"decision":"continue|propose_fault|propose_no_fault","best_hypothesis_id":"H001 or null","unresolved_questions":["short question"],"summary":"short evidence summary"}
         value=self._request_json("reflect on hypotheses and evidence",context,schema)
+        if isinstance(value.get("reflection"), dict): value=value["reflection"]
         decision=value.get("decision")
         if decision not in {"continue","propose_fault","propose_no_fault"}: raise AgentAPIError("reflection decision is invalid")
         return {"decision":decision,"best_hypothesis_id":value.get("best_hypothesis_id"),"unresolved_questions":[str(x) for x in value.get("unresolved_questions",[])],"summary":str(value.get("summary",""))}
