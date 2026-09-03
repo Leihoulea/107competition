@@ -113,7 +113,14 @@ class SSHDirectExecutor(ComputeExecutor):
         except RemoteExecutionError as exc:
             return ("", f"log retrieval unavailable: {exc}")
     def _json(self, path: str) -> dict[str, Any]:
-        try: return json.loads(self._ssh(f"cat {path}").stdout)
-        except json.JSONDecodeError as exc: raise RemoteExecutionError(f"Invalid remote JSON: {path}") from exc
+        for attempt in range(3):
+            try:
+                return json.loads(self._ssh(f"cat {path}").stdout)
+            except json.JSONDecodeError as exc:
+                raise RemoteExecutionError(f"Invalid remote JSON: {path}") from exc
+            except RemoteExecutionError:
+                if attempt == 2: raise
+                time.sleep(2 ** attempt)
+        raise AssertionError("unreachable")
     def fetch_result(self, job: JobHandle) -> dict[str, Any]: return self._json(f"{job.job_dir}/result.json")
     def fetch_failure(self, job: JobHandle) -> dict[str, Any]: return self._json(f"{job.job_dir}/failure.json")
