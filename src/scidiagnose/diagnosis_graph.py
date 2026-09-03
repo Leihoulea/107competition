@@ -1,51 +1,137 @@
-"""LangGraph orchestration for hypothesis-evidence diagnosis (v0.2)."""
+"""LangGraph orchestration for the v0.2.1 cognitive diagnosis loop."""
 from __future__ import annotations
-import json,time
-from dataclasses import asdict
+
+import json
+import time
 from pathlib import Path
 from typing import Any
+
 from langgraph.checkpoint.memory import InMemorySaver
-from langgraph.graph import END,START,StateGraph
-from .agent import ManualAgent,OpenAICompatibleAgent
-from .experiment_tools import COSTS,ExperimentTools
+from langgraph.graph import END, START, StateGraph
+
+from .experiment_tools import COSTS, ExperimentTools
 from .graph_state import DiagnosisGraphState
 
+
+def agreement(metrics: dict[str, Any]) -> float | None:
+    value = metrics.get("agreement_valid", metrics.get("agreement"))
+    return float(value) if value is not None else None
+
+
 class DiagnosisGraph:
-    def __init__(self,agent:ManualAgent|OpenAICompatibleAgent,tools:ExperimentTools,run_dir:Path)->None:
-        self.agent,self.tools,self.run_dir=agent,tools,run_dir;self.trace=run_dir/'trace.jsonl';self.checkpointer=InMemorySaver();g=StateGraph(DiagnosisGraphState)
-        g.add_node('observe',self.observe);g.add_node('hypothesize',self.hypothesize);g.add_node('plan',self.plan);g.add_node('execute',self.execute);g.add_node('evidence',self.evidence);g.add_node('reflect',self.reflect);g.add_node('finalize',self.finalize)
-        g.add_edge(START,'observe');g.add_conditional_edges('observe',lambda s:'finalize' if s['diagnosis_status']=='no_fault' else 'hypothesize',{'finalize':'finalize','hypothesize':'hypothesize'});g.add_edge('hypothesize','plan');g.add_conditional_edges('plan',lambda s:'finalize' if 'final' in (s.get('current_plan') or {}) else 'execute',{'finalize':'finalize','execute':'execute'});g.add_edge('execute','evidence');g.add_edge('evidence','reflect');g.add_conditional_edges('reflect',lambda s:'finalize' if s['diagnosis_status'] in {'validated_fault','no_fault','budget_exhausted'} else 'hypothesize',{'finalize':'finalize','hypothesize':'hypothesize'});g.add_edge('finalize',END);self.app=g.compile(checkpointer=self.checkpointer)
-    def log(self,node:str,**data:Any)->None:self.trace.open('a').write(json.dumps({'node':node,'timestamp':time.time(),**data})+'\n')
-    def observe(self,s:DiagnosisGraphState)->dict[str,Any]:
-        self.log('observe',initial=s['initial_observation'])
-        return {'diagnosis_status':'no_fault' if float(s['initial_observation'].get('agreement',0))>=s['quality_threshold'] else 'investigating'}
-    def hypothesize(self,s:DiagnosisGraphState)->dict[str,Any]:
-        if s.get('hypotheses'):return {}
-        hs=[{'hypothesis_id':'H1','description':'A systematic mismatch may be present.','category':'data_relationship','status':'active','confidence':.4,'evidence_for':[],'evidence_against':[]},{'hypothesis_id':'H2','description':'The observed disagreement may be within expected variation.','category':'normal_variation','status':'active','confidence':.3,'evidence_for':[],'evidence_against':[]}]
-        self.log('hypothesize',hypotheses=hs);return {'hypotheses':hs}
-    def plan(self,s:DiagnosisGraphState)->dict[str,Any]:
-        from .models import DiagnosisState
-        ds=DiagnosisState(s['case_id'],s['budget_total'],s['budget_remaining'],[s['initial_observation']],s.get('experiments',[]));action=self.agent.decide(ds,{**s['task'],'force_final':False})
-        if action.type=='final':
-            status='no_fault' if action.final and action.final.get('decision')=='no_fault' else 'budget_exhausted'
-            self.log('plan',selected_final=action.final,budget_remaining=s['budget_remaining'])
-            return {'current_plan':{'final':action.final},'diagnosis_status':status}
-        plan={'tool':action.tool,'arguments':action.arguments,'reason':action.reason,'target_hypotheses':['H1','H2']};self.log('plan',selected_experiment=plan,hypotheses=s['hypotheses'],budget_remaining=s['budget_remaining']);return {'current_plan':plan}
-    def execute(self,s:DiagnosisGraphState)->dict[str,Any]:
-        plan=s['current_plan']
-        if 'final' in plan:return {}
-        record=self.tools.execute(plan['tool'],plan['arguments']);self.log('execute',experiment_id=record['experiment_id'],backend=record['backend'],remote_host=record['remote_host'],remote_pid=record['remote_pid'],result=record['result']);return {'experiments':s.get('experiments',[])+[record],'latest_result':record,'budget_remaining':s['budget_remaining']-record['cost'],'steps_used':s['steps_used']+1}
-    def evidence(self,s:DiagnosisGraphState)->dict[str,Any]:
-        r=s.get('latest_result');
-        if not r:return {}
-        m=r['result'].get('metrics',{});e={'evidence_id':f"E{len(s.get('evidence',[]))+1:03d}",'experiment_id':r['experiment_id'],'statement':f"{r['tool']} produced agreement {m.get('agreement','n/a')}",'metrics':m,'supports':['H1'] if m.get('agreement',0)>=s['quality_threshold'] else [],'contradicts':[]};self.log('evidence',evidence=e);return {'evidence':s.get('evidence',[])+[e]}
-    def reflect(self,s:DiagnosisGraphState)->dict[str,Any]:
-        best=max((x['metrics'].get('agreement',0) for x in s.get('evidence',[])),default=0);status='validated_fault' if best>=s['quality_threshold'] else ('budget_exhausted' if s['steps_used']>=s['max_steps'] or s['budget_remaining']<=0 else 'needs_more_evidence');self.log('reflect',decision=status,best_agreement=best);return {'diagnosis_status':status}
-    def finalize(self,s:DiagnosisGraphState)->dict[str,Any]:
-        requested=(s.get('current_plan') or {}).get('final')
-        if s['diagnosis_status']=='no_fault' and isinstance(requested,dict): final=requested
+    """State transitions are auditable; model calls receive only public cognitive state."""
+    def __init__(self, agent: Any, tools: ExperimentTools, run_dir: Path) -> None:
+        self.agent, self.tools, self.run_dir = agent, tools, run_dir
+        self.trace = run_dir / "trace.jsonl"
+        self.checkpointer = InMemorySaver()
+        graph = StateGraph(DiagnosisGraphState)
+        for name, node in (("observe", self.observe), ("hypothesize", self.hypothesize), ("plan", self.plan), ("budget_check", self.budget_check), ("execute", self.execute), ("extract_evidence", self.extract_evidence), ("update_hypotheses", self.update_hypotheses), ("reflect", self.reflect), ("validation_gate", self.validation_gate), ("finalize", self.finalize)):
+            graph.add_node(name, node)
+        graph.add_edge(START, "observe")
+        graph.add_edge("observe", "hypothesize")
+        graph.add_edge("hypothesize", "plan")
+        graph.add_edge("plan", "budget_check")
+        graph.add_conditional_edges("budget_check", lambda s: "reflect" if s.get("budget_blocked") else "execute", {"reflect": "reflect", "execute": "execute"})
+        graph.add_edge("execute", "extract_evidence")
+        graph.add_edge("extract_evidence", "update_hypotheses")
+        graph.add_edge("update_hypotheses", "reflect")
+        graph.add_conditional_edges("reflect", lambda s: "plan" if s["diagnosis_status"] == "continue" else "validation_gate", {"plan": "plan", "validation_gate": "validation_gate"})
+        graph.add_conditional_edges("validation_gate", lambda s: "finalize" if s["diagnosis_status"] in {"accepted_fault", "accepted_no_fault", "budget_exhausted"} else "plan", {"finalize": "finalize", "plan": "plan"})
+        graph.add_edge("finalize", END)
+        self.app = graph.compile(checkpointer=self.checkpointer)
+
+    def log(self, node: str, **data: Any) -> None:
+        self.trace.open("a").write(json.dumps({"node": node, "timestamp": time.time(), **data}) + "\n")
+
+    @staticmethod
+    def _context(s: DiagnosisGraphState) -> dict[str, Any]:
+        return {"case_id": s["case_id"], "task": s["task"], "initial_observation": s["initial_observation"], "hypotheses": s.get("hypotheses", []), "evidence": s.get("evidence", []), "experiments": [{key: item.get(key) for key in ("experiment_id", "tool", "arguments", "cost", "result")} for item in s.get("experiments", [])], "budget_total": s["budget_total"], "budget_remaining": s["budget_remaining"], "tool_costs": COSTS, "quality_threshold": s["quality_threshold"], "steps_used": s["steps_used"], "max_steps": s["max_steps"]}
+
+    def observe(self, s: DiagnosisGraphState) -> dict[str, Any]:
+        self.log("observe", initial=s["initial_observation"])
+        return {"diagnosis_status": "investigating"}
+
+    def hypothesize(self, s: DiagnosisGraphState) -> dict[str, Any]:
+        context = self._context(s)
+        hypotheses = self.agent.generate_hypotheses(context) if not s.get("hypotheses") else s["hypotheses"]
+        self.log("hypothesize", hypotheses=hypotheses)
+        return {"hypotheses": hypotheses}
+
+    def plan(self, s: DiagnosisGraphState) -> dict[str, Any]:
+        plan = self.agent.plan_experiment(self._context(s))
+        if "final" in plan:
+            self.log("plan", selected_final=plan["final"])
+            return {"current_plan": plan, "diagnosis_status": "propose_no_fault"}
+        plan_id = f"PLAN{len(s.get('experiments', [])) + 1:03d}"
+        pipeline = plan.get("arguments", {}).get("pipeline", [])
+        estimated = COSTS[plan["tool"]] + (len(pipeline) if plan["tool"] == "evaluate_candidate" else 0)
+        plan = {"plan_id": plan_id, **plan, "estimated_cost": estimated}
+        self.log("plan", selected_experiment=plan)
+        return {"current_plan": plan}
+
+    def budget_check(self, s: DiagnosisGraphState) -> dict[str, Any]:
+        plan = s["current_plan"] or {}
+        blocked = "final" in plan or plan.get("estimated_cost", 0) > s["budget_remaining"] or s["steps_used"] >= s["max_steps"]
+        self.log("budget_check", plan_id=plan.get("plan_id"), estimated_cost=plan.get("estimated_cost", 0), budget_remaining=s["budget_remaining"], blocked=blocked)
+        return {"budget_blocked": blocked}
+
+    def execute(self, s: DiagnosisGraphState) -> dict[str, Any]:
+        plan = s["current_plan"] or {}
+        record = self.tools.execute(plan["tool"], plan["arguments"])
+        remaining = s["budget_remaining"] - record["cost"]
+        if remaining < 0: raise RuntimeError("budget guard failed before remote execution")
+        self.log("execute", plan_id=plan["plan_id"], experiment_id=record["experiment_id"], backend=record["backend"], remote_host=record["remote_host"], remote_pid=record["remote_pid"], result=record["result"])
+        return {"experiments": s.get("experiments", []) + [record], "latest_result": record, "budget_remaining": remaining, "steps_used": s["steps_used"] + 1}
+
+    def extract_evidence(self, s: DiagnosisGraphState) -> dict[str, Any]:
+        record = s["latest_result"]
+        metrics = record["result"].get("metrics", {})
+        baseline = agreement(s["initial_observation"])
+        observed = agreement(metrics)
+        delta = observed - baseline if baseline is not None and observed is not None else None
+        evidence_id = f"E{len(s.get('evidence', [])) + 1:03d}"
+        residual = max(0.0, s["quality_threshold"] - observed) if observed is not None else None
+        item = {"evidence_id": evidence_id, "experiment_id": record["experiment_id"], "baseline_metric": baseline, "observed_metric": observed, "delta": delta, "threshold": s["quality_threshold"], "residual_gap": residual, "valid_pixels": metrics.get("valid_pixels"), "valid_fraction": metrics.get("valid_fraction"), "interpretation": "Metric evidence pending hypothesis update.", "supports": [], "contradicts": []}
+        self.log("extract_evidence", evidence=item)
+        return {"evidence": s.get("evidence", []) + [item]}
+
+    def update_hypotheses(self, s: DiagnosisGraphState) -> dict[str, Any]:
+        context = self._context(s)
+        context["latest_evidence"] = s["evidence"][-1]
+        hypotheses = self.agent.update_hypotheses(context)
+        self.log("update_hypotheses", evidence_id=context["latest_evidence"]["evidence_id"], hypotheses=hypotheses)
+        return {"hypotheses": hypotheses}
+
+    def reflect(self, s: DiagnosisGraphState) -> dict[str, Any]:
+        best = max((item["observed_metric"] or 0.0 for item in s.get("evidence", [])), default=0.0)
+        context = self._context(s)
+        context.update({"best_metric": best, "budget_blocked": s.get("budget_blocked", False)})
+        reflection = self.agent.reflect(context)
+        decision = reflection["decision"]
+        if s.get("budget_blocked") or s["budget_remaining"] <= 0 or s["steps_used"] >= s["max_steps"]:
+            status = "propose_no_fault" if decision == "propose_no_fault" else "budget_exhausted"
         else:
-            best=max(s.get('experiments',[]),key=lambda x:x['result'].get('metrics',{}).get('agreement',0),default=None);final={'decision':'fault' if s['diagnosis_status']=='validated_fault' else 'no_fault','fault_family':'validated_candidate' if best else 'no_fault','root_cause':'evidence-backed candidate' if best else 'initial agreement meets quality threshold','confidence':.8,'evidence_experiment_ids':[best['experiment_id']] if best else [],'recommended_repair':best['arguments'] if best else {}}
-        self.log('finalize',final=final);return {'final_diagnosis':final}
-    def run(self,state:DiagnosisGraphState)->DiagnosisGraphState:
-        return self.app.invoke(state,{'configurable':{'thread_id':state['run_id']}})
+            status = decision
+        self.log("reflect", reflection=reflection, best_metric=best, status=status)
+        return {"reflection": reflection, "diagnosis_status": status, "budget_blocked": False}
+
+    def validation_gate(self, s: DiagnosisGraphState) -> dict[str, Any]:
+        best = max((item["observed_metric"] or 0.0 for item in s.get("evidence", [])), default=0.0)
+        proposed = s["diagnosis_status"]
+        if proposed == "propose_fault": status = "accepted_fault" if best >= s["quality_threshold"] else "continue"
+        elif proposed == "propose_no_fault": status = "accepted_no_fault"
+        else: status = "budget_exhausted"
+        self.log("validation_gate", proposed=proposed, best_metric=best, accepted=status)
+        return {"diagnosis_status": status}
+
+    def finalize(self, s: DiagnosisGraphState) -> dict[str, Any]:
+        experiments = s.get("experiments", [])
+        best = max(experiments, key=lambda item: agreement(item.get("result", {}).get("metrics", {})) or 0.0, default=None)
+        context = self._context(s)
+        context.update({"reflection": s.get("reflection"), "best_experiment": best, "allowed_evidence_ids": [item["experiment_id"] for item in experiments]})
+        final = self.agent.final_diagnosis(context)
+        self.log("finalize", final=final)
+        return {"final_diagnosis": final}
+
+    def run(self, state: DiagnosisGraphState) -> DiagnosisGraphState:
+        return self.app.invoke(state, {"configurable": {"thread_id": state["run_id"]}})

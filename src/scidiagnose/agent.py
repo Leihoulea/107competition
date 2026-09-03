@@ -28,6 +28,67 @@ class OpenAICompatibleAgent:
         self.settings=settings or Settings(); self.timeout=timeout; self.max_retries=max_retries
         if not (self.settings.base_url and self.settings.model_name and self.settings.api_key):
             raise AgentAPIError("SCIDIAG_BASE_URL, SCIDIAG_MODEL_NAME, and SCIDIAG_API_KEY are required for API mode")
+
+    def _request_json(self, request_name: str, context: dict[str, Any], response_schema: dict[str, Any]) -> dict[str, Any]:
+        """Send a concise structured cognitive request; hidden case files never enter context."""
+        visible = {"request": request_name, "context": context, "response_schema": response_schema}
+        payload={"model":self.settings.model_name,"messages":[{"role":"system","content":SYSTEM_PROMPT},{"role":"user","content":json.dumps(visible)}],"temperature":0,"response_format":{"type":"json_object"}}
+        url=self.settings.base_url.rstrip("/")+"/chat/completions"; body=json.dumps(payload).encode(); req=request.Request(url,body,headers={"Authorization":f"Bearer {self.settings.api_key}","Content-Type":"application/json"},method="POST")
+        for attempt in range(self.max_retries + 1):
+            try:
+                with request.urlopen(req,timeout=self.timeout) as response: data=json.loads(response.read())
+                raw=data["choices"][0]["message"]["content"]
+                value=json.loads(raw)
+                if not isinstance(value,dict): raise ValueError("response must be a JSON object")
+                return value
+            except error.HTTPError as exc:
+                if exc.code in {429,500,502,503,504} and attempt < self.max_retries:
+                    time.sleep(2 ** attempt); continue
+                raise AgentAPIError(f"School LLM API request failed: {exc}") from exc
+            except (error.URLError,json.JSONDecodeError,KeyError,IndexError,TypeError,ValueError) as exc:
+                raise AgentAPIError(f"School LLM API returned invalid structured output: {exc}") from exc
+
+    @staticmethod
+    def _hypotheses(value: dict[str, Any], existing: list[dict[str, Any]] | None = None) -> list[dict[str, Any]]:
+        raw=value.get("hypotheses")
+        if not isinstance(raw,list) or not 2 <= len(raw) <= 5: raise AgentAPIError("model must provide 2 to 5 hypotheses")
+        prior={item["hypothesis_id"] for item in existing or []}; result=[]
+        for index,item in enumerate(raw,1):
+            if not isinstance(item,dict): raise AgentAPIError("hypothesis must be an object")
+            hypothesis_id=str(item.get("hypothesis_id") or (f"H{index:03d}" if not prior else next(iter(prior))))
+            status=item.get("status","active")
+            if status not in {"active","supported","weakened","rejected","validated"}: status="active"
+            result.append({"hypothesis_id":hypothesis_id,"category":str(item.get("category","unspecified")),"description":str(item.get("description","Plausible explanation requiring evidence.")),"status":status,"confidence":max(0.0,min(1.0,float(item.get("confidence",.5)))),"evidence_for":[str(x) for x in item.get("evidence_for",[])],"evidence_against":[str(x) for x in item.get("evidence_against",[])]})
+        return result
+
+    def generate_hypotheses(self, context: dict[str, Any]) -> list[dict[str, Any]]:
+        schema={"hypotheses":[{"hypothesis_id":"H001","category":"short label","description":"concise explanation","status":"active","confidence":0.5,"evidence_for":[],"evidence_against":[]}]}
+        return self._hypotheses(self._request_json("generate competing hypotheses",context,schema))
+
+    def update_hypotheses(self, context: dict[str, Any]) -> list[dict[str, Any]]:
+        schema={"hypotheses":[{"hypothesis_id":"existing ID","category":"short label","description":"concise explanation","status":"supported|weakened|rejected|validated|active","confidence":0.5,"evidence_for":["E001"],"evidence_against":[]}]}
+        return self._hypotheses(self._request_json("update competing hypotheses using the latest evidence",context,schema), context.get("hypotheses"))
+
+    def plan_experiment(self, context: dict[str, Any]) -> dict[str, Any]:
+        schema={"objective":"distinguish named hypotheses","target_hypotheses":["H001"],"experiment":{"tool":"one allowed tool","arguments":{}},"expected_evidence":"short measurable outcome"}
+        value=self._request_json("select one cost-aware diagnostic experiment",context,schema)
+        experiment=value.get("experiment",value)
+        action=self._validate({"type":"tool_call","tool":experiment.get("tool"),"arguments":experiment.get("arguments",{}),"reason":value.get("objective",value.get("reason",""))})
+        valid={item["hypothesis_id"] for item in context["hypotheses"]}
+        targets=[item for item in value.get("target_hypotheses",[]) if item in valid] or list(valid)
+        return {"objective":str(value.get("objective",action.reason)),"target_hypotheses":targets,"tool":action.tool,"arguments":action.arguments,"expected_evidence":str(value.get("expected_evidence","Measure evidence that distinguishes the target hypotheses."))}
+
+    def reflect(self, context: dict[str, Any]) -> dict[str, Any]:
+        schema={"decision":"continue|propose_fault|propose_no_fault","best_hypothesis_id":"H001 or null","unresolved_questions":["short question"],"summary":"short evidence summary"}
+        value=self._request_json("reflect on hypotheses and evidence",context,schema)
+        decision=value.get("decision")
+        if decision not in {"continue","propose_fault","propose_no_fault"}: raise AgentAPIError("reflection decision is invalid")
+        return {"decision":decision,"best_hypothesis_id":value.get("best_hypothesis_id"),"unresolved_questions":[str(x) for x in value.get("unresolved_questions",[])],"summary":str(value.get("summary",""))}
+
+    def final_diagnosis(self, context: dict[str, Any]) -> dict[str, Any]:
+        schema={"decision":"fault|no_fault","fault_family":"canonical category","root_cause":"concise evidence-based statement","confidence":0.0,"evidence_experiment_ids":["EXP_001"],"recommended_repair":{},"remaining_uncertainty":[]}
+        value=self._request_json("produce the final evidence-backed diagnosis",context,schema)
+        return self._validate({"type":"final","final":value}).final or {}
     def decide(self,state:DiagnosisState,task:dict[str,object])->AgentAction:
         schema={"type":"tool_call|final","tool":"inspect|compare|transform_and_compare|shift_and_compare|evaluate_candidate (tool_call only)","arguments":{},"reason":"short evidence-based rationale","final":{"decision":"fault|no_fault","fault_family":"string","root_cause":"string","confidence":"0..1","evidence_experiment_ids":["EXP_001"],"recommended_repair":{}}}
         visible={"task":task,"state":{"case_id":state.case_id,"budget_remaining":state.budget_remaining,"observations":state.observations,"experiments":[{"experiment_id":x["experiment_id"],"tool":x["tool"],"arguments":x["arguments"],"result":x["result"]} for x in state.experiments]},"action_schema":schema}
@@ -105,6 +166,24 @@ class OpenAICompatibleAgent:
         return {"dr":dr,"dc":dc}
 class ManualAgent:
     """Deterministic demonstration policy that reacts only to visible experiment evidence."""
+    def generate_hypotheses(self, context: dict[str, Any]) -> list[dict[str, Any]]:
+        return [{"hypothesis_id":"H001","category":"systematic_mismatch","description":"A repeatable discrepancy may affect the computation.","status":"active","confidence":.5,"evidence_for":[],"evidence_against":[]},{"hypothesis_id":"H002","category":"normal_variation","description":"The observation may be consistent with expected variation.","status":"active","confidence":.4,"evidence_for":[],"evidence_against":[]}]
+    def update_hypotheses(self, context: dict[str, Any]) -> list[dict[str, Any]]:
+        evidence=context["latest_evidence"]; updated=[dict(item) for item in context["hypotheses"]]
+        if (evidence.get("delta") or 0) > 0:
+            updated[0]={**updated[0],"status":"supported","confidence":.7,"evidence_for":updated[0]["evidence_for"]+[evidence["evidence_id"]]}
+        return updated
+    def plan_experiment(self, context: dict[str, Any]) -> dict[str, Any]:
+        from .models import DiagnosisState
+        action=self.decide(DiagnosisState(context["case_id"],context["budget_total"],context["budget_remaining"],[context["initial_observation"]],context["experiments"]),context["task"])
+        if action.type=="final": return {"final":action.final}
+        return {"objective":action.reason,"target_hypotheses":[item["hypothesis_id"] for item in context["hypotheses"] if item["status"] in {"active","supported"}],"tool":action.tool,"arguments":action.arguments,"expected_evidence":"A measurable result will distinguish the active hypotheses."}
+    def reflect(self, context: dict[str, Any]) -> dict[str, Any]:
+        best=context["best_metric"]
+        return {"decision":"propose_fault" if best>=context["quality_threshold"] else "continue","best_hypothesis_id":"H001","unresolved_questions":[],"summary":"Deterministic demonstration reflection."}
+    def final_diagnosis(self, context: dict[str, Any]) -> dict[str, Any]:
+        best=context.get("best_experiment")
+        return {"decision":"fault" if best else "no_fault","fault_family":"validated_candidate" if best else "no_fault","root_cause":"A real candidate experiment supplied the final evidence." if best else "No fault evidence was validated.","confidence":.8,"evidence_experiment_ids":[best["experiment_id"]] if best else [],"recommended_repair":best["arguments"] if best else {}}
     def decide(self,state:DiagnosisState,task:dict[str,object])->AgentAction:
         if not state.experiments: return AgentAction("tool_call","inspect",reason="Establish array structure and value ranges before testing hypotheses.")
         if len(state.experiments)==1: return AgentAction("tool_call","transform_and_compare",{"operation":"rot180"},"Test one general 2-D transform and measure whether agreement changes materially.")
