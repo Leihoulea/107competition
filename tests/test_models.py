@@ -8,3 +8,14 @@ def test_api_action_normalization():
     assert OpenAICompatibleAgent._validate({"action":"final","decision":"fault","fault_family":"spatial_alignment","root_cause":"orientation","confidence":.9,"evidence_experiment_ids":["EXP_001"],"recommended_repair":{}}).type == "final"
     assert OpenAICompatibleAgent._validate({"type":"json_object","tool":"shift_and_compare","arguments":{"dr":-1,"dc":0}}).arguments == {"dr":-1,"dc":0}
     assert OpenAICompatibleAgent._validate({"type":"tool_call","tool":"evaluate_candidate","arguments":{"pipeline":[{"operation":"shift","dr":0,"dc":1}]}}).arguments == {"pipeline":[{"type":"shift","dr":0,"dc":1}]}
+
+
+def test_structured_envelopes_are_unwrapped(monkeypatch):
+    class Settings: base_url="http://example.invalid"; model_name="test"; api_key="test"
+    agent = OpenAICompatibleAgent(Settings())
+    class Response:
+        def __enter__(self): return self
+        def __exit__(self, *args): return False
+        def read(self): return b'{"choices":[{"message":{"content":"{\\"type\\":\\"json_object\\",\\"obj\\":{\\"answer\\":1}}"}}]}'
+    monkeypatch.setattr("scidiagnose.agent.request.urlopen", lambda *args, **kwargs: Response())
+    assert agent._request_json("test", {}, {}) == {"answer": 1}

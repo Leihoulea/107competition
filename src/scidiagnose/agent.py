@@ -15,6 +15,9 @@ Use real computational experiments to distinguish competing hypotheses.
 Choose experiments based on their expected diagnostic value, prior evidence, and computational cost.
 After every executed experiment, reassess the hypotheses.
 A partial improvement is evidence, but it does not necessarily identify the complete root cause.
+An experiment directly tests only its stated candidate; do not generalize one inconclusive result
+to a broader explanation without supporting evidence. Prefer a materially different experiment
+over a near-duplicate when prior results have low diagnostic value.
 Do not assume that every anomaly implies a fault. A scientifically valid conclusion may be no_fault.
 Never claim an experiment, metric, document, or evidence item that is not present in the provided state.
 Only use evidence produced by executed experiments. Do not expose hidden reasoning.
@@ -40,11 +43,21 @@ class OpenAICompatibleAgent:
                 raw=data["choices"][0]["message"]["content"]
                 value=json.loads(raw)
                 if not isinstance(value,dict): raise ValueError("response must be a JSON object")
+                # School models sometimes wrap any structured payload in a generic envelope.
+                if value.get("type") == "json_object":
+                    for key in ("obj", "data", "result"):
+                        if isinstance(value.get(key), dict):
+                            value = value[key]
+                            break
                 return value
             except error.HTTPError as exc:
                 if exc.code in {429,500,502,503,504} and attempt < self.max_retries:
                     time.sleep(2 ** attempt); continue
                 raise AgentAPIError(f"School LLM API request failed: {exc}") from exc
+            except OSError as exc:
+                if attempt < self.max_retries:
+                    time.sleep(2 ** attempt); continue
+                raise AgentAPIError(f"School LLM API transport failed: {exc}") from exc
             except (error.URLError,json.JSONDecodeError,KeyError,IndexError,TypeError,ValueError) as exc:
                 raise AgentAPIError(f"School LLM API returned invalid structured output: {exc}") from exc
 
@@ -67,13 +80,16 @@ class OpenAICompatibleAgent:
 
     def update_hypotheses(self, context: dict[str, Any]) -> list[dict[str, Any]]:
         schema={"hypotheses":[{"hypothesis_id":"existing ID","category":"short label","description":"concise explanation","status":"supported|weakened|rejected|validated|active","confidence":0.5,"evidence_for":["E001"],"evidence_against":[]}]}
-        return self._hypotheses(self._request_json("update competing hypotheses using the latest evidence",context,schema), context.get("hypotheses"))
+        return self._hypotheses(self._request_json("update competing hypotheses using the latest evidence; link each change to the tested candidate and do not overgeneralize an inconclusive result",context,schema), context.get("hypotheses"))
 
     def plan_experiment(self, context: dict[str, Any]) -> dict[str, Any]:
-        schema={"objective":"distinguish named hypotheses","target_hypotheses":["H001"],"experiment":{"tool":"one allowed tool","arguments":{}},"expected_evidence":"short measurable outcome"}
+        schema={"objective":"distinguish named hypotheses","target_hypotheses":["H001"],"experiment":{"tool":"inspect|compare|transform_and_compare|shift_and_compare|evaluate_candidate","arguments":"inspect/compare use {}; transform requires operation in identity,flip_x,flip_y,rot90,rot180,rot270,transpose; shift requires integer dr and dc in [-5,5]; evaluate_candidate requires pipeline of 0-4 steps, each transform or shift using the same fields"},"expected_evidence":"short measurable outcome"}
         value=self._request_json("select one cost-aware diagnostic experiment",context,schema)
         experiment=value.get("experiment",value)
-        action=self._validate({"type":"tool_call","tool":experiment.get("tool"),"arguments":experiment.get("arguments",{}),"reason":value.get("objective",value.get("reason",""))})
+        try:
+            action=self._validate({"type":"tool_call","tool":experiment.get("tool"),"arguments":experiment.get("arguments",{}),"reason":value.get("objective",value.get("reason",""))})
+        except (AttributeError, ValueError) as exc:
+            raise AgentAPIError(f"Planner returned an invalid experiment contract: {exc}; payload={json.dumps(value)[:1200]}") from exc
         valid={item["hypothesis_id"] for item in context["hypotheses"]}
         targets=[item for item in value.get("target_hypotheses",[]) if item in valid] or list(valid)
         return {"objective":str(value.get("objective",action.reason)),"target_hypotheses":targets,"tool":action.tool,"arguments":action.arguments,"expected_evidence":str(value.get("expected_evidence","Measure evidence that distinguishes the target hypotheses."))}

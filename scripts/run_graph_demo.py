@@ -3,8 +3,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 import time
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
 
 from scidiagnose.agent import AgentAPIError, ManualAgent, OpenAICompatibleAgent
 from scidiagnose.config import Settings
@@ -13,18 +17,20 @@ from scidiagnose.experiment_tools import ExperimentTools
 from scidiagnose.ssh_executor import RemoteExecutionError, SSHDirectExecutor
 
 
-ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser()
 parser.add_argument("--case", default="b02")
 parser.add_argument("--host")
 parser.add_argument("--agent", choices=["manual", "api"], default="manual")
 parser.add_argument("--max-steps", type=int, default=8)
+parser.add_argument("--run-id", help="Optional stable run directory name under runs/.")
 args = parser.parse_args()
 
 case = ROOT / "cases" / args.case
 task = json.loads((case / "task.json").read_text())
 initial = json.loads((case / "initial_result.json").read_text())
-run = ROOT / "runs" / f"RUN_{task['case_id']}_GRAPH_{int(time.time())}"
+run = ROOT / "runs" / (args.run_id or f"RUN_{task['case_id']}_GRAPH_{int(time.time())}")
+if run.exists():
+    raise SystemExit(f"Run directory already exists: {run}")
 run.mkdir(parents=True)
 
 try:

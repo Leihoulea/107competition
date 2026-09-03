@@ -35,7 +35,7 @@ class SSHDirectExecutor(ComputeExecutor):
             raise RemoteExecutionError(result.stderr.strip() or result.stdout.strip() or f"command failed ({result.returncode})")
         return result
     def _ssh(self, command: str, check: bool = True, retries: int = 1) -> subprocess.CompletedProcess[str]:
-        """Retry idempotent SSH commands once; never retry a task submission."""
+        """Retry idempotent SSH commands once."""
         args=["ssh", *self._connection_options(), self.settings.remote_host, command]
         for attempt in range(retries + 1):
             try:
@@ -77,8 +77,10 @@ class SSHDirectExecutor(ComputeExecutor):
         if not command or any(not isinstance(v, str) for v in command): raise ValueError("command must be a non-empty list of strings")
         directory = self.create_job_dir(experiment_id)
         if any(not re.fullmatch(r"[A-Za-z0-9_./~$=-]+", value) for value in command): raise ValueError("command contains unsupported characters")
-        # Retrying after an uncertain submit could create duplicate experiments.
-        output = self._ssh(f"cd {directory}; nohup {' '.join(command)} > stdout.log 2> stderr.log < /dev/null & echo $!", retries=0).stdout.strip()
+        # A durable PID marker makes retrying an interrupted SSH response safe: a retry
+        # returns the already-started task instead of launching a duplicate task.
+        launch = f"cd {directory}; if test -s remote.pid; then cat remote.pid; else nohup {' '.join(command)} > stdout.log 2> stderr.log < /dev/null & pid=$!; echo $pid > remote.pid; echo $pid; fi"
+        output = self._ssh(launch, retries=1).stdout.strip()
         pid = output.splitlines()[-1] if output else ""
         if not pid.isdigit(): raise RemoteExecutionError(f"Could not parse remote PID from: {output!r}")
         return JobHandle(experiment_id, "ssh_direct", self.settings.remote_host, int(pid), directory)
