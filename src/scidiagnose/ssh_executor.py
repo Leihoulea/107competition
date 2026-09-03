@@ -108,7 +108,10 @@ class SSHDirectExecutor(ComputeExecutor):
         raise TimeoutError(f"Timed out waiting for {job.job_id}{suffix}")
     def logs(self, job: JobHandle, tail: int = 100) -> tuple[str, str]:
         if tail < 1: raise ValueError("tail must be positive")
-        return (self._ssh(f"tail -n {tail} {job.job_dir}/stdout.log", False).stdout, self._ssh(f"tail -n {tail} {job.job_dir}/stderr.log", False).stdout)
+        try:
+            return (self._ssh(f"tail -n {tail} {job.job_dir}/stdout.log", False).stdout, self._ssh(f"tail -n {tail} {job.job_dir}/stderr.log", False).stdout)
+        except RemoteExecutionError as exc:
+            return ("", f"log retrieval unavailable: {exc}")
     def _json(self, path: str) -> dict[str, Any]:
         try: return json.loads(self._ssh(f"cat {path}").stdout)
         except json.JSONDecodeError as exc: raise RemoteExecutionError(f"Invalid remote JSON: {path}") from exc

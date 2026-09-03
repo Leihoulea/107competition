@@ -62,9 +62,9 @@ class OpenAICompatibleAgent:
                 raise AgentAPIError(f"School LLM API returned invalid structured output: {exc}") from exc
 
     @staticmethod
-    def _hypotheses(value: dict[str, Any], existing: list[dict[str, Any]] | None = None) -> list[dict[str, Any]]:
+    def _hypotheses(value: dict[str, Any], existing: list[dict[str, Any]] | None = None, minimum: int = 2) -> list[dict[str, Any]]:
         raw=value.get("hypotheses")
-        if not isinstance(raw,list) or not 2 <= len(raw) <= 5: raise AgentAPIError("model must provide 2 to 5 hypotheses")
+        if not isinstance(raw,list) or not minimum <= len(raw) <= 5: raise AgentAPIError(f"model must provide {minimum} to 5 hypotheses")
         prior={item["hypothesis_id"] for item in existing or []}; result=[]
         for index,item in enumerate(raw,1):
             if not isinstance(item,dict): raise AgentAPIError("hypothesis must be an object")
@@ -80,11 +80,13 @@ class OpenAICompatibleAgent:
 
     def update_hypotheses(self, context: dict[str, Any]) -> list[dict[str, Any]]:
         schema={"hypotheses":[{"hypothesis_id":"existing ID","category":"short label","description":"concise explanation","status":"supported|weakened|rejected|validated|active","confidence":0.5,"evidence_for":["E001"],"evidence_against":[]}]}
-        return self._hypotheses(self._request_json("update competing hypotheses using the latest evidence; link each change to the tested candidate and do not overgeneralize an inconclusive result",context,schema), context.get("hypotheses"))
+        existing=context.get("hypotheses",[]); updates=self._hypotheses(self._request_json("update competing hypotheses using the latest evidence; link each change to the tested candidate and do not overgeneralize an inconclusive result",context,schema), existing, minimum=1)
+        by_id={item["hypothesis_id"]:item for item in updates}
+        return [by_id.get(item["hypothesis_id"],item) for item in existing] + [item for item in updates if item["hypothesis_id"] not in {old["hypothesis_id"] for old in existing}]
 
     def plan_experiment(self, context: dict[str, Any]) -> dict[str, Any]:
         schema={"objective":"distinguish named hypotheses","target_hypotheses":["H001"],"experiment":{"tool":"inspect|compare|transform_and_compare|shift_and_compare|evaluate_candidate","arguments":"inspect/compare use {}; transform requires operation in identity,flip_x,flip_y,rot90,rot180,rot270,transpose; shift requires integer dr and dc in [-5,5]; evaluate_candidate requires pipeline of 0-4 steps, each transform or shift using the same fields"},"expected_evidence":"short measurable outcome"}
-        value=self._request_json("select one cost-aware diagnostic experiment",context,schema)
+        value=self._request_json("select one cost-aware diagnostic experiment. Do not repeat an already executed tool with identical arguments; choose a new experiment that can distinguish currently active hypotheses.",context,schema)
         experiment=value.get("experiment",value)
         try:
             action=self._validate({"type":"tool_call","tool":experiment.get("tool"),"arguments":experiment.get("arguments",{}),"reason":value.get("objective",value.get("reason",""))})
