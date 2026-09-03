@@ -1,6 +1,9 @@
 {
   "process_status": "COMPLETED",
   "exit_code": 0,
-  "agreement": 0.573272705078125,
-  "valid_pixels": 65536
+  "agreement": 0.5561022840907287,
+  "agreement_all": 0.573272705078125,
+  "agreement_valid": 0.5561022840907287,
+  "valid_pixels": 63001,
+  "valid_fraction": 0.9613189697265625
 }
