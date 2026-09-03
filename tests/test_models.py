@@ -6,3 +6,5 @@ def test_api_action_normalization():
     assert OpenAICompatibleAgent._validate({"tool_name":"inspect","args":{}}).tool == "inspect"
     assert OpenAICompatibleAgent._validate({"tool":"transform_and_compare","arguments":{"transform":"transpose"}}).arguments == {"operation":"transpose"}
     assert OpenAICompatibleAgent._validate({"action":"final","decision":"fault","fault_family":"spatial_alignment","root_cause":"orientation","confidence":.9,"evidence_experiment_ids":["EXP_001"],"recommended_repair":{}}).type == "final"
+    assert OpenAICompatibleAgent._validate({"type":"json_object","tool":"shift_and_compare","arguments":{"dr":-1,"dc":0}}).arguments == {"dr":-1,"dc":0}
+    assert OpenAICompatibleAgent._validate({"type":"tool_call","tool":"evaluate_candidate","arguments":{"pipeline":[{"operation":"shift","dr":0,"dc":1}]}}).arguments == {"pipeline":[{"type":"shift","dr":0,"dc":1}]}
