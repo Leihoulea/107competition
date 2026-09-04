@@ -50,6 +50,18 @@ class SSHDirectExecutor(ComputeExecutor):
     def check_connection(self) -> dict[str, Any]:
         result = self._ssh("hostname", False)
         return {"ok": result.returncode == 0, "hostname": result.stdout.strip(), "error": result.stderr.strip()}
+    def warm_connection(self, attempts: int = 3) -> None:
+        """Re-establish an idle campus SSH path before uploads or job submission."""
+        if attempts < 1: raise ValueError("attempts must be positive")
+        last_error: RemoteExecutionError | None = None
+        for attempt in range(attempts):
+            try:
+                self._ssh("true", retries=0)
+                return
+            except RemoteExecutionError as exc:
+                last_error = exc
+                if attempt + 1 < attempts: time.sleep(3 * (attempt + 1))
+        raise RemoteExecutionError(f"SSH connection did not recover after {attempts} warm-up attempts: {last_error}")
     def probe(self) -> dict[str, Any]:
         commands = {"hostname":"hostname", "uname":"uname -a", "os_release":"cat /etc/os-release", "python3":"command -v python3", "python_version":"python3 --version", "pip3":"command -v pip3", "conda":"command -v conda", "micromamba":"command -v micromamba", "nvidia_smi":"command -v nvidia-smi", "cpu":"lscpu", "memory":"free -h", "home_disk":"df -h \"$HOME\"", "numpy":f"{self._python} -c 'import numpy; print(numpy.__version__)'"}
         info = {key:self._ssh(command, False).stdout.strip() or "NOT_AVAILABLE" for key, command in commands.items()}

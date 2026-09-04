@@ -14,6 +14,7 @@ class ExperimentTools:
     def _ensure_data(self) -> None:
         if self.uploaded:return
         if not isinstance(self.executor,SSHDirectExecutor): raise NotImplementedError("ExperimentTools remote workflow currently requires SSHDirectExecutor")
+        self.executor.warm_connection()
         base=f"{self.executor.workspace}/inputs/{self.case_dir.name}"; self.executor._ssh(f"mkdir -p {base}")
         for name in ("reference.npy","target_faulty.npy","target_valid.npy"):
             path=self.case_dir/"public"/"data"/name
