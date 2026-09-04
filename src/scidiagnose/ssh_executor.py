@@ -77,7 +77,7 @@ class SSHDirectExecutor(ComputeExecutor):
         if not _EXP.fullmatch(experiment_id): raise ValueError("experiment_id must contain only letters, digits, _ or -")
         return f"{self._workspace}/jobs/{experiment_id}"
     def create_job_dir(self, experiment_id: str) -> str:
-        directory = self.job_dir(experiment_id); self._ssh(f"mkdir -p {directory}"); return directory
+        directory = self.job_dir(experiment_id); self._ssh(f"mkdir -p {directory}", retries=3); return directory
     def upload(self, local_path: str | Path, remote_path: str) -> None:
         path = Path(local_path)
         if not path.is_file(): raise FileNotFoundError(f"Local file does not exist: {path}")
