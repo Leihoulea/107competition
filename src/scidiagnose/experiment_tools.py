@@ -33,14 +33,32 @@ class ExperimentTools:
                 continue
         observations = [item.get("compute_observation", {}) for item in records]
         terminal = sum(item.get("lifecycle_state") in {"COMPLETED", "FAILED"} for item in observations)
+        compute = [item.get("compute_metrics", {}) for item in observations]
+        def numeric(metrics: dict[str, Any], key: str) -> float:
+            value = metrics.get(key, 0)
+            return float(value) if isinstance(value, (int, float)) else 0.0
+        total_wall = sum(numeric(metrics, "wall_seconds") for metrics in compute)
+        total_cpu = sum(
+            numeric(metrics, "user_cpu_seconds") + numeric(metrics, "system_cpu_seconds")
+            if "user_cpu_seconds" in metrics or "system_cpu_seconds" in metrics
+            else numeric(metrics, "process_cpu_seconds")
+            for metrics in compute
+        )
+        peak_memory_mib = max((numeric(metrics, "max_rss_kib") / 1024 for metrics in compute), default=0.0)
+        experiments = [{"experiment_id": item.get("experiment_id"), "status": item.get("status"), "compute_observation": item.get("compute_observation", {})} for item in records]
         summary = {
             "schema_version": "1",
             "experiment_count": len(records),
             "terminal_observation_count": terminal,
             "status_counts": {state: sum(item.get("status") == state for item in records) for state in ("COMPLETED", "FAILED", "RUNNING")},
+            "budget_units_used": sum(int(item.get("cost", 0)) for item in records),
             "total_cost": sum(int(item.get("cost", 0)) for item in records),
+            "total_wall_seconds": round(total_wall, 6),
+            "total_cpu_seconds": round(total_cpu, 6),
+            "peak_memory_mb": round(peak_memory_mib, 6),
             "site_profiles": sorted({json.dumps(item.get("site_profile", {}), sort_keys=True) for item in observations}),
-            "experiments": [{"experiment_id": item.get("experiment_id"), "status": item.get("status"), "compute_observation": item.get("compute_observation", {})} for item in records],
+            "experiments": experiments,
+            "remote_jobs": [{"job_id": item.get("job_id"), "backend": item.get("backend"), "remote_pid": item.get("remote_pid"), "status": item.get("status"), "lifecycle_state": item.get("compute_observation", {}).get("lifecycle_state"), "lifecycle": item.get("compute_observation", {}).get("compute_metrics", {}).get("lifecycle", [])} for item in records],
         }
         # Convert the set-friendly representation back to JSON objects.
         summary["site_profiles"] = [json.loads(item) for item in summary["site_profiles"]]
@@ -51,13 +69,13 @@ class ExperimentTools:
             pipeline=(arguments or {}).get("pipeline")
             if not isinstance(pipeline,list) or len(pipeline)>4: raise ValueError("pipeline must contain 0 to 4 steps")
         self.count+=1; exp_id=f"EXP_{self.count:03d}"; request=ExperimentRequest(exp_id,tool,arguments or {}); local=self.run_dir/"experiments"/f"{exp_id}.request.json"; local.write_text(json.dumps(request.to_dict(),indent=2))
-        self._ensure_data(); assert isinstance(self.executor,SSHDirectExecutor); remote_exp_id=f"{self.run_dir.name}_{exp_id}"; job_dir=self.executor.create_job_dir(remote_exp_id); self.executor.upload(local,f"{job_dir}/experiment.json")
+        self._ensure_data(); assert isinstance(self.executor,SSHDirectExecutor); remote_exp_id=f"{self.run_dir.name}_{exp_id}"; job_dir=self.executor.create_job_dir(remote_exp_id); upload_started=time.monotonic(); self.executor.upload(local,f"{job_dir}/experiment.json"); upload_seconds=time.monotonic()-upload_started
         job=self.executor.submit(remote_exp_id,[self.executor.remote_python,f"{self.executor.workspace}/scripts/run_experiment.py","--input-dir",f"{self.executor.workspace}/inputs/{self.case_dir.name}","--experiment-json","experiment.json","--output-json","result.json"])
-        status=self.executor.wait(job,callback=lambda s: print("Status:",s)); stdout,stderr=self.executor.logs(job)
-        result=self.executor.fetch_result(job) if status=="COMPLETED" else self.executor.fetch_failure(job)
+        wait_started=time.monotonic(); status=self.executor.wait(job,callback=lambda s: print("Status:",s)); wait_seconds=time.monotonic()-wait_started; stdout,stderr=self.executor.logs(job)
+        fetch_started=time.monotonic(); result=self.executor.fetch_result(job) if status=="COMPLETED" else self.executor.fetch_failure(job); result_fetch_seconds=time.monotonic()-fetch_started
         cost=COSTS[tool]+(len((arguments or {}).get("pipeline",[])) if tool=="evaluate_candidate" else 0)
         observation = self.executor.observe(job).to_dict()
-        observation["compute_metrics"] = {**observation["compute_metrics"], **result.get("compute_metrics", {})}
+        observation["compute_metrics"] = {**observation["compute_metrics"], **result.get("compute_metrics", {}), "executor_durations_seconds": {"upload": round(upload_seconds, 6), "wait": round(wait_seconds, 6), "result_fetch": round(result_fetch_seconds, 6)}}
         observation["scientific_metrics"] = result.get("scientific_metrics", {})
         record={"experiment_id":exp_id,"tool":tool,"arguments":arguments or {},"backend":job.backend,"remote_host":job.remote_host,"remote_pid":job.remote_pid,"job_id":job.job_id,"status":status,"cost":cost,"result":result,"compute_observation":observation,"stdout":stdout,"stderr":stderr}; (self.run_dir/"experiments"/f"{exp_id}.json").write_text(json.dumps(record,indent=2)); self._write_compute_summary(); return record
     def inspect(self)->dict[str,Any]: return self.execute("inspect")

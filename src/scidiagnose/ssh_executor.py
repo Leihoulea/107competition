@@ -17,11 +17,20 @@ class SSHDirectExecutor(ComputeExecutor):
         self._workspace = self._safe(self.settings.remote_workspace, "path")
         self._python = self._safe(self.settings.remote_python, "Python path")
         self._lifecycle: dict[str, list[dict[str, Any]]] = {}
+        self._lifecycle_timestamps: dict[str, dict[str, float]] = {}
 
     def _record_lifecycle(self, job_id: str, state: str) -> None:
         events = self._lifecycle.setdefault(job_id, [])
+        now = time.time()
         if not events or events[-1]["state"] != state:
-            events.append({"state": state, "observed_at": time.time()})
+            events.append({"state": state, "observed_at": now})
+        timestamps = self._lifecycle_timestamps.setdefault(job_id, {})
+        if state == "SUBMITTED":
+            timestamps.setdefault("submit_timestamp", now)
+        elif state == "RUNNING":
+            timestamps.setdefault("start_timestamp", now)
+        elif state in self.TERMINAL_STATES:
+            timestamps.setdefault("finish_timestamp", now)
 
     def anonymous_site_profile(self) -> dict[str, str]:
         """Return a stable site token without exposing an SSH alias or hostname."""
@@ -146,7 +155,7 @@ class SSHDirectExecutor(ComputeExecutor):
             backend=job.backend,
             lifecycle_state=state,
             remote_pid=job.remote_pid,
-            compute_metrics={"lifecycle": list(self._lifecycle.get(job.job_id, []))},
+            compute_metrics={"lifecycle": list(self._lifecycle.get(job.job_id, [])), **self._lifecycle_timestamps.get(job.job_id, {})},
             site_profile=self.anonymous_site_profile(),
         )
     def _json(self, path: str) -> dict[str, Any]:
