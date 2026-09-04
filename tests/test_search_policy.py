@@ -112,6 +112,32 @@ def test_api_policy_preserves_ranked_top_k_candidate_contract():
     assert planned["candidate_plans"][1]["tested_scope"] == ["scope-b"]
 
 
+def test_invalid_top_k_candidate_is_filtered_before_selecting_valid_candidate():
+    agent = object.__new__(OpenAICompatibleAgent)
+    agent._request_json = lambda *args: {"candidates": [
+        {"objective": "invalid", "target_hypotheses": ["H001"], "experiment": {"tool": "shift_and_compare", "arguments": {"shifts": [[1, 0]]}}},
+        {"objective": "valid", "target_hypotheses": ["H001"], "tested_scope": ["scope-a"], "experiment": {"tool": "inspect", "arguments": {}}},
+    ]}
+    planned = agent.plan_experiment({"hypotheses": state()["hypotheses"]})
+    assert planned["tool"] == "inspect"
+    assert planned["rejected_candidates"] == [{"rank": 1, "reason": "shift dr and dc must be integers in [-5, 5]"}]
+
+
+def test_all_invalid_candidates_get_one_contract_correction():
+    agent = object.__new__(OpenAICompatibleAgent)
+    calls = []
+    def request(name, context, schema):
+        calls.append((name, context))
+        if len(calls) == 1:
+            return {"candidates": [{"experiment": {"tool": "shift_and_compare", "arguments": {"shifts": [[1, 0]]}}}]}
+        return {"candidates": [{"target_hypotheses": ["H001"], "tested_scope": ["scope-a"], "experiment": {"tool": "compare", "arguments": {}}}]}
+    agent._request_json = request
+    planned = agent.plan_experiment({"hypotheses": state()["hypotheses"]})
+    assert len(calls) == 2
+    assert "planner_correction" in calls[1][1]
+    assert planned["tool"] == "compare"
+
+
 def test_manual_agent_graph_never_returns_a_planner_final_action():
     class Tools:
         def __init__(self): self.calls = 0

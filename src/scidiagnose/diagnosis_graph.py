@@ -109,6 +109,8 @@ class DiagnosisGraph:
         proposed = self.agent.plan_experiment(self._context(s))
         if "final" in proposed:
             raise RuntimeError("planner may only return an experiment plan; final decisions require reflection and validation")
+        if proposed.get("rejected_candidates"):
+            self.log("plan_candidates_filtered", rejected_candidates=proposed["rejected_candidates"])
         candidates = proposed.get("candidate_plans") if isinstance(proposed.get("candidate_plans"), list) else [proposed]
         hypotheses = {item["hypothesis_id"]: item for item in s.get("hypotheses", [])}
         plan = None

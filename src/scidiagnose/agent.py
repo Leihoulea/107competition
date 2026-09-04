@@ -93,24 +93,36 @@ class OpenAICompatibleAgent:
 
     def plan_experiment(self, context: dict[str, Any]) -> dict[str, Any]:
         schema={"candidates":[{"objective":"distinguish named hypotheses","target_hypotheses":["H001"],"tested_scope":["named measurable condition"],"experiment":{"tool":"one supported tool name","arguments":{}},"expected_evidence":"short measurable outcome"}]}
+        def parse(value: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+            raw=value.get("candidates")
+            if not isinstance(raw, list):
+                experiment=value.get("experiment")
+                raw=[{**value, **experiment}] if isinstance(experiment, dict) else [value]
+            valid={item["hypothesis_id"] for item in context["hypotheses"]}; candidates=[]; rejected=[]
+            for index, candidate in enumerate(raw[:3], 1):
+                if not isinstance(candidate, dict):
+                    rejected.append({"rank": index, "reason": "candidate must be an object"}); continue
+                experiment=candidate.get("experiment", candidate)
+                try:
+                    action=self._validate({"type":"tool_call","tool":experiment.get("tool"),"arguments":experiment.get("arguments",{}),"reason":candidate.get("objective",candidate.get("reason",""))})
+                except (AttributeError, ValueError) as exc:
+                    rejected.append({"rank": index, "reason": str(exc)}); continue
+                targets=[item for item in candidate.get("target_hypotheses",[]) if item in valid] or list(valid)
+                scope=candidate.get("tested_scope", [])
+                if not isinstance(scope, list): scope=[scope]
+                candidates.append({"objective":str(candidate.get("objective",action.reason)),"target_hypotheses":targets,"tested_scope":[str(x) for x in scope if str(x).strip()],"tool":action.tool,"arguments":action.arguments,"expected_evidence":str(candidate.get("expected_evidence","Measure evidence that distinguishes the target hypotheses."))})
+            return candidates, rejected
+
         value=self._request_json("propose two or three ranked, cost-aware experiment candidates. Each must cover named hypotheses and a stated measurable scope. Avoid candidates equivalent or near-equivalent to executed experiments.",context,schema)
-        raw=value.get("candidates")
-        if not isinstance(raw, list):
-            experiment=value.get("experiment")
-            raw=[{**value, **experiment}] if isinstance(experiment, dict) else [value]
-        valid={item["hypothesis_id"] for item in context["hypotheses"]}; candidates=[]
-        for candidate in raw[:3]:
-            experiment=candidate.get("experiment", candidate) if isinstance(candidate, dict) else {}
-            try:
-                action=self._validate({"type":"tool_call","tool":experiment.get("tool"),"arguments":experiment.get("arguments",{}),"reason":candidate.get("objective",candidate.get("reason",""))})
-            except (AttributeError, ValueError) as exc:
-                raise AgentAPIError(f"Planner returned an invalid experiment contract: {exc}; payload={json.dumps(candidate)[:1200]}") from exc
-            targets=[item for item in candidate.get("target_hypotheses",[]) if item in valid] or list(valid)
-            scope=candidate.get("tested_scope", [])
-            if not isinstance(scope, list): scope=[scope]
-            candidates.append({"objective":str(candidate.get("objective",action.reason)),"target_hypotheses":targets,"tested_scope":[str(x) for x in scope if str(x).strip()],"tool":action.tool,"arguments":action.arguments,"expected_evidence":str(candidate.get("expected_evidence","Measure evidence that distinguishes the target hypotheses."))})
-        if not candidates: raise AgentAPIError("planner must provide at least one candidate")
-        return {**candidates[0], "candidate_plans": candidates}
+        candidates, rejected=parse(value)
+        if not candidates:
+            correction={**context, "planner_correction": {"rejected_candidates": rejected}}
+            value=self._request_json("Correct the planner response once. Every candidate must contain one supported experiment contract with valid arguments; omit any candidate that cannot meet that contract.",correction,schema)
+            candidates, retry_rejected=parse(value)
+            rejected += retry_rejected
+            if not candidates:
+                raise AgentAPIError(f"Planner returned no valid experiment candidates after correction; payload={json.dumps(value)[:1200]}")
+        return {**candidates[0], "candidate_plans": candidates, "rejected_candidates": rejected}
 
     def reflect(self, context: dict[str, Any]) -> dict[str, Any]:
         schema={"decision":"continue|propose_fault|propose_no_fault","best_hypothesis_id":"H001 or null","unresolved_questions":["short question"],"summary":"short evidence summary"}
