@@ -37,6 +37,10 @@ def _argument_distance(left: Any, right: Any) -> float:
     return 0.0 if left == right else 2.0
 
 
+def _signature(tool: Any, arguments: Any) -> str:
+    return f"{tool}:{json.dumps(arguments if isinstance(arguments, dict) else {}, sort_keys=True, separators=(',', ':'))}"
+
+
 class DiagnosisGraph:
     """State transitions are auditable; model calls receive only public cognitive state."""
     def __init__(self, agent: Any, tools: ExperimentTools, run_dir: Path) -> None:
@@ -63,8 +67,32 @@ class DiagnosisGraph:
         self.trace.open("a").write(json.dumps({"node": node, "timestamp": time.time(), **data}) + "\n")
 
     @staticmethod
-    def _context(s: DiagnosisGraphState) -> dict[str, Any]:
-        return {"case_id": s["case_id"], "task": s["task"], "initial_observation": s["initial_observation"], "hypotheses": s.get("hypotheses", []), "evidence": s.get("evidence", []), "experiments": [{key: item.get(key) for key in ("experiment_id", "tool", "arguments", "cost", "result")} for item in s.get("experiments", [])], "budget_total": s["budget_total"], "budget_remaining": s["budget_remaining"], "tool_costs": COSTS, "quality_threshold": s["quality_threshold"], "steps_used": s["steps_used"], "max_steps": s["max_steps"]}
+    def _experiment_coverage(s: DiagnosisGraphState) -> dict[str, Any]:
+        """Summarize executed probes without exposing any unexecuted candidate."""
+        baseline = agreement(s.get("initial_observation", {}))
+        families: dict[str, dict[str, Any]] = {}
+        signatures: list[str] = []
+        for record in s.get("experiments", []):
+            family = str(record.get("family", record.get("tool", "unknown")))
+            signature = _signature(record.get("tool"), record.get("arguments", {}))
+            signatures.append(signature)
+            summary = families.setdefault(family, {"count": 0, "best_delta": None, "low_information_count": 0, "informative_count": 0})
+            summary["count"] += 1
+            observed = agreement(record.get("result", {}).get("metrics", {}))
+            delta = observed - baseline if observed is not None and baseline is not None else None
+            if delta is None:
+                continue
+            summary["best_delta"] = delta if summary["best_delta"] is None else max(summary["best_delta"], delta)
+            if abs(delta) < .01:
+                summary["low_information_count"] += 1
+            else:
+                summary["informative_count"] += 1
+        return {"tested_signatures": list(dict.fromkeys(signatures)), "families": families}
+
+    @classmethod
+    def _context(cls, s: DiagnosisGraphState) -> dict[str, Any]:
+        coverage = s.get("experiment_coverage") or cls._experiment_coverage(s)
+        return {"case_id": s["case_id"], "task": s["task"], "initial_observation": s["initial_observation"], "hypotheses": s.get("hypotheses", []), "evidence": s.get("evidence", []), "experiments": [{key: item.get(key) for key in ("experiment_id", "tool", "arguments", "cost", "result")} for item in s.get("experiments", [])], "experiment_coverage": coverage, "budget_total": s["budget_total"], "budget_remaining": s["budget_remaining"], "tool_costs": COSTS, "quality_threshold": s["quality_threshold"], "steps_used": s["steps_used"], "max_steps": s["max_steps"]}
 
     def observe(self, s: DiagnosisGraphState) -> dict[str, Any]:
         self.log("observe", initial=s["initial_observation"])
@@ -109,13 +137,17 @@ class DiagnosisGraph:
 
     @staticmethod
     def _novelty(s: DiagnosisGraphState, candidate: dict[str, Any]) -> dict[str, Any]:
+        coverage = s.get("experiment_coverage") or DiagnosisGraph._experiment_coverage(s)
+        family = str(candidate.get("family", candidate.get("tool", "unknown")))
+        family_coverage = coverage.get("families", {}).get(family, {})
+        stagnated = family_coverage.get("count", 0) >= 2 and family_coverage.get("low_information_count", 0) >= 2
         for previous in s.get("experiments", []):
             if previous.get("tool") != candidate.get("tool"): continue
             distance = _argument_distance(previous.get("arguments", {}), candidate.get("arguments", {}))
             if distance == 0:
                 return {"status": "duplicate", "experiment_id": previous.get("experiment_id"), "distance": distance}
-            if distance <= 1:
-                return {"status": "near_duplicate", "experiment_id": previous.get("experiment_id"), "distance": distance}
+            if distance <= 1 and stagnated:
+                return {"status": "near_duplicate", "experiment_id": previous.get("experiment_id"), "distance": distance, "family": family}
         return {"status": "novel"}
 
     def budget_check(self, s: DiagnosisGraphState) -> dict[str, Any]:
@@ -131,7 +163,9 @@ class DiagnosisGraph:
         if remaining < 0: raise RuntimeError("budget guard failed before remote execution")
         self.log("execute", plan_id=plan["plan_id"], experiment_id=record["experiment_id"], backend=record["backend"], remote_host=record["remote_host"], remote_pid=record["remote_pid"], result=record["result"])
         record = {**record, "plan_id": plan["plan_id"], "coverage": plan.get("coverage", {})}
-        return {"experiments": s.get("experiments", []) + [record], "latest_result": record, "budget_remaining": remaining, "steps_used": s["steps_used"] + 1}
+        experiments = s.get("experiments", []) + [record]
+        experiment_coverage = self._experiment_coverage({**s, "experiments": experiments})
+        return {"experiments": experiments, "latest_result": record, "experiment_coverage": experiment_coverage, "budget_remaining": remaining, "steps_used": s["steps_used"] + 1}
 
     def extract_evidence(self, s: DiagnosisGraphState) -> dict[str, Any]:
         record = s["latest_result"]

@@ -39,6 +39,8 @@ class DiagnosisGraphState(TypedDict, total=False):
     initial_observation: dict[str, Any]
     hypotheses: list[Hypothesis]
     experiments: list[dict[str, Any]]
+    # Planner-visible aggregate of what has been tested and how informative it was.
+    experiment_coverage: dict[str, Any]
     evidence: list[EvidenceItem]
     current_plan: dict[str, Any] | None
     budget_blocked: bool

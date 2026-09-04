@@ -38,7 +38,7 @@ def test_planner_selects_novel_ranked_candidate_and_records_coverage():
     with TemporaryDirectory(dir=Path.cwd()) as directory:
         graph = DiagnosisGraph(CandidateAgent(), object(), Path(directory))
         planned = graph.plan(state(previous))["current_plan"]
-    assert planned["tool"] == "inspect"
+    assert planned["tool"] == "shift_and_compare"
     assert planned["coverage"]["hypothesis_ids"] == ["H001"]
     assert planned["coverage"]["novelty"] == {"status": "novel"}
 
@@ -51,6 +51,36 @@ def test_planner_rejects_when_every_candidate_repeats_existing_probe():
         graph = DiagnosisGraph(RepeatAgent(), object(), Path(directory))
         with pytest.raises(RuntimeError, match="no novel candidate"):
             graph.plan(state([{"experiment_id": "EXP_1", "tool": "compare", "arguments": {}}]))
+
+
+def test_planner_receives_coverage():
+    class CoverageAgent:
+        def plan_experiment(self, context):
+            self.context = context
+            return {"target_hypotheses": ["H001"], "tested_scope": ["scope-a"], "tool": "inspect", "arguments": {}}
+    agent = CoverageAgent()
+    previous = [{"experiment_id": "EXP_1", "tool": "compare", "arguments": {}, "result": {"metrics": {"agreement_valid": .6}}}]
+    with TemporaryDirectory(dir=Path.cwd()) as directory:
+        DiagnosisGraph(agent, object(), Path(directory)).plan(state(previous))
+    coverage = agent.context["experiment_coverage"]
+    assert coverage["tested_signatures"] == ["compare:{}"]
+    assert coverage["families"]["compare"] == {"count": 1, "best_delta": pytest.approx(.2), "low_information_count": 0, "informative_count": 1}
+
+
+def test_near_duplicate_stagnation():
+    class StagnationAgent:
+        def plan_experiment(self, context):
+            return {"candidate_plans": [
+                {"target_hypotheses": ["H001"], "tested_scope": ["scope-a"], "tool": "shift_and_compare", "arguments": {"dr": 0, "dc": 0}},
+                {"target_hypotheses": ["H001"], "tested_scope": ["scope-a"], "tool": "inspect", "arguments": {}},
+            ]}
+    previous = [
+        {"experiment_id": "EXP_1", "tool": "shift_and_compare", "arguments": {"dr": 0, "dc": 1}, "result": {"metrics": {"agreement_valid": .4}}},
+        {"experiment_id": "EXP_2", "tool": "shift_and_compare", "arguments": {"dr": 0, "dc": 2}, "result": {"metrics": {"agreement_valid": .4}}},
+    ]
+    with TemporaryDirectory(dir=Path.cwd()) as directory:
+        planned = DiagnosisGraph(StagnationAgent(), object(), Path(directory)).plan(state(previous))["current_plan"]
+    assert planned["tool"] == "inspect"
 
 
 def test_evidence_can_update_only_hypotheses_covered_by_its_scope():
