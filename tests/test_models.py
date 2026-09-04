@@ -19,3 +19,13 @@ def test_structured_envelopes_are_unwrapped(monkeypatch):
         def read(self): return b'{"choices":[{"message":{"content":"{\\"type\\":\\"json_object\\",\\"obj\\":{\\"answer\\":1}}"}}]}'
     monkeypatch.setattr("scidiagnose.agent.request.urlopen", lambda *args, **kwargs: Response())
     assert agent._request_json("test", {}, {}) == {"answer": 1}
+
+
+def test_reflection_decision_dialects_are_normalized():
+    value, decision = OpenAICompatibleAgent._normalize_reflection(
+        {"reflection": {"action": "needs more evidence", "summary": "not decisive"}}
+    )
+    assert value["summary"] == "not decisive"
+    assert decision == "continue"
+    assert OpenAICompatibleAgent._normalize_reflection({"decision": "fault"})[1] == "propose_fault"
+    assert OpenAICompatibleAgent._normalize_reflection({"decision": "no-fault"})[1] == "propose_no_fault"

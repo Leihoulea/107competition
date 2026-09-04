@@ -99,10 +99,43 @@ class OpenAICompatibleAgent:
     def reflect(self, context: dict[str, Any]) -> dict[str, Any]:
         schema={"decision":"continue|propose_fault|propose_no_fault","best_hypothesis_id":"H001 or null","unresolved_questions":["short question"],"summary":"short evidence summary"}
         value=self._request_json("reflect on hypotheses and evidence",context,schema)
-        if isinstance(value.get("reflection"), dict): value=value["reflection"]
-        decision=value.get("decision")
-        if decision not in {"continue","propose_fault","propose_no_fault"}: raise AgentAPIError("reflection decision is invalid")
+        value, decision=self._normalize_reflection(value)
         return {"decision":decision,"best_hypothesis_id":value.get("best_hypothesis_id"),"unresolved_questions":[str(x) for x in value.get("unresolved_questions",[])],"summary":str(value.get("summary",""))}
+
+    @staticmethod
+    def _normalize_reflection(value: dict[str, Any]) -> tuple[dict[str, Any], str]:
+        """Accept equivalent decision dialects used by OpenAI-compatible models.
+
+        The graph deliberately has only three internal reflection states.  Providers
+        nevertheless often return a nested ``reflection`` object, call the field
+        ``action``, or spell ``continue`` as "needs more evidence".  Normalize only
+        explicit semantic equivalents; unknown values still fail loudly with a
+        bounded payload summary so a new provider dialect can be diagnosed.
+        """
+        if isinstance(value.get("reflection"), dict):
+            value=value["reflection"]
+        raw=value.get("decision", value.get("action"))
+        normalized=str(raw).strip().lower().replace("-","_").replace(" ","_") if raw is not None else ""
+        aliases={
+            "continue":"continue",
+            "replan":"continue",
+            "continue_investigation":"continue",
+            "investigate_further":"continue",
+            "needs_more_evidence":"continue",
+            "need_more_evidence":"continue",
+            "collect_more_evidence":"continue",
+            "propose_fault":"propose_fault",
+            "fault":"propose_fault",
+            "confirm_fault":"propose_fault",
+            "propose_no_fault":"propose_no_fault",
+            "no_fault":"propose_no_fault",
+            "confirm_no_fault":"propose_no_fault",
+        }
+        decision=aliases.get(normalized)
+        if decision is None:
+            payload=json.dumps(value, ensure_ascii=False, default=str)[:1200]
+            raise AgentAPIError(f"reflection decision is invalid: {raw!r}; payload={payload}")
+        return value, decision
 
     def final_diagnosis(self, context: dict[str, Any]) -> dict[str, Any]:
         schema={"decision":"fault|no_fault","fault_family":"canonical category","root_cause":"concise evidence-based statement","confidence":0.0,"evidence_experiment_ids":["EXP_001"],"recommended_repair":{},"remaining_uncertainty":[]}
