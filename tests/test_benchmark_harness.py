@@ -53,7 +53,9 @@ def test_run_reader_supports_official_graph_trace_and_unavailable_metrics_are_nu
 
 def test_posthoc_scoring_is_explicit_and_never_required_for_a_run():
     row = BenchmarkHarness().deterministic_exhaustive(PublicCase.load(ROOT / "cases" / "b01"), 1)
-    scored = BenchmarkHarness.score_posthoc([row], {"B01": {"decision": "no_fault"}})
+    scored = BenchmarkHarness.score_posthoc([row], {"B01": {"decision": "no_fault", "fault_family": "no_fault"}})
     assert scored[0]["false_positive"] == (row["decision"] == "fault")
+    assert scored[0]["fault_detection_correct"] == (row["decision"] == "no_fault")
+    assert scored[0]["fault_family_correct"] == (row["fault_family"] == "no_fault")
     custom = BenchmarkHarness.score_posthoc([row], evaluator=lambda result, truth: {"external_score": result["method"]})
     assert custom[0]["external_score"] == "deterministic_exhaustive"

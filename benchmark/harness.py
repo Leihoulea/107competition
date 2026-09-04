@@ -199,6 +199,9 @@ class BenchmarkHarness:
                 copy.update(evaluator(dict(row), truth))
             elif isinstance(truth, dict):
                 expected = truth.get("decision"); copy["false_positive"] = row.get("decision") == "fault" and expected != "fault"
+                copy["fault_detection_correct"] = row.get("decision") == expected if expected in {"fault", "no_fault"} else None
+                expected_family = truth.get("fault_family")
+                copy["fault_family_correct"] = row.get("fault_family") == expected_family if expected_family is not None else None
             else: copy["false_positive"] = None
             scored.append(copy)
         return scored
