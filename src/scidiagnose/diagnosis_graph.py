@@ -241,6 +241,16 @@ class DiagnosisGraph:
         context.update({"best_metric": best, "budget_blocked": s.get("budget_blocked", False)})
         reflection = self.agent.reflect(context)
         decision = reflection["decision"]
+        # A clean initial observation is already an explicit no-fault evidence
+        # contract for the current benchmark.  Do not keep consuming budget when
+        # the model merely continues despite having no validated repair evidence.
+        if decision == "continue" and self._no_fault_supported(s) and not self._validated_repairs(s):
+            decision = "propose_no_fault"
+            reflection = {
+                **reflection,
+                "decision": decision,
+                "summary": f"{reflection.get('summary', '')} Initial quality already satisfies the no-fault evidence contract.",
+            }
         if s.get("budget_blocked") or s["budget_remaining"] <= 0 or s["steps_used"] >= s["max_steps"]:
             # A valid fault or a properly supported no-fault conclusion may still be
             # assessed by the gate at the limit.  An unsupported conclusion becomes
