@@ -254,11 +254,21 @@ class ManualAgent:
             updated[0]={**updated[0],"status":"supported","confidence":.7,"evidence_for":updated[0]["evidence_for"]+[evidence["evidence_id"]]}
         return updated
     def plan_experiment(self, context: dict[str, Any]) -> dict[str, Any]:
-        from .models import DiagnosisState
-        action=self.decide(DiagnosisState(context["case_id"],context["budget_total"],context["budget_remaining"],[context["initial_observation"]],context["experiments"]),context["task"])
-        if action.type=="final": return {"final":action.final}
+        # This adapter is used by the graph, whose planner deliberately never
+        # accepts final decisions.  Keep the demonstration policy in the same
+        # experiment-only contract and let reflect/gate/finalize end the run.
+        candidates=(
+            ("inspect", {}), ("compare", {}),
+            ("shift_and_compare", {"dr": 0, "dc": 2}),
+            ("shift_and_compare", {"dr": 0, "dc": 4}),
+            ("shift_and_compare", {"dr": 2, "dc": 0}),
+            ("shift_and_compare", {"dr": 4, "dc": 0}),
+            ("shift_and_compare", {"dr": 2, "dc": 2}),
+            ("shift_and_compare", {"dr": -2, "dc": -2}),
+        )
+        tool, arguments=candidates[min(len(context["experiments"]), len(candidates)-1)]
         targets=[item["hypothesis_id"] for item in context["hypotheses"] if item["status"] in {"active","supported"}]
-        plan={"objective":action.reason,"target_hypotheses":targets,"tested_scope":["measured agreement"],"tool":action.tool,"arguments":action.arguments,"expected_evidence":"A measurable result will distinguish the active hypotheses."}
+        plan={"objective":"Obtain a distinct measurement for the active hypotheses.","target_hypotheses":targets,"tested_scope":["measured agreement"],"tool":tool,"arguments":arguments,"expected_evidence":"A measurable result will distinguish the active hypotheses."}
         return {**plan,"candidate_plans":[plan]}
     def reflect(self, context: dict[str, Any]) -> dict[str, Any]:
         best=context["best_metric"]

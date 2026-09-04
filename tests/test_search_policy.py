@@ -5,6 +5,7 @@ import pytest
 
 from scidiagnose.diagnosis_graph import DiagnosisGraph
 from scidiagnose.agent import OpenAICompatibleAgent
+from scidiagnose.agent import ManualAgent
 
 
 def state(experiments=None):
@@ -109,3 +110,18 @@ def test_api_policy_preserves_ranked_top_k_candidate_contract():
     planned = agent.plan_experiment({"hypotheses": state()["hypotheses"]})
     assert [item["objective"] for item in planned["candidate_plans"]] == ["first", "second"]
     assert planned["candidate_plans"][1]["tested_scope"] == ["scope-b"]
+
+
+def test_manual_agent_graph_never_returns_a_planner_final_action():
+    class Tools:
+        def __init__(self): self.calls = 0
+        def execute(self, tool, arguments):
+            self.calls += 1
+            return {"experiment_id": f"EXP_{self.calls}", "tool": tool, "arguments": arguments, "backend": "fake", "remote_host": "fake", "remote_pid": 1, "cost": 1, "result": {"metrics": {"agreement_valid": .4}}}
+    current = state()
+    current.update({"task": {"expected_quality_threshold": .85}, "hypotheses": [], "max_steps": 3, "steps_used": 0})
+    with TemporaryDirectory(dir=Path.cwd()) as directory:
+        tools = Tools()
+        result = DiagnosisGraph(ManualAgent(), tools, Path(directory)).run(current)
+    assert tools.calls == 3
+    assert result["final_diagnosis"]["decision"] == "inconclusive"
