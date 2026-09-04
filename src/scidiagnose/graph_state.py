@@ -10,6 +10,7 @@ class Hypothesis(TypedDict):
     description: str
     status: Literal["active", "supported", "weakened", "rejected", "validated"]
     confidence: float
+    testable_scope: list[str]
     evidence_for: list[str]
     evidence_against: list[str]
 
@@ -27,6 +28,8 @@ class EvidenceItem(TypedDict):
     interpretation: str
     supports: list[str]
     contradicts: list[str]
+    tested_hypotheses: list[str]
+    tested_scope: list[str]
 
 
 class DiagnosisGraphState(TypedDict, total=False):

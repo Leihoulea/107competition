@@ -73,30 +73,44 @@ class OpenAICompatibleAgent:
             hypothesis_id=str(item.get("hypothesis_id") or (f"H{index:03d}" if not prior else next(iter(prior))))
             status=item.get("status","active")
             if status not in {"active","supported","weakened","rejected","validated"}: status="active"
-            result.append({"hypothesis_id":hypothesis_id,"category":str(item.get("category","unspecified")),"description":str(item.get("description","Plausible explanation requiring evidence.")),"status":status,"confidence":max(0.0,min(1.0,float(item.get("confidence",.5)))),"evidence_for":[str(x) for x in item.get("evidence_for",[])],"evidence_against":[str(x) for x in item.get("evidence_against",[])]})
+            scope=item.get("testable_scope", [str(item.get("category", "unspecified"))])
+            if not isinstance(scope, list): scope=[scope]
+            scope=[str(x) for x in scope if str(x).strip()] or ["unspecified"]
+            result.append({"hypothesis_id":hypothesis_id,"category":str(item.get("category","unspecified")),"description":str(item.get("description","Plausible explanation requiring evidence.")),"status":status,"confidence":max(0.0,min(1.0,float(item.get("confidence",.5)))),"testable_scope":scope,"evidence_for":[str(x) for x in item.get("evidence_for",[])],"evidence_against":[str(x) for x in item.get("evidence_against",[])]})
         return result
 
     def generate_hypotheses(self, context: dict[str, Any]) -> list[dict[str, Any]]:
-        schema={"hypotheses":[{"hypothesis_id":"H001","category":"short label","description":"concise explanation","status":"active","confidence":0.5,"evidence_for":[],"evidence_against":[]}]}
+        schema={"hypotheses":[{"hypothesis_id":"H001","category":"short label","description":"concise explanation","testable_scope":["named measurable condition"],"status":"active","confidence":0.5,"evidence_for":[],"evidence_against":[]}]}
         return self._hypotheses(self._request_json("generate competing hypotheses",context,schema))
 
     def update_hypotheses(self, context: dict[str, Any]) -> list[dict[str, Any]]:
-        schema={"hypotheses":[{"hypothesis_id":"existing ID","category":"short label","description":"concise explanation","status":"supported|weakened|rejected|validated|active","confidence":0.5,"evidence_for":["E001"],"evidence_against":[]}]}
-        existing=context.get("hypotheses",[]); updates=self._hypotheses(self._request_json("update competing hypotheses using the latest evidence; link each change to the tested candidate and do not overgeneralize an inconclusive result",context,schema), existing, minimum=1)
+        schema={"hypotheses":[{"hypothesis_id":"existing ID","category":"short label","description":"concise explanation","testable_scope":["preserve existing scope"],"status":"supported|weakened|rejected|validated|active","confidence":0.5,"evidence_for":["E001"],"evidence_against":[]}]}
+        existing=context.get("hypotheses",[]); updates=self._hypotheses(self._request_json("update only hypotheses covered by the latest experiment. Preserve every uncovered hypothesis exactly; link changes to the supplied evidence.",context,schema), existing, minimum=1)
+        allowed=set(context.get("scope_hypothesis_ids", []))
+        if allowed: updates=[item for item in updates if item["hypothesis_id"] in allowed]
         by_id={item["hypothesis_id"]:item for item in updates}
         return [by_id.get(item["hypothesis_id"],item) for item in existing] + [item for item in updates if item["hypothesis_id"] not in {old["hypothesis_id"] for old in existing}]
 
     def plan_experiment(self, context: dict[str, Any]) -> dict[str, Any]:
-        schema={"objective":"distinguish named hypotheses","target_hypotheses":["H001"],"experiment":{"tool":"inspect|compare|transform_and_compare|shift_and_compare|evaluate_candidate","arguments":"inspect/compare use {}; transform requires operation in identity,flip_x,flip_y,rot90,rot180,rot270,transpose; shift requires integer dr and dc in [-5,5]; evaluate_candidate requires pipeline of 0-4 steps, each transform or shift using the same fields"},"expected_evidence":"short measurable outcome"}
-        value=self._request_json("select one cost-aware diagnostic experiment. Do not repeat an already executed tool with identical arguments; choose a new experiment that can distinguish currently active hypotheses.",context,schema)
-        experiment=value.get("experiment",value)
-        try:
-            action=self._validate({"type":"tool_call","tool":experiment.get("tool"),"arguments":experiment.get("arguments",{}),"reason":value.get("objective",value.get("reason",""))})
-        except (AttributeError, ValueError) as exc:
-            raise AgentAPIError(f"Planner returned an invalid experiment contract: {exc}; payload={json.dumps(value)[:1200]}") from exc
-        valid={item["hypothesis_id"] for item in context["hypotheses"]}
-        targets=[item for item in value.get("target_hypotheses",[]) if item in valid] or list(valid)
-        return {"objective":str(value.get("objective",action.reason)),"target_hypotheses":targets,"tool":action.tool,"arguments":action.arguments,"expected_evidence":str(value.get("expected_evidence","Measure evidence that distinguishes the target hypotheses."))}
+        schema={"candidates":[{"objective":"distinguish named hypotheses","target_hypotheses":["H001"],"tested_scope":["named measurable condition"],"experiment":{"tool":"one supported tool name","arguments":{}},"expected_evidence":"short measurable outcome"}]}
+        value=self._request_json("propose two or three ranked, cost-aware experiment candidates. Each must cover named hypotheses and a stated measurable scope. Avoid candidates equivalent or near-equivalent to executed experiments.",context,schema)
+        raw=value.get("candidates")
+        if not isinstance(raw, list):
+            experiment=value.get("experiment")
+            raw=[{**value, **experiment}] if isinstance(experiment, dict) else [value]
+        valid={item["hypothesis_id"] for item in context["hypotheses"]}; candidates=[]
+        for candidate in raw[:3]:
+            experiment=candidate.get("experiment", candidate) if isinstance(candidate, dict) else {}
+            try:
+                action=self._validate({"type":"tool_call","tool":experiment.get("tool"),"arguments":experiment.get("arguments",{}),"reason":candidate.get("objective",candidate.get("reason",""))})
+            except (AttributeError, ValueError) as exc:
+                raise AgentAPIError(f"Planner returned an invalid experiment contract: {exc}; payload={json.dumps(candidate)[:1200]}") from exc
+            targets=[item for item in candidate.get("target_hypotheses",[]) if item in valid] or list(valid)
+            scope=candidate.get("tested_scope", [])
+            if not isinstance(scope, list): scope=[scope]
+            candidates.append({"objective":str(candidate.get("objective",action.reason)),"target_hypotheses":targets,"tested_scope":[str(x) for x in scope if str(x).strip()],"tool":action.tool,"arguments":action.arguments,"expected_evidence":str(candidate.get("expected_evidence","Measure evidence that distinguishes the target hypotheses."))})
+        if not candidates: raise AgentAPIError("planner must provide at least one candidate")
+        return {**candidates[0], "candidate_plans": candidates}
 
     def reflect(self, context: dict[str, Any]) -> dict[str, Any]:
         schema={"decision":"continue|propose_fault|propose_no_fault","best_hypothesis_id":"H001 or null","unresolved_questions":["short question"],"summary":"short evidence summary"}
@@ -233,7 +247,7 @@ class OpenAICompatibleAgent:
 class ManualAgent:
     """Deterministic demonstration policy that reacts only to visible experiment evidence."""
     def generate_hypotheses(self, context: dict[str, Any]) -> list[dict[str, Any]]:
-        return [{"hypothesis_id":"H001","category":"systematic_mismatch","description":"A repeatable discrepancy may affect the computation.","status":"active","confidence":.5,"evidence_for":[],"evidence_against":[]},{"hypothesis_id":"H002","category":"normal_variation","description":"The observation may be consistent with expected variation.","status":"active","confidence":.4,"evidence_for":[],"evidence_against":[]}]
+        return [{"hypothesis_id":"H001","category":"systematic_mismatch","description":"A repeatable discrepancy may affect the computation.","testable_scope":["measured agreement"],"status":"active","confidence":.5,"evidence_for":[],"evidence_against":[]},{"hypothesis_id":"H002","category":"normal_variation","description":"The observation may be consistent with expected variation.","testable_scope":["measured agreement"],"status":"active","confidence":.4,"evidence_for":[],"evidence_against":[]}]
     def update_hypotheses(self, context: dict[str, Any]) -> list[dict[str, Any]]:
         evidence=context["latest_evidence"]; updated=[dict(item) for item in context["hypotheses"]]
         if (evidence.get("delta") or 0) > 0:
@@ -243,7 +257,9 @@ class ManualAgent:
         from .models import DiagnosisState
         action=self.decide(DiagnosisState(context["case_id"],context["budget_total"],context["budget_remaining"],[context["initial_observation"]],context["experiments"]),context["task"])
         if action.type=="final": return {"final":action.final}
-        return {"objective":action.reason,"target_hypotheses":[item["hypothesis_id"] for item in context["hypotheses"] if item["status"] in {"active","supported"}],"tool":action.tool,"arguments":action.arguments,"expected_evidence":"A measurable result will distinguish the active hypotheses."}
+        targets=[item["hypothesis_id"] for item in context["hypotheses"] if item["status"] in {"active","supported"}]
+        plan={"objective":action.reason,"target_hypotheses":targets,"tested_scope":["measured agreement"],"tool":action.tool,"arguments":action.arguments,"expected_evidence":"A measurable result will distinguish the active hypotheses."}
+        return {**plan,"candidate_plans":[plan]}
     def reflect(self, context: dict[str, Any]) -> dict[str, Any]:
         best=context["best_metric"]
         return {"decision":"propose_fault" if best>=context["quality_threshold"] else "continue","best_hypothesis_id":"H001","unresolved_questions":[],"summary":"Deterministic demonstration reflection."}
@@ -254,6 +270,6 @@ class ManualAgent:
         return {"decision":"fault" if best else "no_fault","fault_family":"validated_candidate" if best else "no_fault","root_cause":"A real candidate experiment supplied the final evidence." if best else "No fault evidence was validated.","confidence":.8,"evidence_experiment_ids":[best["experiment_id"]] if best else [],"recommended_repair":best["arguments"] if best else {}}
     def decide(self,state:DiagnosisState,task:dict[str,object])->AgentAction:
         if not state.experiments: return AgentAction("tool_call","inspect",reason="Establish array structure and value ranges before testing hypotheses.")
-        if len(state.experiments)==1: return AgentAction("tool_call","transform_and_compare",{"operation":"rot180"},"Test one general 2-D transform and measure whether agreement changes materially.")
+        if len(state.experiments)==1: return AgentAction("tool_call","compare",reason="Repeat the general comparison after the initial structural observation.")
         latest=state.experiments[-1]["result"].get("metrics",{}); improved=float(latest.get("agreement",0))>=float(task["expected_quality_threshold"])
-        return AgentAction("final",reason="Two real experiments supplied the evidence.",final={"decision":"fault" if improved else "no_fault","fault_family":"spatial_alignment" if improved else "undetermined","root_cause":"orientation_mismatch" if improved else "insufficient_evidence","confidence":.95 if improved else .4,"evidence_experiment_ids":[item["experiment_id"] for item in state.experiments],"recommended_repair":{"operation":"rot180"} if improved else {}})
+        return AgentAction("final",reason="Two real experiments supplied the evidence.",final={"decision":"fault" if improved else "no_fault","fault_family":"measured_mismatch" if improved else "undetermined","root_cause":"measured_discrepancy" if improved else "insufficient_evidence","confidence":.95 if improved else .4,"evidence_experiment_ids":[item["experiment_id"] for item in state.experiments],"recommended_repair":{}})
