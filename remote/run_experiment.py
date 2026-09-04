@@ -1,8 +1,37 @@
 """Restricted NumPy runner for composable scientific diagnostic experiments."""
 from __future__ import annotations
-import argparse, json, os, platform, time, traceback
+import argparse, hashlib, json, os, platform, time, traceback
 from pathlib import Path
 import numpy as np
+
+
+def _site_profile() -> dict[str, object]:
+    """Stable, anonymous execution-site metadata (stdlib only)."""
+    site_id = hashlib.sha256(platform.node().encode("utf-8")).hexdigest()[:16]
+    return {"profile_version": "1", "site_id": f"remote-{site_id}", "os_family": platform.system().lower()}
+
+
+def _compute_metrics(started: float) -> dict[str, object]:
+    metrics: dict[str, object] = {
+        "wall_seconds": round(time.monotonic() - started, 6),
+        "process_cpu_seconds": round(time.process_time(), 6),
+        "pid": os.getpid(),
+    }
+    if hasattr(os, "getloadavg"):
+        metrics["load_average_1m"] = round(os.getloadavg()[0], 4)
+    try:
+        import resource  # Available on Unix; intentionally optional.
+        metrics["max_rss_kib"] = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+    except ImportError:
+        pass
+    return metrics
+
+
+def _scientific_metrics(metrics: dict[str, object]) -> dict[str, object]:
+    """Flatten numerical scientific evidence for generic observability consumers."""
+    values = {key: value for key, value in metrics.items() if isinstance(value, (int, float)) and not isinstance(value, bool)}
+    primary_name = "agreement_valid" if "agreement_valid" in values else "agreement" if "agreement" in values else None
+    return {"metric_count": len(values), "primary_metric": primary_name, "primary_value": values.get(primary_name) if primary_name else None, "values": values}
 
 OPS={"identity":lambda x:x,"flip_x":np.fliplr,"flip_y":np.flipud,"rot90":lambda x:np.rot90(x,1),"rot180":lambda x:np.rot90(x,2),"rot270":lambda x:np.rot90(x,3),"transpose":np.transpose}
 def shift_without_wrap(a:np.ndarray,dr:int,dc:int)->tuple[np.ndarray,np.ndarray]:
@@ -39,6 +68,6 @@ def main()->None:
         elif tool=="shift_and_compare":dr,dc=arg.get("dr"),arg.get("dc");v,m=apply_pipeline(target,[{"type":"shift","dr":dr,"dc":dc}],initial_valid);out={"dr":dr,"dc":dc,**metrics(ref,v,m)}
         elif tool=="evaluate_candidate":pipeline=arg.get("pipeline");v,m=apply_pipeline(target,pipeline,initial_valid);out={"pipeline":pipeline,**metrics(ref,v,m)}
         else:raise ValueError("tool is not allowed")
-        result={"status":"success","experiment_id":req["experiment_id"],"tool":tool,"arguments":arg,"metrics":out,"hostname":platform.node(),"pid":os.getpid(),"elapsed_seconds":round(time.monotonic()-t,3)};Path(args.output_json).write_text(json.dumps(result,indent=2));print(json.dumps(result),flush=True)
+        result={"status":"success","experiment_id":req["experiment_id"],"tool":tool,"arguments":arg,"metrics":out,"scientific_metrics":_scientific_metrics(out),"compute_metrics":_compute_metrics(t),"site_profile":_site_profile(),"elapsed_seconds":round(time.monotonic()-t,3)};Path(args.output_json).write_text(json.dumps(result,indent=2));print(json.dumps(result),flush=True)
     except BaseException as e:Path("failure.json").write_text(json.dumps({"status":"failed","error_type":type(e).__name__,"message":str(e),"traceback":traceback.format_exc()},indent=2));raise
 if __name__=="__main__":main()
