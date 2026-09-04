@@ -27,8 +27,10 @@ class AgentAPIError(RuntimeError): pass
 
 class OpenAICompatibleAgent:
     """Minimal stdlib client for school endpoints implementing /chat/completions."""
-    def __init__(self, settings: Settings | None = None, timeout: int = 60, max_retries: int = 2) -> None:
-        self.settings=settings or Settings(); self.timeout=timeout; self.max_retries=max_retries
+    def __init__(self, settings: Settings | None = None, timeout: int = 60, max_retries: int | None = None) -> None:
+        self.settings=settings or Settings(); self.timeout=timeout
+        self.max_retries=int(getattr(self.settings, "api_max_retries", 2) if max_retries is None else max_retries)
+        self.retry_base_seconds=float(getattr(self.settings, "api_retry_base_seconds", 1))
         if not (self.settings.base_url and self.settings.model_name and self.settings.api_key):
             raise AgentAPIError("SCIDIAG_BASE_URL, SCIDIAG_MODEL_NAME, and SCIDIAG_API_KEY are required for API mode")
 
@@ -52,11 +54,11 @@ class OpenAICompatibleAgent:
                 return value
             except error.HTTPError as exc:
                 if exc.code in {429,500,502,503,504} and attempt < self.max_retries:
-                    time.sleep(2 ** attempt); continue
+                    time.sleep(self.retry_base_seconds * (2 ** attempt)); continue
                 raise AgentAPIError(f"School LLM API request failed: {exc}") from exc
             except OSError as exc:
                 if attempt < self.max_retries:
-                    time.sleep(2 ** attempt); continue
+                    time.sleep(self.retry_base_seconds * (2 ** attempt)); continue
                 raise AgentAPIError(f"School LLM API transport failed: {exc}") from exc
             except (error.URLError,json.JSONDecodeError,KeyError,IndexError,TypeError,ValueError) as exc:
                 raise AgentAPIError(f"School LLM API returned invalid structured output: {exc}") from exc
@@ -157,10 +159,15 @@ class OpenAICompatibleAgent:
             except error.HTTPError as exc:
                 retryable=exc.code in {429,500,502,503,504}
                 if retryable and attempt < self.max_retries:
-                    time.sleep(2 ** attempt)
+                    time.sleep(self.retry_base_seconds * (2 ** attempt))
                     continue
                 raise AgentAPIError(f"School LLM API request failed: {exc}") from exc
-            except (error.URLError,json.JSONDecodeError) as exc:
+            except (error.URLError, OSError) as exc:
+                if attempt < self.max_retries:
+                    time.sleep(self.retry_base_seconds * (2 ** attempt))
+                    continue
+                raise AgentAPIError(f"School LLM API request failed: {exc}") from exc
+            except json.JSONDecodeError as exc:
                 raise AgentAPIError(f"School LLM API request failed: {exc}") from exc
         try: raw=data["choices"][0]["message"]["content"]; action=json.loads(raw); return self._validate(action)
         except (KeyError,IndexError,TypeError,json.JSONDecodeError,ValueError) as exc: raise AgentAPIError(f"School LLM API returned an invalid action: {exc}; response={raw[:1200]!r}") from exc

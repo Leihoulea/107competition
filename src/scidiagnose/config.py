@@ -33,3 +33,5 @@ class Settings:
     model_name: str | None = os.environ.get("SCIDIAG_MODEL_NAME") or None
     api_key: str | None = os.environ.get("SCIDIAG_API_KEY") or None
     base_url: str | None = os.environ.get("SCIDIAG_BASE_URL") or None
+    api_max_retries: int = int(os.environ.get("SCIDIAG_API_MAX_RETRIES", "4"))
+    api_retry_base_seconds: float = float(os.environ.get("SCIDIAG_API_RETRY_BASE_SECONDS", "1"))
