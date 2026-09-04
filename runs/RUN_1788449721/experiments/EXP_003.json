@@ -1,0 +1,21 @@
+{
+  "experiment_id": "EXP_003",
+  "tool": "transform_and_compare",
+  "arguments": {
+    "transform": "transpose"
+  },
+  "backend": "ssh_direct",
+  "remote_host": "server-114",
+  "remote_pid": 24770,
+  "job_id": "EXP_003",
+  "status": "FAILED",
+  "cost": 4,
+  "result": {
+    "status": "failed",
+    "error_type": "ValueError",
+    "message": "operation must be an allowed transform",
+    "traceback": "Traceback (most recent call last):\n  File \"/root/scidiagnose-demo/scripts/run_experiment.py\", line 20, in main\n    if op not in OPS: raise ValueError(\"operation must be an allowed transform\")\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: operation must be an allowed transform\n"
+  },
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"/root/scidiagnose-demo/scripts/run_experiment.py\", line 30, in <module>\n    if __name__==\"__main__\": main()\n                             ^^^^^^\n  File \"/root/scidiagnose-demo/scripts/run_experiment.py\", line 20, in main\n    if op not in OPS: raise ValueError(\"operation must be an allowed transform\")\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: operation must be an allowed transform\n"
+}

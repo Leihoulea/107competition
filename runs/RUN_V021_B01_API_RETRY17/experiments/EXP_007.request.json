@@ -1,0 +1,17 @@
+{
+  "experiment_id": "EXP_007",
+  "tool": "evaluate_candidate",
+  "arguments": {
+    "pipeline": [
+      {
+        "type": "shift",
+        "dr": 0,
+        "dc": 0
+      },
+      {
+        "type": "transform",
+        "operation": "identity"
+      }
+    ]
+  }
+}

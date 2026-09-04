@@ -1,0 +1,67 @@
+{
+  "experiment_id": "EXP_002",
+  "tool": "evaluate_candidate",
+  "arguments": {
+    "pipeline": [
+      {
+        "type": "transform",
+        "operation": "rot180"
+      },
+      {
+        "type": "shift",
+        "dr": -5,
+        "dc": 5
+      }
+    ]
+  },
+  "backend": "ssh_direct",
+  "remote_host": "server-114",
+  "remote_pid": 38774,
+  "job_id": "EXP_002",
+  "status": "COMPLETED",
+  "cost": 5,
+  "result": {
+    "status": "success",
+    "experiment_id": "EXP_002",
+    "tool": "evaluate_candidate",
+    "arguments": {
+      "pipeline": [
+        {
+          "type": "transform",
+          "operation": "rot180"
+        },
+        {
+          "type": "shift",
+          "dr": -5,
+          "dc": 5
+        }
+      ]
+    },
+    "metrics": {
+      "pipeline": [
+        {
+          "type": "transform",
+          "operation": "rot180"
+        },
+        {
+          "type": "shift",
+          "dr": -5,
+          "dc": 5
+        }
+      ],
+      "agreement": 0.9719369533816924,
+      "intersection": 26493,
+      "union": 28261,
+      "iou": 0.9374402887371289,
+      "precision": 0.9730057293962098,
+      "recall": 0.9624718448012788,
+      "valid_pixels": 63001,
+      "valid_fraction": 0.9613189697265625
+    },
+    "hostname": "ubuntu",
+    "pid": 38774,
+    "elapsed_seconds": 0.002
+  },
+  "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_002\", \"tool\": \"evaluate_candidate\", \"arguments\": {\"pipeline\": [{\"type\": \"transform\", \"operation\": \"rot180\"}, {\"type\": \"shift\", \"dr\": -5, \"dc\": 5}]}, \"metrics\": {\"pipeline\": [{\"type\": \"transform\", \"operation\": \"rot180\"}, {\"type\": \"shift\", \"dr\": -5, \"dc\": 5}], \"agreement\": 0.9719369533816924, \"intersection\": 26493, \"union\": 28261, \"iou\": 0.9374402887371289, \"precision\": 0.9730057293962098, \"recall\": 0.9624718448012788, \"valid_pixels\": 63001, \"valid_fraction\": 0.9613189697265625}, \"hostname\": \"ubuntu\", \"pid\": 38774, \"elapsed_seconds\": 0.002}\n",
+  "stderr": ""
+}

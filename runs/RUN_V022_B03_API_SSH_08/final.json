@@ -1,0 +1,13 @@
+{
+  "decision": "no_fault",
+  "fault_family": "no_fault",
+  "root_cause": "No silent failure detected. The comparison agreement of 0.9357 exceeds the quality threshold of 0.85, and a 1-pixel shift test (EXP_001) did not improve agreement (0.9341), ruling out spatial misalignment. No masking artifact or systematic bias was indicated by the available evidence.",
+  "confidence": 0.85,
+  "evidence_experiment_ids": [
+    "EXP_001"
+  ],
+  "recommended_repair": {},
+  "remaining_uncertainty": [
+    "Localized systematic bias (H004) and masking artifacts (H003) were not directly tested, but the high overall agreement and full valid-pixel coverage provide no indication of such faults."
+  ]
+}

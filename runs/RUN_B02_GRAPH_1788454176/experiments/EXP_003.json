@@ -1,0 +1,37 @@
+{
+  "experiment_id": "EXP_003",
+  "tool": "transform_and_compare",
+  "arguments": {
+    "operation": "transpose"
+  },
+  "backend": "ssh_direct",
+  "remote_host": "server-114",
+  "remote_pid": 43169,
+  "job_id": "EXP_003",
+  "status": "COMPLETED",
+  "cost": 4,
+  "result": {
+    "status": "success",
+    "experiment_id": "EXP_003",
+    "tool": "transform_and_compare",
+    "arguments": {
+      "operation": "transpose"
+    },
+    "metrics": {
+      "operation": "transpose",
+      "agreement": 0.5301344423104395,
+      "intersection": 12576,
+      "union": 42178,
+      "iou": 0.29816492010052636,
+      "precision": 0.4618774790656677,
+      "recall": 0.45687713434570953,
+      "valid_pixels": 63001,
+      "valid_fraction": 0.9613189697265625
+    },
+    "hostname": "ubuntu",
+    "pid": 43169,
+    "elapsed_seconds": 0.002
+  },
+  "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_003\", \"tool\": \"transform_and_compare\", \"arguments\": {\"operation\": \"transpose\"}, \"metrics\": {\"operation\": \"transpose\", \"agreement\": 0.5301344423104395, \"intersection\": 12576, \"union\": 42178, \"iou\": 0.29816492010052636, \"precision\": 0.4618774790656677, \"recall\": 0.45687713434570953, \"valid_pixels\": 63001, \"valid_fraction\": 0.9613189697265625}, \"hostname\": \"ubuntu\", \"pid\": 43169, \"elapsed_seconds\": 0.002}\n",
+  "stderr": ""
+}

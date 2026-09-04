@@ -1,0 +1,118 @@
+{
+  "experiment_id": "EXP_002",
+  "tool": "inspect",
+  "arguments": {},
+  "backend": "ssh_direct",
+  "remote_host": "server-114",
+  "remote_pid": 163324,
+  "job_id": "RUN_V022_B03_API_SSH_02_EXP_002",
+  "status": "COMPLETED",
+  "cost": 1,
+  "result": {
+    "status": "success",
+    "experiment_id": "EXP_002",
+    "tool": "inspect",
+    "arguments": {},
+    "metrics": {
+      "reference": {
+        "shape": [
+          256,
+          256
+        ],
+        "dtype": "uint8",
+        "min": 0.0,
+        "max": 1.0,
+        "mean": 0.3839569091796875,
+        "std": 0.4863476134133576,
+        "unique_count": 2,
+        "nan_fraction": 0.0
+      },
+      "target": {
+        "shape": [
+          256,
+          256
+        ],
+        "dtype": "uint8",
+        "min": 0.0,
+        "max": 1.0,
+        "mean": 0.371368408203125,
+        "std": 0.48317068784416356,
+        "unique_count": 2,
+        "nan_fraction": 0.0
+      }
+    },
+    "scientific_metrics": {
+      "metric_count": 0,
+      "primary_metric": null,
+      "primary_value": null,
+      "values": {}
+    },
+    "compute_metrics": {
+      "wall_seconds": 0.013726,
+      "process_cpu_seconds": 1.05822,
+      "pid": 163324,
+      "python_version": "3.12.3",
+      "input_bytes": 196992,
+      "load_average_1m": 0.2769,
+      "user_cpu_seconds": 1.004745,
+      "system_cpu_seconds": 0.054107,
+      "max_rss_kib": 35708,
+      "max_rss_unit": "KiB (Linux ru_maxrss)"
+    },
+    "site_profile": {
+      "profile_version": "1",
+      "site_id": "remote-7804a56a5c7636cc",
+      "os_family": "linux"
+    },
+    "elapsed_seconds": 0.014
+  },
+  "compute_observation": {
+    "job_id": "RUN_V022_B03_API_SSH_02_EXP_002",
+    "backend": "ssh_direct",
+    "lifecycle_state": "COMPLETED",
+    "observed_at": 1788509407.8187642,
+    "remote_pid": 163324,
+    "compute_metrics": {
+      "lifecycle": [
+        {
+          "state": "SUBMITTED",
+          "observed_at": 1788509405.8406172
+        },
+        {
+          "state": "COMPLETED",
+          "observed_at": 1788509406.2151506
+        }
+      ],
+      "submit_timestamp": 1788509405.8406172,
+      "finish_timestamp": 1788509406.2151506,
+      "wall_seconds": 0.013726,
+      "process_cpu_seconds": 1.05822,
+      "pid": 163324,
+      "python_version": "3.12.3",
+      "input_bytes": 196992,
+      "load_average_1m": 0.2769,
+      "user_cpu_seconds": 1.004745,
+      "system_cpu_seconds": 0.054107,
+      "max_rss_kib": 35708,
+      "max_rss_unit": "KiB (Linux ru_maxrss)",
+      "executor_durations_seconds": {
+        "upload": 0.373084,
+        "wait": 0.374549,
+        "result_fetch": 0.270344
+      }
+    },
+    "scientific_metrics": {
+      "metric_count": 0,
+      "primary_metric": null,
+      "primary_value": null,
+      "values": {}
+    },
+    "site_profile": {
+      "profile_version": "1",
+      "site_id": "ssh-642478ca63710924",
+      "backend": "ssh_direct"
+    }
+  },
+  "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_002\", \"tool\": \"inspect\", \"arguments\": {}, \"metrics\": {\"reference\": {\"shape\": [256, 256], \"dtype\": \"uint8\", \"min\": 0.0, \"max\": 1.0, \"mean\": 0.3839569091796875, \"std\": 0.4863476134133576, \"unique_count\": 2, \"nan_fraction\": 0.0}, \"target\": {\"shape\": [256, 256], \"dtype\": \"uint8\", \"min\": 0.0, \"max\": 1.0, \"mean\": 0.371368408203125, \"std\": 0.48317068784416356, \"unique_count\": 2, \"nan_fraction\": 0.0}}, \"scientific_metrics\": {\"metric_count\": 0, \"primary_metric\": null, \"primary_value\": null, \"values\": {}}, \"compute_metrics\": {\"wall_seconds\": 0.013726, \"process_cpu_seconds\": 1.05822, \"pid\": 163324, \"python_version\": \"3.12.3\", \"input_bytes\": 196992, \"load_average_1m\": 0.2769, \"user_cpu_seconds\": 1.004745, \"system_cpu_seconds\": 0.054107, \"max_rss_kib\": 35708, \"max_rss_unit\": \"KiB (Linux ru_maxrss)\"}, \"site_profile\": {\"profile_version\": \"1\", \"site_id\": \"remote-7804a56a5c7636cc\", \"os_family\": \"linux\"}, \"elapsed_seconds\": 0.014}\n",
+  "stderr": ""
+}

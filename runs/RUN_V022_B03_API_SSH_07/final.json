@@ -1,0 +1,13 @@
+{
+  "decision": "no_fault",
+  "fault_family": "none",
+  "root_cause": "No silent failure detected. The comparison completed successfully with agreement 0.9357, which exceeds the quality threshold of 0.85. A 1-pixel shift test decreased agreement to 0.9341, providing no evidence of spatial misalignment. The high agreement and lack of improvement under shift support a correct comparison.",
+  "confidence": 0.9,
+  "evidence_experiment_ids": [
+    "EXP_001"
+  ],
+  "recommended_repair": {},
+  "remaining_uncertainty": [
+    "Value transformation and masking errors were not directly tested, but the high agreement and absence of shift improvement make these unlikely to represent a silent failure."
+  ]
+}

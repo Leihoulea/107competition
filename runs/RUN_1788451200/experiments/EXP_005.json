@@ -1,0 +1,36 @@
+{
+  "experiment_id": "EXP_005",
+  "tool": "shift_and_compare",
+  "arguments": {
+    "dr": 0,
+    "dc": 1
+  },
+  "backend": "ssh_direct",
+  "remote_host": "server-114",
+  "remote_pid": 31660,
+  "job_id": "EXP_005",
+  "status": "COMPLETED",
+  "cost": 4,
+  "result": {
+    "status": "success",
+    "experiment_id": "EXP_005",
+    "tool": "shift_and_compare",
+    "arguments": {
+      "dr": 0,
+      "dc": 1
+    },
+    "metrics": {
+      "dr": 0,
+      "dc": 1,
+      "agreement": 0.581787109375,
+      "intersection": 10452,
+      "union": 37860,
+      "iou": 0.27606973058637085
+    },
+    "hostname": "ubuntu",
+    "pid": 31660,
+    "elapsed_seconds": 0.001
+  },
+  "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_005\", \"tool\": \"shift_and_compare\", \"arguments\": {\"dr\": 0, \"dc\": 1}, \"metrics\": {\"dr\": 0, \"dc\": 1, \"agreement\": 0.581787109375, \"intersection\": 10452, \"union\": 37860, \"iou\": 0.27606973058637085}, \"hostname\": \"ubuntu\", \"pid\": 31660, \"elapsed_seconds\": 0.001}\n",
+  "stderr": ""
+}

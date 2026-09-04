@@ -1,0 +1,41 @@
+{
+  "experiments": [
+    {
+      "experiment_id": "EXP_001",
+      "tool": "compare",
+      "arguments": {},
+      "backend": "ssh_direct",
+      "remote_host": "server-114",
+      "remote_pid": 41494,
+      "job_id": "EXP_001",
+      "status": "COMPLETED",
+      "cost": 1,
+      "result": {
+        "status": "success",
+        "experiment_id": "EXP_001",
+        "tool": "compare",
+        "arguments": {},
+        "metrics": {
+          "agreement": 0.9357452392578125,
+          "intersection": 22645,
+          "union": 26856,
+          "iou": 0.8432007745010426,
+          "precision": 0.9304379981921276,
+          "recall": 0.8999324404880181,
+          "valid_pixels": 65536,
+          "valid_fraction": 1.0
+        },
+        "hostname": "ubuntu",
+        "pid": 41494,
+        "elapsed_seconds": 0.002
+      },
+      "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_001\", \"tool\": \"compare\", \"arguments\": {}, \"metrics\": {\"agreement\": 0.9357452392578125, \"intersection\": 22645, \"union\": 26856, \"iou\": 0.8432007745010426, \"precision\": 0.9304379981921276, \"recall\": 0.8999324404880181, \"valid_pixels\": 65536, \"valid_fraction\": 1.0}, \"hostname\": \"ubuntu\", \"pid\": 41494, \"elapsed_seconds\": 0.002}\n",
+      "stderr": ""
+    }
+  ],
+  "action": {
+    "type": "tool_call",
+    "final": null,
+    "reason": "Need to inspect the underlying data to understand the spatial disagreement despite high agreement metric."
+  }
+}

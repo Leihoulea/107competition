@@ -1,0 +1,13 @@
+{
+  "decision": "fault",
+  "fault_family": "spatial_alignment",
+  "root_cause": "orientation_mismatch",
+  "confidence": 0.95,
+  "evidence_experiment_ids": [
+    "EXP_001",
+    "EXP_002"
+  ],
+  "recommended_repair": {
+    "operation": "rot180"
+  }
+}

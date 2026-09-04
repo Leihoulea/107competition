@@ -1,0 +1,7 @@
+{
+  "experiment_id": "EXP_002",
+  "tool": "transform_and_compare",
+  "arguments": {
+    "operation": "identity"
+  }
+}

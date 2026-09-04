@@ -1,0 +1,7 @@
+{
+  "experiment_id": "EXP_005",
+  "tool": "transform_and_compare",
+  "arguments": {
+    "operation": "transpose"
+  }
+}

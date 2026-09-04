@@ -1,0 +1,42 @@
+{
+  "experiment_id": "EXP_004",
+  "tool": "shift_and_compare",
+  "arguments": {
+    "dr": -1,
+    "dc": 0
+  },
+  "backend": "ssh_direct",
+  "remote_host": "server-114",
+  "remote_pid": 52705,
+  "job_id": "EXP_004",
+  "status": "COMPLETED",
+  "cost": 4,
+  "result": {
+    "status": "success",
+    "experiment_id": "EXP_004",
+    "tool": "shift_and_compare",
+    "arguments": {
+      "dr": -1,
+      "dc": 0
+    },
+    "metrics": {
+      "dr": -1,
+      "dc": 0,
+      "agreement": 0.6019148284313726,
+      "agreement_all": 0.6033935546875,
+      "agreement_valid": 0.6019148284313726,
+      "intersection": 11749,
+      "union": 37736,
+      "iou": 0.31134725461098156,
+      "precision": 0.4826438811978803,
+      "recall": 0.46730570360353196,
+      "valid_pixels": 65280,
+      "valid_fraction": 0.99609375
+    },
+    "hostname": "ubuntu",
+    "pid": 52705,
+    "elapsed_seconds": 0.002
+  },
+  "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_004\", \"tool\": \"shift_and_compare\", \"arguments\": {\"dr\": -1, \"dc\": 0}, \"metrics\": {\"dr\": -1, \"dc\": 0, \"agreement\": 0.6019148284313726, \"agreement_all\": 0.6033935546875, \"agreement_valid\": 0.6019148284313726, \"intersection\": 11749, \"union\": 37736, \"iou\": 0.31134725461098156, \"precision\": 0.4826438811978803, \"recall\": 0.46730570360353196, \"valid_pixels\": 65280, \"valid_fraction\": 0.99609375}, \"hostname\": \"ubuntu\", \"pid\": 52705, \"elapsed_seconds\": 0.002}\n",
+  "stderr": ""
+}

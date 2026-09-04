@@ -1,0 +1,251 @@
+{
+  "run_id": "RUN_B01_SINGLE",
+  "case_id": "B01",
+  "task": {
+    "case_id": "B01",
+    "title": "Unexpected spatial disagreement between scientific products",
+    "task": "A completed scientific comparison may contain a silent failure. Use available experiments to determine whether a fault exists and validate any repair.",
+    "budget": 30,
+    "expected_quality_threshold": 0.85
+  },
+  "initial_observation": {
+    "process_status": "COMPLETED",
+    "exit_code": 0,
+    "agreement": 0.601593017578125,
+    "valid_pixels": 65536
+  },
+  "hypotheses": [
+    {
+      "hypothesis_id": "H1",
+      "description": "A systematic mismatch may be present.",
+      "category": "data_relationship",
+      "status": "active",
+      "confidence": 0.4,
+      "evidence_for": [],
+      "evidence_against": []
+    },
+    {
+      "hypothesis_id": "H2",
+      "description": "The observed disagreement may be within expected variation.",
+      "category": "normal_variation",
+      "status": "active",
+      "confidence": 0.3,
+      "evidence_for": [],
+      "evidence_against": []
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "EXP_001",
+      "tool": "inspect",
+      "arguments": {},
+      "backend": "ssh_direct",
+      "remote_host": "server-114",
+      "remote_pid": 36838,
+      "job_id": "EXP_001",
+      "status": "COMPLETED",
+      "cost": 1,
+      "result": {
+        "status": "success",
+        "experiment_id": "EXP_001",
+        "tool": "inspect",
+        "arguments": {},
+        "metrics": {
+          "reference": {
+            "shape": [
+              256,
+              256
+            ],
+            "dtype": "uint8",
+            "min": 0.0,
+            "max": 1.0,
+            "mean": 0.3837127685546875,
+            "std": 0.4862892964098473,
+            "unique_count": 2,
+            "nan_fraction": 0.0
+          },
+          "target": {
+            "shape": [
+              256,
+              256
+            ],
+            "dtype": "uint8",
+            "min": 0.0,
+            "max": 1.0,
+            "mean": 0.3715972900390625,
+            "std": 0.48323156361592046,
+            "unique_count": 2,
+            "nan_fraction": 0.0
+          }
+        },
+        "hostname": "ubuntu",
+        "pid": 36838,
+        "elapsed_seconds": 0.013
+      },
+      "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_001\", \"tool\": \"inspect\", \"arguments\": {}, \"metrics\": {\"reference\": {\"shape\": [256, 256], \"dtype\": \"uint8\", \"min\": 0.0, \"max\": 1.0, \"mean\": 0.3837127685546875, \"std\": 0.4862892964098473, \"unique_count\": 2, \"nan_fraction\": 0.0}, \"target\": {\"shape\": [256, 256], \"dtype\": \"uint8\", \"min\": 0.0, \"max\": 1.0, \"mean\": 0.3715972900390625, \"std\": 0.48323156361592046, \"unique_count\": 2, \"nan_fraction\": 0.0}}, \"hostname\": \"ubuntu\", \"pid\": 36838, \"elapsed_seconds\": 0.013}\n",
+      "stderr": ""
+    },
+    {
+      "experiment_id": "EXP_002",
+      "tool": "transform_and_compare",
+      "arguments": {
+        "operation": "rot180"
+      },
+      "backend": "ssh_direct",
+      "remote_host": "server-114",
+      "remote_pid": 37230,
+      "job_id": "EXP_002",
+      "status": "COMPLETED",
+      "cost": 4,
+      "result": {
+        "status": "success",
+        "experiment_id": "EXP_002",
+        "tool": "transform_and_compare",
+        "arguments": {
+          "operation": "rot180"
+        },
+        "metrics": {
+          "operation": "rot180",
+          "agreement": 0.935272216796875,
+          "intersection": 22629,
+          "union": 26871,
+          "iou": 0.8421346432957464,
+          "precision": 0.9292079004640086,
+          "recall": 0.8998687716228576,
+          "valid_pixels": 65536,
+          "valid_fraction": 1.0
+        },
+        "hostname": "ubuntu",
+        "pid": 37230,
+        "elapsed_seconds": 0.002
+      },
+      "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_002\", \"tool\": \"transform_and_compare\", \"arguments\": {\"operation\": \"rot180\"}, \"metrics\": {\"operation\": \"rot180\", \"agreement\": 0.935272216796875, \"intersection\": 22629, \"union\": 26871, \"iou\": 0.8421346432957464, \"precision\": 0.9292079004640086, \"recall\": 0.8998687716228576, \"valid_pixels\": 65536, \"valid_fraction\": 1.0}, \"hostname\": \"ubuntu\", \"pid\": 37230, \"elapsed_seconds\": 0.002}\n",
+      "stderr": ""
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E001",
+      "experiment_id": "EXP_001",
+      "statement": "inspect produced agreement n/a",
+      "metrics": {
+        "reference": {
+          "shape": [
+            256,
+            256
+          ],
+          "dtype": "uint8",
+          "min": 0.0,
+          "max": 1.0,
+          "mean": 0.3837127685546875,
+          "std": 0.4862892964098473,
+          "unique_count": 2,
+          "nan_fraction": 0.0
+        },
+        "target": {
+          "shape": [
+            256,
+            256
+          ],
+          "dtype": "uint8",
+          "min": 0.0,
+          "max": 1.0,
+          "mean": 0.3715972900390625,
+          "std": 0.48323156361592046,
+          "unique_count": 2,
+          "nan_fraction": 0.0
+        }
+      },
+      "supports": [],
+      "contradicts": []
+    },
+    {
+      "evidence_id": "E002",
+      "experiment_id": "EXP_002",
+      "statement": "transform_and_compare produced agreement 0.935272216796875",
+      "metrics": {
+        "operation": "rot180",
+        "agreement": 0.935272216796875,
+        "intersection": 22629,
+        "union": 26871,
+        "iou": 0.8421346432957464,
+        "precision": 0.9292079004640086,
+        "recall": 0.8998687716228576,
+        "valid_pixels": 65536,
+        "valid_fraction": 1.0
+      },
+      "supports": [
+        "H1"
+      ],
+      "contradicts": []
+    }
+  ],
+  "current_plan": {
+    "tool": "transform_and_compare",
+    "arguments": {
+      "operation": "rot180"
+    },
+    "reason": "Test one general 2-D transform and measure whether agreement changes materially.",
+    "target_hypotheses": [
+      "H1",
+      "H2"
+    ]
+  },
+  "latest_result": {
+    "experiment_id": "EXP_002",
+    "tool": "transform_and_compare",
+    "arguments": {
+      "operation": "rot180"
+    },
+    "backend": "ssh_direct",
+    "remote_host": "server-114",
+    "remote_pid": 37230,
+    "job_id": "EXP_002",
+    "status": "COMPLETED",
+    "cost": 4,
+    "result": {
+      "status": "success",
+      "experiment_id": "EXP_002",
+      "tool": "transform_and_compare",
+      "arguments": {
+        "operation": "rot180"
+      },
+      "metrics": {
+        "operation": "rot180",
+        "agreement": 0.935272216796875,
+        "intersection": 22629,
+        "union": 26871,
+        "iou": 0.8421346432957464,
+        "precision": 0.9292079004640086,
+        "recall": 0.8998687716228576,
+        "valid_pixels": 65536,
+        "valid_fraction": 1.0
+      },
+      "hostname": "ubuntu",
+      "pid": 37230,
+      "elapsed_seconds": 0.002
+    },
+    "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_002\", \"tool\": \"transform_and_compare\", \"arguments\": {\"operation\": \"rot180\"}, \"metrics\": {\"operation\": \"rot180\", \"agreement\": 0.935272216796875, \"intersection\": 22629, \"union\": 26871, \"iou\": 0.8421346432957464, \"precision\": 0.9292079004640086, \"recall\": 0.8998687716228576, \"valid_pixels\": 65536, \"valid_fraction\": 1.0}, \"hostname\": \"ubuntu\", \"pid\": 37230, \"elapsed_seconds\": 0.002}\n",
+    "stderr": ""
+  },
+  "budget_total": 30,
+  "budget_remaining": 25,
+  "steps_used": 2,
+  "max_steps": 8,
+  "quality_threshold": 0.85,
+  "diagnosis_status": "validated_fault",
+  "final_diagnosis": {
+    "decision": "fault",
+    "fault_family": "validated_candidate",
+    "root_cause": "evidence-backed candidate",
+    "confidence": 0.8,
+    "evidence_experiment_ids": [
+      "EXP_002"
+    ],
+    "recommended_repair": {
+      "operation": "rot180"
+    }
+  },
+  "knowledge_queries": [],
+  "knowledge_evidence": []
+}

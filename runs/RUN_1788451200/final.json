@@ -1,0 +1,18 @@
+{
+  "decision": "fault",
+  "fault_family": "spatial_misalignment",
+  "root_cause": "The two products contain the same set of pixel values but are arranged differently in space, causing low pixel-level agreement. Simple shifts and transpose do not resolve the mismatch, indicating a more complex spatial reordering (e.g., row/column permutation) rather than a simple translation or flip.",
+  "confidence": 0.85,
+  "evidence_experiment_ids": [
+    "EXP_001",
+    "EXP_002",
+    "EXP_003",
+    "EXP_004",
+    "EXP_005",
+    "EXP_006"
+  ],
+  "recommended_repair": {
+    "type": "reorder_rows_or_columns",
+    "description": "Investigate the spatial ordering of the target product. Since global statistics match exactly, the data values are identical but permuted. Try sorting rows/columns by a key (e.g., latitude/longitude) or apply a permutation that aligns the products. Validate by recomputing agreement after reordering."
+  }
+}

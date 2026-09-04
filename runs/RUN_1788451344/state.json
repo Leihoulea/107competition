@@ -1,0 +1,112 @@
+{
+  "case_id": "GEO-001",
+  "budget_total": 30,
+  "budget_remaining": 25,
+  "observations": [
+    {
+      "process_status": "COMPLETED",
+      "exit_code": 0,
+      "agreement": 0.58197021484375,
+      "valid_pixels": 65536
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "EXP_001",
+      "tool": "inspect",
+      "arguments": {},
+      "backend": "ssh_direct",
+      "remote_host": "server-114",
+      "remote_pid": 32792,
+      "job_id": "EXP_001",
+      "status": "COMPLETED",
+      "cost": 1,
+      "result": {
+        "status": "success",
+        "experiment_id": "EXP_001",
+        "tool": "inspect",
+        "arguments": {},
+        "metrics": {
+          "reference": {
+            "shape": [
+              256,
+              256
+            ],
+            "dtype": "uint8",
+            "min": 0.0,
+            "max": 1.0,
+            "mean": 0.36859130859375,
+            "std": 0.48242279778519687,
+            "unique_count": 2,
+            "nan_fraction": 0.0
+          },
+          "target": {
+            "shape": [
+              256,
+              256
+            ],
+            "dtype": "uint8",
+            "min": 0.0,
+            "max": 1.0,
+            "mean": 0.36859130859375,
+            "std": 0.48242279778519687,
+            "unique_count": 2,
+            "nan_fraction": 0.0
+          }
+        },
+        "hostname": "ubuntu",
+        "pid": 32792,
+        "elapsed_seconds": 0.013
+      },
+      "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_001\", \"tool\": \"inspect\", \"arguments\": {}, \"metrics\": {\"reference\": {\"shape\": [256, 256], \"dtype\": \"uint8\", \"min\": 0.0, \"max\": 1.0, \"mean\": 0.36859130859375, \"std\": 0.48242279778519687, \"unique_count\": 2, \"nan_fraction\": 0.0}, \"target\": {\"shape\": [256, 256], \"dtype\": \"uint8\", \"min\": 0.0, \"max\": 1.0, \"mean\": 0.36859130859375, \"std\": 0.48242279778519687, \"unique_count\": 2, \"nan_fraction\": 0.0}}, \"hostname\": \"ubuntu\", \"pid\": 32792, \"elapsed_seconds\": 0.013}\n",
+      "stderr": ""
+    },
+    {
+      "experiment_id": "EXP_002",
+      "tool": "transform_and_compare",
+      "arguments": {
+        "operation": "rot180"
+      },
+      "backend": "ssh_direct",
+      "remote_host": "server-114",
+      "remote_pid": 33184,
+      "job_id": "EXP_002",
+      "status": "COMPLETED",
+      "cost": 4,
+      "result": {
+        "status": "success",
+        "experiment_id": "EXP_002",
+        "tool": "transform_and_compare",
+        "arguments": {
+          "operation": "rot180"
+        },
+        "metrics": {
+          "operation": "rot180",
+          "agreement": 1.0,
+          "intersection": 24156,
+          "union": 24156,
+          "iou": 1.0
+        },
+        "hostname": "ubuntu",
+        "pid": 33184,
+        "elapsed_seconds": 0.002
+      },
+      "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_002\", \"tool\": \"transform_and_compare\", \"arguments\": {\"operation\": \"rot180\"}, \"metrics\": {\"operation\": \"rot180\", \"agreement\": 1.0, \"intersection\": 24156, \"union\": 24156, \"iou\": 1.0}, \"hostname\": \"ubuntu\", \"pid\": 33184, \"elapsed_seconds\": 0.002}\n",
+      "stderr": ""
+    }
+  ],
+  "final_diagnosis": {
+    "decision": "fault",
+    "fault_family": "orientation_error",
+    "root_cause": "The target product was rotated 180 degrees relative to the reference, causing systematic spatial misalignment. Rotating the target by 180 degrees restores perfect agreement (IoU=1.0).",
+    "confidence": 1.0,
+    "evidence_experiment_ids": [
+      "EXP_001",
+      "EXP_002"
+    ],
+    "recommended_repair": {
+      "operation": "rot180",
+      "description": "Apply a 180-degree rotation to the target product to correct the orientation error before comparison or downstream use."
+    }
+  }
+}

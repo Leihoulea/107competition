@@ -1,0 +1,33 @@
+{
+  "experiment_id": "EXP_002",
+  "tool": "transform_and_compare",
+  "arguments": {
+    "operation": "rot180"
+  },
+  "backend": "ssh_direct",
+  "remote_host": "server-114",
+  "remote_pid": 33184,
+  "job_id": "EXP_002",
+  "status": "COMPLETED",
+  "cost": 4,
+  "result": {
+    "status": "success",
+    "experiment_id": "EXP_002",
+    "tool": "transform_and_compare",
+    "arguments": {
+      "operation": "rot180"
+    },
+    "metrics": {
+      "operation": "rot180",
+      "agreement": 1.0,
+      "intersection": 24156,
+      "union": 24156,
+      "iou": 1.0
+    },
+    "hostname": "ubuntu",
+    "pid": 33184,
+    "elapsed_seconds": 0.002
+  },
+  "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_002\", \"tool\": \"transform_and_compare\", \"arguments\": {\"operation\": \"rot180\"}, \"metrics\": {\"operation\": \"rot180\", \"agreement\": 1.0, \"intersection\": 24156, \"union\": 24156, \"iou\": 1.0}, \"hostname\": \"ubuntu\", \"pid\": 33184, \"elapsed_seconds\": 0.002}\n",
+  "stderr": ""
+}

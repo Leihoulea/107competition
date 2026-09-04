@@ -1,0 +1,14 @@
+{
+  "decision": "fault",
+  "fault_family": "orientation_error",
+  "root_cause": "The target product was rotated 180 degrees relative to the reference, causing systematic spatial misalignment. Rotating the target by 180 degrees restores perfect agreement (IoU=1.0).",
+  "confidence": 1.0,
+  "evidence_experiment_ids": [
+    "EXP_001",
+    "EXP_002"
+  ],
+  "recommended_repair": {
+    "operation": "rot180",
+    "description": "Apply a 180-degree rotation to the target product to correct the orientation error before comparison or downstream use."
+  }
+}
