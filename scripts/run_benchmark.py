@@ -21,9 +21,9 @@ def api_llm(context):
     agent = OpenAICompatibleAgent(Settings())
     mode = context["mode"]
     schemas = {
-        "direct_final": {"decision": "fault|no_fault", "confidence": 0.0, "evidence_experiment_ids": []},
+        "direct_final": {"decision": "fault|no_fault", "fault_family": "string", "root_cause": "string", "confidence": 0.0, "evidence_experiment_ids": [], "recommended_repair": {}},
         "one_shot_plan": {"operation": "identity|flip_x|flip_y|rot90|rot180|rot270|transpose"},
-        "one_shot_final": {"decision": "fault|no_fault", "confidence": 0.0, "evidence_experiment_ids": ["BASE_001"]},
+        "one_shot_final": {"decision": "fault|no_fault", "fault_family": "string", "root_cause": "string", "confidence": 0.0, "evidence_experiment_ids": ["BASE_001"], "recommended_repair": {}},
     }
     return agent._request_json("benchmark " + mode + "; use only the supplied public context and do not claim unexecuted evidence", context, schemas[mode])
 
