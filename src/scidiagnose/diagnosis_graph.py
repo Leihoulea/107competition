@@ -18,6 +18,25 @@ def agreement(metrics: dict[str, Any]) -> float | None:
     return float(value) if value is not None else None
 
 
+def _scope(values: Any) -> list[str]:
+    """Normalize the small, auditable vocabulary used for evidence coverage."""
+    if not isinstance(values, list): values = [values]
+    return list(dict.fromkeys(str(value) for value in values if str(value).strip()))
+
+
+def _argument_distance(left: Any, right: Any) -> float:
+    """A conservative structural distance for rejecting almost repeated probes."""
+    if type(left) is not type(right): return 99.0
+    if isinstance(left, dict):
+        if set(left) != set(right): return 99.0
+        return sum(_argument_distance(left[key], right[key]) for key in left)
+    if isinstance(left, list):
+        if len(left) != len(right): return 99.0
+        return sum(_argument_distance(a, b) for a, b in zip(left, right))
+    if isinstance(left, (int, float)) and not isinstance(left, bool): return min(abs(left - right), 2.0)
+    return 0.0 if left == right else 2.0
+
+
 class DiagnosisGraph:
     """State transitions are auditable; model calls receive only public cognitive state."""
     def __init__(self, agent: Any, tools: ExperimentTools, run_dir: Path) -> None:
@@ -54,19 +73,50 @@ class DiagnosisGraph:
     def hypothesize(self, s: DiagnosisGraphState) -> dict[str, Any]:
         context = self._context(s)
         hypotheses = self.agent.generate_hypotheses(context) if not s.get("hypotheses") else s["hypotheses"]
+        hypotheses = [{**item, "testable_scope": _scope(item.get("testable_scope", [item.get("category", "unspecified")])) or ["unspecified"]} for item in hypotheses]
         self.log("hypothesize", hypotheses=hypotheses)
         return {"hypotheses": hypotheses}
 
     def plan(self, s: DiagnosisGraphState) -> dict[str, Any]:
-        plan = self.agent.plan_experiment(self._context(s))
-        if "final" in plan:
+        proposed = self.agent.plan_experiment(self._context(s))
+        if "final" in proposed:
             raise RuntimeError("planner may only return an experiment plan; final decisions require reflection and validation")
+        candidates = proposed.get("candidate_plans") if isinstance(proposed.get("candidate_plans"), list) else [proposed]
+        hypotheses = {item["hypothesis_id"]: item for item in s.get("hypotheses", [])}
+        plan = None
+        rejected: list[dict[str, Any]] = []
+        for candidate in candidates[:3]:
+            targets = [item for item in candidate.get("target_hypotheses", []) if item in hypotheses]
+            if not targets: targets = [key for key, item in hypotheses.items() if item.get("status") in {"active", "supported"}]
+            tested_scope = _scope(candidate.get("tested_scope", []))
+            if not tested_scope:
+                tested_scope = _scope([scope for key in targets for scope in hypotheses[key].get("testable_scope", [])])
+            covered = [key for key in targets if set(tested_scope) & set(hypotheses[key].get("testable_scope", []))]
+            novelty = self._novelty(s, candidate)
+            if covered and novelty["status"] == "novel":
+                plan = {**candidate, "target_hypotheses": covered, "tested_scope": tested_scope, "coverage": {"hypothesis_ids": covered, "tested_scope": tested_scope, "novelty": novelty}}
+                break
+            rejected.append({"target_hypotheses": targets, "tested_scope": tested_scope, "novelty": novelty, "reason": "no covered hypothesis" if not covered else "not novel"})
+        if plan is None:
+            self.log("plan_rejected", candidates=rejected)
+            raise RuntimeError("planner produced no novel candidate with testable hypothesis coverage")
         plan_id = f"PLAN{len(s.get('experiments', [])) + 1:03d}"
         pipeline = plan.get("arguments", {}).get("pipeline", [])
         estimated = COSTS[plan["tool"]] + (len(pipeline) if plan["tool"] == "evaluate_candidate" else 0)
         plan = {"plan_id": plan_id, **plan, "estimated_cost": estimated}
         self.log("plan", selected_experiment=plan)
         return {"current_plan": plan}
+
+    @staticmethod
+    def _novelty(s: DiagnosisGraphState, candidate: dict[str, Any]) -> dict[str, Any]:
+        for previous in s.get("experiments", []):
+            if previous.get("tool") != candidate.get("tool"): continue
+            distance = _argument_distance(previous.get("arguments", {}), candidate.get("arguments", {}))
+            if distance == 0:
+                return {"status": "duplicate", "experiment_id": previous.get("experiment_id"), "distance": distance}
+            if distance <= 1:
+                return {"status": "near_duplicate", "experiment_id": previous.get("experiment_id"), "distance": distance}
+        return {"status": "novel"}
 
     def budget_check(self, s: DiagnosisGraphState) -> dict[str, Any]:
         plan = s["current_plan"] or {}
@@ -80,6 +130,7 @@ class DiagnosisGraph:
         remaining = s["budget_remaining"] - record["cost"]
         if remaining < 0: raise RuntimeError("budget guard failed before remote execution")
         self.log("execute", plan_id=plan["plan_id"], experiment_id=record["experiment_id"], backend=record["backend"], remote_host=record["remote_host"], remote_pid=record["remote_pid"], result=record["result"])
+        record = {**record, "plan_id": plan["plan_id"], "coverage": plan.get("coverage", {})}
         return {"experiments": s.get("experiments", []) + [record], "latest_result": record, "budget_remaining": remaining, "steps_used": s["steps_used"] + 1}
 
     def extract_evidence(self, s: DiagnosisGraphState) -> dict[str, Any]:
@@ -90,16 +141,32 @@ class DiagnosisGraph:
         delta = observed - baseline if baseline is not None and observed is not None else None
         evidence_id = f"E{len(s.get('evidence', [])) + 1:03d}"
         residual = max(0.0, s["quality_threshold"] - observed) if observed is not None else None
-        item = {"evidence_id": evidence_id, "experiment_id": record["experiment_id"], "baseline_metric": baseline, "observed_metric": observed, "delta": delta, "threshold": s["quality_threshold"], "residual_gap": residual, "valid_pixels": metrics.get("valid_pixels"), "valid_fraction": metrics.get("valid_fraction"), "interpretation": "Metric evidence pending hypothesis update.", "supports": [], "contradicts": []}
+        coverage = record.get("coverage", {})
+        # Direct callers from the pre-policy API have no plan record.  Treat
+        # those legacy records as broad observations so they retain their old,
+        # explicitly all-hypothesis update behaviour.
+        tested_hypotheses = list(coverage.get("hypothesis_ids", [])) or [item["hypothesis_id"] for item in s.get("hypotheses", [])]
+        tested_scope = list(coverage.get("tested_scope", [])) or _scope([scope for item in s.get("hypotheses", []) for scope in item.get("testable_scope", [])])
+        item = {"evidence_id": evidence_id, "experiment_id": record["experiment_id"], "baseline_metric": baseline, "observed_metric": observed, "delta": delta, "threshold": s["quality_threshold"], "residual_gap": residual, "valid_pixels": metrics.get("valid_pixels"), "valid_fraction": metrics.get("valid_fraction"), "interpretation": "Metric evidence pending hypothesis update.", "supports": [], "contradicts": [], "tested_hypotheses": tested_hypotheses, "tested_scope": tested_scope}
         self.log("extract_evidence", evidence=item)
         return {"evidence": s.get("evidence", []) + [item]}
 
     def update_hypotheses(self, s: DiagnosisGraphState) -> dict[str, Any]:
         context = self._context(s)
         context["latest_evidence"] = s["evidence"][-1]
-        hypotheses = self.agent.update_hypotheses(context)
+        allowed = set(context["latest_evidence"].get("tested_hypotheses", []))
+        context["scope_hypothesis_ids"] = sorted(allowed)
+        returned = {item["hypothesis_id"]: item for item in self.agent.update_hypotheses(context) if item.get("hypothesis_id") in allowed}
+        hypotheses = []
+        for old in s.get("hypotheses", []):
+            update = returned.get(old["hypothesis_id"])
+            hypotheses.append({**update, "testable_scope": old.get("testable_scope", [])} if update else old)
+        latest = dict(context["latest_evidence"])
+        latest["supports"] = [item["hypothesis_id"] for item in hypotheses if item["hypothesis_id"] in allowed and latest["evidence_id"] in item.get("evidence_for", [])]
+        latest["contradicts"] = [item["hypothesis_id"] for item in hypotheses if item["hypothesis_id"] in allowed and latest["evidence_id"] in item.get("evidence_against", [])]
+        evidence = s["evidence"][:-1] + [latest]
         self.log("update_hypotheses", evidence_id=context["latest_evidence"]["evidence_id"], hypotheses=hypotheses)
-        return {"hypotheses": hypotheses}
+        return {"hypotheses": hypotheses, "evidence": evidence}
 
     def reflect(self, s: DiagnosisGraphState) -> dict[str, Any]:
         best = max((item["observed_metric"] or 0.0 for item in s.get("evidence", [])), default=0.0)
