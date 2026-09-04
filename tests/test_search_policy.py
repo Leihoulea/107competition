@@ -167,6 +167,20 @@ def test_all_invalid_candidates_get_one_contract_correction():
     assert planned["tool"] == "compare"
 
 
+def test_api_planner_receives_a_neutral_tool_catalog():
+    agent = object.__new__(OpenAICompatibleAgent)
+    contexts = []
+
+    def request(name, context, schema):
+        contexts.append(context)
+        return {"candidates": [{"target_hypotheses": ["H001"], "tested_scope": ["scope-a"], "experiment": {"tool": "compare", "arguments": {}}}]}
+
+    agent._request_json = request
+    agent.plan_experiment({"hypotheses": state()["hypotheses"]})
+    assert contexts[0]["tool_catalog"]["compare"] == {"arguments": {}}
+    assert contexts[0]["tool_catalog"]["shift_and_compare"]["arguments"]["dr"] == "integer [-5, 5]"
+
+
 def test_manual_agent_graph_never_returns_a_planner_final_action():
     class Tools:
         def __init__(self): self.calls = 0

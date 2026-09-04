@@ -20,7 +20,17 @@ class OneShotLLMBaseline:
     def run(self, case: PublicCase, repeat: int) -> dict[str, Any]: return BenchmarkHarness(self.llm).one_shot_llm(case, repeat)
 
 
-class DeterministicExhaustiveBaseline:
+class DeterministicTransformSweepBaseline:
     """Enumerates the fixed public transform set without a model."""
-    name = "deterministic_exhaustive"
-    def run(self, case: PublicCase, repeat: int) -> dict[str, Any]: return BenchmarkHarness().deterministic_exhaustive(case, repeat)
+    name = "deterministic_transform_sweep"
+    def run(self, case: PublicCase, repeat: int) -> dict[str, Any]: return BenchmarkHarness().deterministic_transform_sweep(case, repeat)
+
+
+class DeterministicFullSearchBaseline:
+    """Enumerates the public transform-plus-shift search space without a model."""
+    name = "deterministic_full_search"
+    def run(self, case: PublicCase, repeat: int) -> dict[str, Any]: return BenchmarkHarness().deterministic_full_search(case, repeat)
+
+
+# Kept as an import-compatible name for existing downstream scripts.
+DeterministicExhaustiveBaseline = DeterministicTransformSweepBaseline

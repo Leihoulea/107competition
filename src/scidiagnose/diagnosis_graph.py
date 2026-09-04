@@ -18,6 +18,22 @@ def agreement(metrics: dict[str, Any]) -> float | None:
     return float(value) if value is not None else None
 
 
+REPAIR_IMPROVEMENT_MARGIN = 1e-3
+
+
+def _is_non_identity_repair(record: dict[str, Any]) -> bool:
+    """Return whether a recorded experiment applied an actual repair candidate."""
+    tool = record.get("tool")
+    arguments = record.get("arguments", {})
+    if tool == "transform_and_compare":
+        return arguments.get("operation") != "identity"
+    if tool == "shift_and_compare":
+        return bool(arguments.get("dr") or arguments.get("dc"))
+    if tool == "evaluate_candidate":
+        return isinstance(arguments.get("pipeline"), list) and bool(arguments["pipeline"])
+    return False
+
+
 def _scope(values: Any) -> list[str]:
     """Normalize the small, auditable vocabulary used for evidence coverage."""
     if not isinstance(values, list): values = [values]
@@ -178,7 +194,7 @@ class DiagnosisGraph:
         record = self.tools.execute(plan["tool"], plan["arguments"])
         remaining = s["budget_remaining"] - record["cost"]
         if remaining < 0: raise RuntimeError("budget guard failed before remote execution")
-        self.log("execute", plan_id=plan["plan_id"], experiment_id=record["experiment_id"], backend=record["backend"], remote_host=record["remote_host"], remote_pid=record["remote_pid"], result=record["result"])
+        self.log("execute", plan_id=plan["plan_id"], experiment_id=record["experiment_id"], tool=record["tool"], arguments=record["arguments"], cost=record["cost"], backend=record["backend"], remote_host=record["remote_host"], remote_pid=record["remote_pid"], compute_observation=record.get("compute_observation"), result=record["result"])
         record = {**record, "plan_id": plan["plan_id"], "coverage": plan.get("coverage", {})}
         experiments = s.get("experiments", []) + [record]
         experiment_coverage = self._experiment_coverage({**s, "experiments": experiments})
@@ -240,15 +256,34 @@ class DiagnosisGraph:
         proposed = s["diagnosis_status"]
         initial_metric = agreement(s.get("initial_observation", {}))
         no_fault_supported = self._no_fault_supported(s)
+        validated_repairs = self._validated_repairs(s)
         if proposed == "propose_fault":
-            status = "accepted_fault" if best >= s["quality_threshold"] else "continue"
+            status = "accepted_fault" if validated_repairs else "continue"
         elif proposed == "propose_no_fault":
             status = "accepted_no_fault" if no_fault_supported else "continue"
         else:
             status = "budget_exhausted"
         validated = {"accepted_fault": "fault", "accepted_no_fault": "no_fault", "budget_exhausted": "inconclusive"}.get(status)
-        self.log("validation_gate", proposed=proposed, best_metric=best, initial_metric=initial_metric, no_fault_supported=no_fault_supported, accepted=status, validated_decision=validated)
+        self.log("validation_gate", proposed=proposed, best_metric=best, initial_metric=initial_metric, no_fault_supported=no_fault_supported, validated_repair_experiment_ids=validated_repairs, accepted=status, validated_decision=validated)
         return {"diagnosis_status": status, "validated_decision": validated}
+
+    def _validated_repairs(self, s: DiagnosisGraphState) -> list[str]:
+        """Require a real, materially improving repair before accepting fault."""
+        initial = agreement(s.get("initial_observation", {}))
+        threshold = s.get("quality_threshold")
+        if initial is None or threshold is None or initial >= threshold:
+            return []
+        validated = []
+        for record in s.get("experiments", []):
+            observed = agreement(record.get("result", {}).get("metrics", {}))
+            if (
+                _is_non_identity_repair(record)
+                and observed is not None
+                and observed >= threshold
+                and observed - initial >= REPAIR_IMPROVEMENT_MARGIN
+            ):
+                validated.append(record.get("experiment_id"))
+        return [item for item in validated if isinstance(item, str)]
 
     @staticmethod
     def _no_fault_supported(s: DiagnosisGraphState) -> bool:

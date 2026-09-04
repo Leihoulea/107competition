@@ -23,6 +23,14 @@ Never claim an experiment, metric, document, or evidence item that is not presen
 Only use evidence produced by executed experiments. Do not expose hidden reasoning.
 Return only concise structured scientific state updates or requested actions, matching the supplied schema."""
 
+PLANNER_TOOL_CATALOG = {
+    "inspect": {"arguments": {}},
+    "compare": {"arguments": {}},
+    "transform_and_compare": {"arguments": {"operation": ["identity", "flip_x", "flip_y", "rot90", "rot180", "rot270", "transpose"]}},
+    "shift_and_compare": {"arguments": {"dr": "integer [-5, 5]", "dc": "integer [-5, 5]"}},
+    "evaluate_candidate": {"arguments": {"pipeline": "0 to 4 steps; each step is transform(operation) or shift(dr, dc)"}},
+}
+
 class AgentAPIError(RuntimeError): pass
 
 class OpenAICompatibleAgent:
@@ -113,10 +121,11 @@ class OpenAICompatibleAgent:
                 candidates.append({"objective":str(candidate.get("objective",action.reason)),"target_hypotheses":targets,"tested_scope":[str(x) for x in scope if str(x).strip()],"tool":action.tool,"arguments":action.arguments,"expected_evidence":str(candidate.get("expected_evidence","Measure evidence that distinguishes the target hypotheses."))})
             return candidates, rejected
 
-        value=self._request_json("propose two or three ranked, cost-aware experiment candidates. Each must cover named hypotheses and a stated measurable scope. Avoid candidates equivalent or near-equivalent to executed experiments.",context,schema)
+        planner_context={**context, "tool_catalog": PLANNER_TOOL_CATALOG}
+        value=self._request_json("propose two or three ranked, cost-aware experiment candidates. Each must use the supplied neutral tool catalog, cover named hypotheses, and state a measurable scope. Avoid candidates equivalent or near-equivalent to executed experiments.",planner_context,schema)
         candidates, rejected=parse(value)
         if not candidates:
-            correction={**context, "planner_correction": {"rejected_candidates": rejected}}
+            correction={**planner_context, "planner_correction": {"rejected_candidates": rejected}}
             value=self._request_json("Correct the planner response once. Every candidate must contain one supported experiment contract with valid arguments; omit any candidate that cannot meet that contract.",correction,schema)
             candidates, retry_rejected=parse(value)
             rejected += retry_rejected

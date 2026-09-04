@@ -69,9 +69,18 @@
 - 引用真实实验：`EXP_001`、`EXP_002`
 - 独立 evaluator：98.33 / 100
 
+## v0.2.2 integration hardening
+
+- 将 fault gate 收紧为：低质量初始观测、非恒等 repair 候选、真实实验的显著改善、且达到阈值，缺一不可。
+- 将 no-fault 的 evaluator 总分与 fault case 对齐：有正常基线、无虚构 repair 的正确 no-fault 可获得 repair/abstention validation 分。
+- 将 transform-only baseline 更名为 deterministic_transform_sweep，新增 7×121 transform-plus-shift 的 deterministic_full_search。
+- One-Shot baseline 现在可一次提出完整 pipeline，而非被接口限制为单个 transform。
+- RunReader 优先读取每实验 artifact 与 compute_summary.json，并读取 graph run 的 state.json / final.json；benchmark 可展示真实远端 wall/CPU/budget telemetry。
+- Planner 获得中性的完整 tool catalog，降低 API 模型猜测参数契约的失败率。
+
 ## 当前状态
 
-SciDiagnose 已满足本阶段核心验收链路：
+SciDiagnose 已具备可审计的核心验收链路：
 
 ```text
 科学异常
@@ -83,8 +92,4 @@ SciDiagnose 已满足本阶段核心验收链路：
 → 最终证据化诊断
 ```
 
-## 后续建议
-
-1. 增加更多科学静默错误案例，如单位不一致、时间错位、掩膜错配。
-2. 接入真实 EPIC/Meteosat 小型数据。
-3. 将本次运行记录整理为比赛展示材料与架构图。
+下一阶段应冻结核心架构，执行 B03、B01×3、B02 与四类 benchmark 的正式实验，再整理答辩材料。

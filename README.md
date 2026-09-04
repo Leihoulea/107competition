@@ -4,11 +4,11 @@ SciDiagnose is a minimal, evidence-driven prototype for diagnosing *scientific s
 
 A computational failure is an exception, missing dependency, or OOM. A scientific silent failure may exit with code zero while producing a scientifically invalid result, such as a spatially misaligned product. The agent never receives the hidden answer: it selects a general diagnostic experiment, sends it to a real compute host, observes structured evidence, and then chooses its next action.
 
-## MVP architecture
+## v0.2.2 architecture
 
-`Agent -> ExperimentTools -> ComputeExecutor -> SSH Direct host`
+Public task -> hypotheses -> ranked experiment plans -> novelty/coverage gate -> budget gate -> SSH Direct experiment -> scientific and compute metrics -> scoped evidence update -> reflection -> validation gate -> fault / no_fault / inconclusive.
 
-The current real backend is `SSHDirectExecutor`: it uses the pre-configured SSH alias, `scp`, `nohup`, a remote PID, and `result.json` / `failure.json`. `LocalExecutor` shares the backend contract for later local testing. No Slurm, database, UI, LangChain, or container runtime is used.
+The current real backend is SSHDirectExecutor: it uses a pre-configured SSH alias, scp, nohup, a remote PID, and result.json / failure.json. Every remote experiment records scientific metrics plus wall time, CPU time, memory, Python version, input bytes, anonymous site profile, and lifecycle events. Per-run compute_summary.json aggregates those observations.
 
 ## Install and configuration
 
@@ -36,14 +36,20 @@ $env:PYTHONPATH = 'src'
 python scripts/probe_remote.py
 python scripts/smoke_remote.py
 python scripts/create_demo_case.py
-python scripts/run_demo.py --case geo_001 --backend ssh --host server-114
+python scripts/run_graph_demo.py --case b01 --agent api --host server-114
 ```
 
-The smoke test runs real Python on the remote host and prints `RUNNING -> COMPLETED`. The demo uploads only the tiny public GEO-001 arrays once, executes two remote NumPy experiments, records all actions under `runs/`, and writes an evidence-backed final diagnosis. `hidden/ground_truth.json` is used only by the post-run evaluator, never by the agent.
+The smoke test runs real Python on the remote host and prints RUNNING -> COMPLETED. Graph runs upload only public arrays, execute remote NumPy experiments, and write trace.jsonl, state.json, final.json, per-experiment records, and compute_summary.json under runs/.
 
-## Limits and future work
+## Public benchmark
 
-This MVP has one synthetic, spatial case and a deterministic ManualAgent for API-free demonstrations. Future work can add an OpenAI-compatible decision client, real EPIC/Meteosat inputs, GPU backends, and a Slurm backend without changing the agent-facing experiment interface. The group server is deliberately not connected during the competition stage.
+The public benchmark contains B01 (single spatial repair), B02 (compound repair), and B03 (no-fault). It compares direct_llm, one_shot_llm, deterministic_transform_sweep, and deterministic_full_search. The full search contains 7 transforms x 11 row shifts x 11 column shifts.
+
+Run the deterministic baselines with:
+
+python scripts/run_benchmark.py --cases b01 b02 b03 --methods deterministic_transform_sweep deterministic_full_search
+
+Benchmark results are truth-blind and report budget units, remote jobs, wall/CPU time, evidence citations, and repair validation. Ground truth is evaluator-only and is never supplied to the diagnosis agent or benchmark method.
 
 ## School LLM API
 
@@ -54,7 +60,7 @@ $env:SCIDIAG_MODEL_PROVIDER = 'openai_compatible'
 $env:SCIDIAG_BASE_URL = 'https://<school-api-host>/v1'
 $env:SCIDIAG_MODEL_NAME = '<school-model-name>'
 $env:SCIDIAG_API_KEY = '<your-key>'
-python scripts/run_demo.py --case geo_001 --backend ssh --agent api
+python scripts/run_graph_demo.py --case b01 --host server-114 --agent api
 ```
 
 If an SSH connection is slow, set a larger per-command limit before launching:
@@ -63,7 +69,7 @@ If an SSH connection is slow, set a larger per-command limit before launching:
 $env:SCIDIAG_COMMAND_TIMEOUT = '120'
 ```
 
-The endpoint must implement `POST /chat/completions`. The agent receives only public task state and actual experiment records; it never receives GEO-001 hidden ground truth.
+The endpoint must implement `POST /chat/completions`. The agent receives only public task state, the neutral tool catalog, and actual experiment records; it never receives evaluator-only ground truth.
 
 Alternatively, create a local `E:\107competition\.env` from `.env.example` and add the three model settings there. `.env` is ignored by Git and is read automatically; never send or commit it.
 

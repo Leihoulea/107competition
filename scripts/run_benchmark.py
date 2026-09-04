@@ -14,7 +14,7 @@ from scidiagnose.config import Settings
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--cases", nargs="+", default=["b01", "b02", "b03"])
-parser.add_argument("--methods", nargs="+", default=["deterministic_exhaustive"])
+parser.add_argument("--methods", nargs="+", default=["deterministic_transform_sweep"])
 parser.add_argument("--repeats", type=int, default=1)
 parser.add_argument("--output-dir", type=Path, default=ROOT / "benchmark" / "results")
 parser.add_argument("--run-dir", type=Path, help="completed SciDiagnose artifact for scidiagnose_run_reader")
@@ -27,7 +27,7 @@ def api_llm(context):
     mode = context["mode"]
     schemas = {
         "direct_final": {"decision": "fault|no_fault", "fault_family": "string", "root_cause": "string", "confidence": 0.0, "evidence_experiment_ids": [], "recommended_repair": {}},
-        "one_shot_plan": {"operation": "identity|flip_x|flip_y|rot90|rot180|rot270|transpose"},
+        "one_shot_plan": {"pipeline": [{"type": "transform|shift", "operation": "transform only: identity|flip_x|flip_y|rot90|rot180|rot270|transpose", "dr": "shift only integer [-5,5]", "dc": "shift only integer [-5,5]"}]},
         "one_shot_final": {"decision": "fault|no_fault", "fault_family": "string", "root_cause": "string", "confidence": 0.0, "evidence_experiment_ids": ["BASE_001"], "recommended_repair": {}},
     }
     return agent._request_json("benchmark " + mode + "; use only the supplied public context and do not claim unexecuted evidence", context, schemas[mode])

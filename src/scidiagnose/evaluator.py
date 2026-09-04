@@ -42,8 +42,9 @@ def evaluate(case_dir: Path, final: dict[str, Any], experiments: list[dict[str, 
     else:
         initial = json.loads((case_dir / "initial_result.json").read_text())
         evidence_supported = _agreement(initial) >= threshold and (not cited or cited <= by_id.keys())
+    no_fault_validated = bool(not truth["fault"] and detected and not repair and evidence_supported)
     used_budget = max(0, budget_total - budget_remaining)
     efficiency = 15 * max(0.0, 1 - used_budget / budget_total) if detected and budget_total else 0.0
-    scores = {"fault_detection": 20.0 if detected else 0.0, "fault_family": 20.0 if family else 0.0, "repair_validation": 30.0 if repair_validated else 0.0, "evidence_quality": 15.0 if evidence_supported else 0.0, "efficiency": efficiency}
+    scores = {"fault_detection": 20.0 if detected else 0.0, "fault_family": 20.0 if family else 0.0, "repair_validation": 30.0 if repair_validated or no_fault_validated else 0.0, "evidence_quality": 15.0 if evidence_supported else 0.0, "efficiency": efficiency}
     scores["total"] = sum(scores.values())
     return scores
