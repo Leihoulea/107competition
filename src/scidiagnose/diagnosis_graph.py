@@ -60,8 +60,7 @@ class DiagnosisGraph:
     def plan(self, s: DiagnosisGraphState) -> dict[str, Any]:
         plan = self.agent.plan_experiment(self._context(s))
         if "final" in plan:
-            self.log("plan", selected_final=plan["final"])
-            return {"current_plan": plan, "diagnosis_status": "propose_no_fault"}
+            raise RuntimeError("planner may only return an experiment plan; final decisions require reflection and validation")
         plan_id = f"PLAN{len(s.get('experiments', [])) + 1:03d}"
         pipeline = plan.get("arguments", {}).get("pipeline", [])
         estimated = COSTS[plan["tool"]] + (len(pipeline) if plan["tool"] == "evaluate_candidate" else 0)
@@ -71,7 +70,7 @@ class DiagnosisGraph:
 
     def budget_check(self, s: DiagnosisGraphState) -> dict[str, Any]:
         plan = s["current_plan"] or {}
-        blocked = "final" in plan or plan.get("estimated_cost", 0) > s["budget_remaining"] or s["steps_used"] >= s["max_steps"]
+        blocked = plan.get("estimated_cost", 0) > s["budget_remaining"] or s["steps_used"] >= s["max_steps"]
         self.log("budget_check", plan_id=plan.get("plan_id"), estimated_cost=plan.get("estimated_cost", 0), budget_remaining=s["budget_remaining"], blocked=blocked)
         return {"budget_blocked": blocked}
 
@@ -109,7 +108,10 @@ class DiagnosisGraph:
         reflection = self.agent.reflect(context)
         decision = reflection["decision"]
         if s.get("budget_blocked") or s["budget_remaining"] <= 0 or s["steps_used"] >= s["max_steps"]:
-            status = "propose_no_fault" if decision == "propose_no_fault" else "budget_exhausted"
+            # A valid fault or a properly supported no-fault conclusion may still be
+            # assessed by the gate at the limit.  An unsupported conclusion becomes
+            # inconclusive rather than being silently accepted as no_fault.
+            status = decision if decision == "propose_fault" or (decision == "propose_no_fault" and self._no_fault_supported(s)) else "budget_exhausted"
         else:
             status = decision
         self.log("reflect", reflection=reflection, best_metric=best, status=status)
@@ -118,19 +120,50 @@ class DiagnosisGraph:
     def validation_gate(self, s: DiagnosisGraphState) -> dict[str, Any]:
         best = max((item["observed_metric"] or 0.0 for item in s.get("evidence", [])), default=0.0)
         proposed = s["diagnosis_status"]
-        if proposed == "propose_fault": status = "accepted_fault" if best >= s["quality_threshold"] else "continue"
-        elif proposed == "propose_no_fault": status = "accepted_no_fault"
-        else: status = "budget_exhausted"
-        self.log("validation_gate", proposed=proposed, best_metric=best, accepted=status)
-        return {"diagnosis_status": status}
+        initial_metric = agreement(s.get("initial_observation", {}))
+        no_fault_supported = self._no_fault_supported(s)
+        if proposed == "propose_fault":
+            status = "accepted_fault" if best >= s["quality_threshold"] else "continue"
+        elif proposed == "propose_no_fault":
+            status = "accepted_no_fault" if no_fault_supported else "continue"
+        else:
+            status = "budget_exhausted"
+        validated = {"accepted_fault": "fault", "accepted_no_fault": "no_fault", "budget_exhausted": "inconclusive"}.get(status)
+        self.log("validation_gate", proposed=proposed, best_metric=best, initial_metric=initial_metric, no_fault_supported=no_fault_supported, accepted=status, validated_decision=validated)
+        return {"diagnosis_status": status, "validated_decision": validated}
+
+    @staticmethod
+    def _no_fault_supported(s: DiagnosisGraphState) -> bool:
+        """Require a clean initial result or explicitly validated normal-range evidence."""
+        initial_metric = agreement(s.get("initial_observation", {}))
+        if initial_metric is not None and initial_metric >= s["quality_threshold"]:
+            return True
+        return any(
+            isinstance(item, dict)
+            and item.get("kind") == "scientific_normal_range"
+            and item.get("validated") is True
+            for item in s.get("knowledge_evidence", [])
+        )
 
     def finalize(self, s: DiagnosisGraphState) -> dict[str, Any]:
         experiments = s.get("experiments", [])
         best = max(experiments, key=lambda item: agreement(item.get("result", {}).get("metrics", {})) or 0.0, default=None)
         context = self._context(s)
-        context.update({"reflection": s.get("reflection"), "best_experiment": best, "allowed_evidence_ids": [item["experiment_id"] for item in experiments]})
+        validated = s.get("validated_decision")
+        if validated not in {"fault", "no_fault", "inconclusive"}:
+            raise RuntimeError("finalize requires a validated_decision from validation_gate")
+        context.update({"reflection": s.get("reflection"), "best_experiment": best, "allowed_evidence_ids": [item["experiment_id"] for item in experiments], "validated_decision": validated})
+        if validated == "inconclusive":
+            final = {"decision":"inconclusive","fault_family":None,"root_cause":"The available budget ended before either a fault repair or a scientifically supported no-fault conclusion was validated.","confidence":0.0,"evidence_experiment_ids":[item["experiment_id"] for item in experiments],"recommended_repair":{},"remaining_uncertainty":["Additional diagnostic experiments or explicit normal-range scientific evidence are required."]}
+            self.log("finalize", final=final, validated_decision=validated)
+            return {"final_diagnosis": final}
         final = self.agent.final_diagnosis(context)
-        self.log("finalize", final=final)
+        if final.get("decision") != validated:
+            correction_context = {**context, "final_correction": f"validation gate requires decision={validated}; model returned decision={final.get('decision')!r}"}
+            final = self.agent.final_diagnosis(correction_context)
+        if final.get("decision") != validated:
+            raise RuntimeError(f"finalizer decision conflicts with validation gate: required {validated!r}, received {final.get('decision')!r}")
+        self.log("finalize", final=final, validated_decision=validated)
         return {"final_diagnosis": final}
 
     def run(self, state: DiagnosisGraphState) -> DiagnosisGraphState:

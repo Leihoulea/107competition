@@ -140,8 +140,15 @@ class OpenAICompatibleAgent:
         return value, decision
 
     def final_diagnosis(self, context: dict[str, Any]) -> dict[str, Any]:
-        schema={"decision":"fault|no_fault","fault_family":"canonical category","root_cause":"concise evidence-based statement","confidence":0.0,"evidence_experiment_ids":["EXP_001"],"recommended_repair":{},"remaining_uncertainty":[]}
-        value=self._request_json("produce the final evidence-backed diagnosis",context,schema)
+        required=context.get("validated_decision")
+        decision_schema=required if required in {"fault", "no_fault"} else "fault|no_fault"
+        schema={"decision":decision_schema,"fault_family":"canonical category","root_cause":"concise evidence-based statement","confidence":0.0,"evidence_experiment_ids":["EXP_001"],"recommended_repair":{},"remaining_uncertainty":[]}
+        request_name="produce the final evidence-backed diagnosis"
+        if required in {"fault", "no_fault"}:
+            request_name += f". The validation gate has accepted {required}; return exactly decision={required}."
+        if context.get("final_correction"):
+            request_name += " Your previous final decision conflicted with the validation gate. Correct it now using only the supplied evidence."
+        value=self._request_json(request_name,context,schema)
         return self._validate({"type":"final","final":value}).final or {}
     def decide(self,state:DiagnosisState,task:dict[str,object])->AgentAction:
         schema={"type":"tool_call|final","tool":"inspect|compare|transform_and_compare|shift_and_compare|evaluate_candidate (tool_call only)","arguments":{},"reason":"short evidence-based rationale","final":{"decision":"fault|no_fault","fault_family":"string","root_cause":"string","confidence":"0..1","evidence_experiment_ids":["EXP_001"],"recommended_repair":{}}}
@@ -241,6 +248,8 @@ class ManualAgent:
         best=context["best_metric"]
         return {"decision":"propose_fault" if best>=context["quality_threshold"] else "continue","best_hypothesis_id":"H001","unresolved_questions":[],"summary":"Deterministic demonstration reflection."}
     def final_diagnosis(self, context: dict[str, Any]) -> dict[str, Any]:
+        if context.get("validated_decision") == "no_fault":
+            return {"decision":"no_fault","fault_family":"no_fault","root_cause":"The validation gate accepted the initial quality or explicit normal-range evidence.","confidence":.8,"evidence_experiment_ids":[],"recommended_repair":{}}
         best=context.get("best_experiment")
         return {"decision":"fault" if best else "no_fault","fault_family":"validated_candidate" if best else "no_fault","root_cause":"A real candidate experiment supplied the final evidence." if best else "No fault evidence was validated.","confidence":.8,"evidence_experiment_ids":[best["experiment_id"]] if best else [],"recommended_repair":best["arguments"] if best else {}}
     def decide(self,state:DiagnosisState,task:dict[str,object])->AgentAction:

@@ -1,5 +1,6 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
+import pytest
 
 from scidiagnose.diagnosis_graph import DiagnosisGraph
 
@@ -30,3 +31,12 @@ def test_graph_routes_to_no_fault_and_checkpoint_threads_do_not_cross():
         first = graph.run(initial("run-a", "CASE_A")); second = graph.run(initial("run-b", "CASE_B"))
         assert first["final_diagnosis"]["decision"] == "no_fault"
         assert second["case_id"] == "CASE_B" and tools.calls == 2
+
+
+def test_planner_cannot_bypass_reflection_with_final_output():
+    class FinalPlanner(Agent):
+        def plan_experiment(self, context): return {"final": {"decision": "no_fault"}}
+    with TemporaryDirectory(dir=Path.cwd()) as directory:
+        graph = DiagnosisGraph(FinalPlanner(), Tools(), Path(directory))
+        with pytest.raises(RuntimeError, match="planner may only return an experiment plan"):
+            graph.plan(initial("run", "CASE"))

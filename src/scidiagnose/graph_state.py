@@ -47,6 +47,7 @@ class DiagnosisGraphState(TypedDict, total=False):
     quality_threshold: float
     reflection: dict[str, Any] | None
     diagnosis_status: str
+    validated_decision: Literal["fault", "no_fault", "inconclusive"] | None
     final_diagnosis: dict[str, Any] | None
     knowledge_queries: list[dict[str, Any]]
     knowledge_evidence: list[dict[str, Any]]
