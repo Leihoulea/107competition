@@ -11,10 +11,21 @@ def _site_profile() -> dict[str, object]:
     return {"profile_version": "1", "site_id": f"remote-{site_id}", "os_family": platform.system().lower()}
 
 
-def _compute_metrics(started: float, input_bytes: int) -> dict[str, object]:
+def _usage_snapshot() -> object | None:
+    try:
+        import resource
+        return resource.getrusage(resource.RUSAGE_SELF)
+    except ImportError:
+        return None
+
+
+def _compute_metrics(wall_started: float, cpu_started: float, usage_started: object | None, input_bytes: int) -> dict[str, object]:
+    """Emit per-experiment deltas; cumulative process values are explicit."""
+    cpu_cumulative = time.process_time()
     metrics: dict[str, object] = {
-        "wall_seconds": round(time.monotonic() - started, 6),
-        "process_cpu_seconds": round(time.process_time(), 6),
+        "wall_seconds": round(time.perf_counter() - wall_started, 6),
+        "cpu_seconds": round(cpu_cumulative - cpu_started, 6),
+        "process_cpu_cumulative_seconds": round(cpu_cumulative, 6),
         "pid": os.getpid(),
         "python_version": platform.python_version(),
         "input_bytes": input_bytes,
@@ -24,11 +35,13 @@ def _compute_metrics(started: float, input_bytes: int) -> dict[str, object]:
     try:
         import resource  # Available on Unix; intentionally optional.
         usage = resource.getrusage(resource.RUSAGE_SELF)
-        metrics["user_cpu_seconds"] = round(usage.ru_utime, 6)
-        metrics["system_cpu_seconds"] = round(usage.ru_stime, 6)
-        # Linux reports ru_maxrss in KiB (not bytes); preserve that unit in-band.
-        metrics["max_rss_kib"] = int(usage.ru_maxrss)
-        metrics["max_rss_unit"] = "KiB (Linux ru_maxrss)"
+        if usage_started is not None:
+            metrics["user_cpu_seconds"] = round(usage.ru_utime - usage_started.ru_utime, 6)
+            metrics["system_cpu_seconds"] = round(usage.ru_stime - usage_started.ru_stime, 6)
+        # Linux reports ru_maxrss in KiB (not bytes); this is a process peak,
+        # not a delta, and is named as such.
+        metrics["peak_rss_kib"] = int(usage.ru_maxrss)
+        metrics["peak_rss_unit"] = "KiB (Linux ru_maxrss)"
     except ImportError:
         pass
     return metrics
@@ -66,7 +79,7 @@ def apply_pipeline(target:np.ndarray,pipeline:list[dict[str,object]],initial_val
         else:raise ValueError("pipeline step type must be transform or shift")
     return value,valid
 def main()->None:
-    p=argparse.ArgumentParser();p.add_argument("--input-dir",required=True);p.add_argument("--experiment-json",required=True);p.add_argument("--output-json",default="result.json");args=p.parse_args();t=time.monotonic()
+    p=argparse.ArgumentParser();p.add_argument("--input-dir",required=True);p.add_argument("--experiment-json",required=True);p.add_argument("--output-json",default="result.json");args=p.parse_args();wall_started=time.perf_counter();cpu_started=time.process_time();usage_started=_usage_snapshot()
     try:
         req=json.loads(Path(args.experiment_json).read_text());tool=req["tool"];arg=req.get("arguments",{});d=Path(args.input_dir);input_bytes=sum(path.stat().st_size for path in d.iterdir() if path.is_file());ref=np.load(d/"reference.npy");target=np.load(d/"target_faulty.npy");initial_valid=np.load(d/"target_valid.npy") if (d/"target_valid.npy").exists() else None
         if tool=="inspect":out={"reference":describe(ref),"target":describe(target)}
@@ -75,6 +88,6 @@ def main()->None:
         elif tool=="shift_and_compare":dr,dc=arg.get("dr"),arg.get("dc");v,m=apply_pipeline(target,[{"type":"shift","dr":dr,"dc":dc}],initial_valid);out={"dr":dr,"dc":dc,**metrics(ref,v,m)}
         elif tool=="evaluate_candidate":pipeline=arg.get("pipeline");v,m=apply_pipeline(target,pipeline,initial_valid);out={"pipeline":pipeline,**metrics(ref,v,m)}
         else:raise ValueError("tool is not allowed")
-        result={"status":"success","experiment_id":req["experiment_id"],"tool":tool,"arguments":arg,"metrics":out,"scientific_metrics":_scientific_metrics(out),"compute_metrics":_compute_metrics(t,input_bytes),"site_profile":_site_profile(),"elapsed_seconds":round(time.monotonic()-t,3)};Path(args.output_json).write_text(json.dumps(result,indent=2));print(json.dumps(result),flush=True)
+        result={"status":"success","experiment_id":req["experiment_id"],"tool":tool,"arguments":arg,"metrics":out,"scientific_metrics":_scientific_metrics(out),"compute_metrics":_compute_metrics(wall_started,cpu_started,usage_started,input_bytes),"site_profile":_site_profile(),"elapsed_seconds":round(time.perf_counter()-wall_started,3)};Path(args.output_json).write_text(json.dumps(result,indent=2));print(json.dumps(result),flush=True)
     except BaseException as e:Path("failure.json").write_text(json.dumps({"status":"failed","error_type":type(e).__name__,"message":str(e),"traceback":traceback.format_exc()},indent=2));raise
 if __name__=="__main__":main()

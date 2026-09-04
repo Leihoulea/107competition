@@ -1,0 +1,14 @@
+{
+  "decision": "no_fault",
+  "fault_family": "no_fault",
+  "root_cause": "The initial observed agreement (0.9357452392578125) meets or exceeds the quality threshold (0.85); the validation gate accepted no_fault. No untested fault family is ruled out by this conclusion.",
+  "confidence": 0.2,
+  "evidence_experiment_ids": [
+    "EXP_001"
+  ],
+  "recommended_repair": {},
+  "remaining_uncertainty": [
+    "Only one shift direction/magnitude was tested; other shifts or rotations were not evaluated.",
+    "Spatial distribution of differences was not analyzed, leaving localized anomaly and processing artifact hypotheses untested."
+  ]
+}

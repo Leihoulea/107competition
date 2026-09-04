@@ -1,7 +1,7 @@
 """Explicit, auditable cognitive state for the v0.2.1 diagnosis graph."""
 from __future__ import annotations
 
-from typing import Any, Literal, TypedDict
+from typing import Any, Literal, NotRequired, TypedDict
 
 
 class Hypothesis(TypedDict):
@@ -11,6 +11,9 @@ class Hypothesis(TypedDict):
     status: Literal["active", "supported", "weakened", "rejected", "validated"]
     confidence: float
     testable_scope: list[str]
+    # Existing traces and third-party agents may omit this field; the graph
+    # deterministically classifies it at the hypothesis boundary.
+    scope_kind: NotRequired[Literal["specific_candidate", "fault_family", "no_fault", "knowledge_claim"]]
     evidence_for: list[str]
     evidence_against: list[str]
 
@@ -29,7 +32,9 @@ class EvidenceItem(TypedDict):
     supports: list[str]
     contradicts: list[str]
     tested_hypotheses: list[str]
-    tested_scope: list[str]
+    system_tested_scope: dict[str, Any]
+    diagnostic_rationale: str
+    predicted_observation: str
 
 
 class DiagnosisGraphState(TypedDict, total=False):

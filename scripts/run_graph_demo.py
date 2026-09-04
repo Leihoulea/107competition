@@ -58,7 +58,10 @@ try:
     result = DiagnosisGraph(agent, ExperimentTools(executor, case, run), run).run(state)
     (run / "state.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
     (run / "final.json").write_text(json.dumps(result["final_diagnosis"], indent=2), encoding="utf-8")
-except Exception as exc:
+except BaseException as exc:
+    # Persist partial traces for ordinary errors and user/process interrupts.
+    # This is intentionally after the run directory is created, so a failed
+    # real backend invocation is still a reviewable benchmark artifact.
     artifact = write_failure_artifact(run, exc)
     raise SystemExit(f"SciDiagnose graph execution error: {exc}\nFailure artifact: {artifact}")
 

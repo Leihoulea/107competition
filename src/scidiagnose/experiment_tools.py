@@ -41,10 +41,10 @@ class ExperimentTools:
         total_cpu = sum(
             numeric(metrics, "user_cpu_seconds") + numeric(metrics, "system_cpu_seconds")
             if "user_cpu_seconds" in metrics or "system_cpu_seconds" in metrics
-            else numeric(metrics, "process_cpu_seconds")
+            else numeric(metrics, "cpu_seconds") if "cpu_seconds" in metrics else numeric(metrics, "process_cpu_seconds")
             for metrics in compute
         )
-        peak_memory_mib = max((numeric(metrics, "max_rss_kib") / 1024 for metrics in compute), default=0.0)
+        peak_memory_mib = max((numeric(metrics, "peak_rss_kib") / 1024 if "peak_rss_kib" in metrics else numeric(metrics, "max_rss_kib") / 1024 for metrics in compute), default=0.0)
         experiments = [{"experiment_id": item.get("experiment_id"), "status": item.get("status"), "compute_observation": item.get("compute_observation", {})} for item in records]
         summary = {
             "schema_version": "1",

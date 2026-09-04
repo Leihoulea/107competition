@@ -1,0 +1,491 @@
+{
+  "run_id": "RUN_V022_B03_API_SSH_10",
+  "case_id": "B03",
+  "task": {
+    "case_id": "B03",
+    "title": "Unexpected spatial disagreement between scientific products",
+    "task": "A completed scientific comparison may contain a silent failure. Use available experiments to determine whether a fault exists and validate any repair.",
+    "budget": 30,
+    "expected_quality_threshold": 0.85
+  },
+  "initial_observation": {
+    "process_status": "COMPLETED",
+    "exit_code": 0,
+    "agreement": 0.9357452392578125,
+    "agreement_all": 0.9357452392578125,
+    "agreement_valid": 0.9357452392578125,
+    "valid_pixels": 65536,
+    "valid_fraction": 1.0
+  },
+  "hypotheses": [
+    {
+      "hypothesis_id": "H001",
+      "category": "spatial_misalignment",
+      "description": "The two products are spatially misaligned (e.g., a small shift or rotation) causing disagreement that is masked by the high overall agreement.",
+      "status": "active",
+      "confidence": 0.4,
+      "testable_scope": [
+        "spatial shift between products",
+        "rotation or scaling mismatch"
+      ],
+      "evidence_for": [],
+      "evidence_against": [],
+      "scope_kind": "fault_family"
+    },
+    {
+      "hypothesis_id": "H002",
+      "category": "localized_anomaly",
+      "description": "A localized region (e.g., a small area or specific feature) has a systematic difference, but the global agreement remains high because the region is small.",
+      "status": "active",
+      "confidence": 0.3,
+      "testable_scope": [
+        "spatial distribution of differences",
+        "clusters of disagreement"
+      ],
+      "evidence_for": [],
+      "evidence_against": [],
+      "scope_kind": "fault_family"
+    },
+    {
+      "hypothesis_id": "H003",
+      "category": "no_fault",
+      "description": "The products are in genuine agreement; the observed agreement is scientifically valid and no fault exists.",
+      "status": "active",
+      "confidence": 0.2,
+      "testable_scope": [
+        "agreement is consistent across spatial subsets",
+        "no systematic pattern in differences"
+      ],
+      "evidence_for": [],
+      "evidence_against": [],
+      "scope_kind": "no_fault"
+    },
+    {
+      "hypothesis_id": "H004",
+      "category": "data_processing_artifact",
+      "description": "A processing artifact (e.g., edge effects, interpolation, or masking) introduces a subtle bias that affects a subset of pixels, but the overall agreement remains high.",
+      "status": "active",
+      "confidence": 0.1,
+      "testable_scope": [
+        "differences near edges or boundaries",
+        "correlation with processing masks"
+      ],
+      "evidence_for": [],
+      "evidence_against": [],
+      "scope_kind": "fault_family"
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "EXP_001",
+      "tool": "shift_and_compare",
+      "arguments": {
+        "dr": 1,
+        "dc": 0
+      },
+      "backend": "ssh_direct",
+      "remote_host": "server-114",
+      "remote_pid": 187838,
+      "job_id": "RUN_V022_B03_API_SSH_10_EXP_001",
+      "status": "COMPLETED",
+      "cost": 4,
+      "result": {
+        "status": "success",
+        "experiment_id": "EXP_001",
+        "tool": "shift_and_compare",
+        "arguments": {
+          "dr": 1,
+          "dc": 0
+        },
+        "metrics": {
+          "dr": 1,
+          "dc": 0,
+          "agreement": 0.9341452205882353,
+          "agreement_all": 0.9343719482421875,
+          "agreement_valid": 0.9341452205882353,
+          "intersection": 22597,
+          "union": 26896,
+          "iou": 0.8401621058893516,
+          "precision": 0.9286947229985205,
+          "recall": 0.8980962600850523,
+          "valid_pixels": 65280,
+          "valid_fraction": 0.99609375
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.9341452205882353,
+          "values": {
+            "dr": 1,
+            "dc": 0,
+            "agreement": 0.9341452205882353,
+            "agreement_all": 0.9343719482421875,
+            "agreement_valid": 0.9341452205882353,
+            "intersection": 22597,
+            "union": 26896,
+            "iou": 0.8401621058893516,
+            "precision": 0.9286947229985205,
+            "recall": 0.8980962600850523,
+            "valid_pixels": 65280,
+            "valid_fraction": 0.99609375
+          }
+        },
+        "compute_metrics": {
+          "wall_seconds": 0.002544,
+          "cpu_seconds": 0.002538,
+          "process_cpu_cumulative_seconds": 1.163564,
+          "pid": 187838,
+          "python_version": "3.12.3",
+          "input_bytes": 196992,
+          "load_average_1m": 0.0,
+          "user_cpu_seconds": 0.002643,
+          "system_cpu_seconds": 0.0,
+          "peak_rss_kib": 34252,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)"
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "remote-7804a56a5c7636cc",
+          "os_family": "linux"
+        },
+        "elapsed_seconds": 0.003
+      },
+      "compute_observation": {
+        "job_id": "RUN_V022_B03_API_SSH_10_EXP_001",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788526506.874774,
+        "remote_pid": 187838,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788526504.8141482
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788526505.3365035
+            }
+          ],
+          "submit_timestamp": 1788526504.8141482,
+          "finish_timestamp": 1788526505.3365035,
+          "wall_seconds": 0.002544,
+          "cpu_seconds": 0.002538,
+          "process_cpu_cumulative_seconds": 1.163564,
+          "pid": 187838,
+          "python_version": "3.12.3",
+          "input_bytes": 196992,
+          "load_average_1m": 0.0,
+          "user_cpu_seconds": 0.002643,
+          "system_cpu_seconds": 0.0,
+          "peak_rss_kib": 34252,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.390027,
+            "wait": 0.522432,
+            "result_fetch": 0.305987
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.9341452205882353,
+          "values": {
+            "dr": 1,
+            "dc": 0,
+            "agreement": 0.9341452205882353,
+            "agreement_all": 0.9343719482421875,
+            "agreement_valid": 0.9341452205882353,
+            "intersection": 22597,
+            "union": 26896,
+            "iou": 0.8401621058893516,
+            "precision": 0.9286947229985205,
+            "recall": 0.8980962600850523,
+            "valid_pixels": 65280,
+            "valid_fraction": 0.99609375
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      },
+      "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_001\", \"tool\": \"shift_and_compare\", \"arguments\": {\"dr\": 1, \"dc\": 0}, \"metrics\": {\"dr\": 1, \"dc\": 0, \"agreement\": 0.9341452205882353, \"agreement_all\": 0.9343719482421875, \"agreement_valid\": 0.9341452205882353, \"intersection\": 22597, \"union\": 26896, \"iou\": 0.8401621058893516, \"precision\": 0.9286947229985205, \"recall\": 0.8980962600850523, \"valid_pixels\": 65280, \"valid_fraction\": 0.99609375}, \"scientific_metrics\": {\"metric_count\": 12, \"primary_metric\": \"agreement_valid\", \"primary_value\": 0.9341452205882353, \"values\": {\"dr\": 1, \"dc\": 0, \"agreement\": 0.9341452205882353, \"agreement_all\": 0.9343719482421875, \"agreement_valid\": 0.9341452205882353, \"intersection\": 22597, \"union\": 26896, \"iou\": 0.8401621058893516, \"precision\": 0.9286947229985205, \"recall\": 0.8980962600850523, \"valid_pixels\": 65280, \"valid_fraction\": 0.99609375}}, \"compute_metrics\": {\"wall_seconds\": 0.002544, \"cpu_seconds\": 0.002538, \"process_cpu_cumulative_seconds\": 1.163564, \"pid\": 187838, \"python_version\": \"3.12.3\", \"input_bytes\": 196992, \"load_average_1m\": 0.0, \"user_cpu_seconds\": 0.002643, \"system_cpu_seconds\": 0.0, \"peak_rss_kib\": 34252, \"peak_rss_unit\": \"KiB (Linux ru_maxrss)\"}, \"site_profile\": {\"profile_version\": \"1\", \"site_id\": \"remote-7804a56a5c7636cc\", \"os_family\": \"linux\"}, \"elapsed_seconds\": 0.003}\n",
+      "stderr": "",
+      "plan_id": "PLAN001",
+      "coverage": {
+        "hypothesis_ids": [
+          "H001"
+        ],
+        "system_tested_scope": {
+          "kind": "candidate",
+          "signature": "shift(dr=1,dc=0)"
+        },
+        "novelty": {
+          "status": "novel"
+        }
+      },
+      "diagnostic_rationale": "A small shift would produce a characteristic pattern of differences concentrated at edges and boundaries. Comparing the original agreement to agreements after applying small shifts can reveal if a shift improves agreement, supporting H001, or if no shift improves agreement, weakening H001.",
+      "predicted_observation": "If H001 is true, at least one shift (e.g., dr=1, dc=0) will yield agreement > 0.9357 and the improvement will be consistent with a systematic shift. If H001 is false, all shifts will yield agreement <= 0.9357."
+    }
+  ],
+  "experiment_coverage": {
+    "tested_signatures": [
+      "shift_and_compare:{\"dc\":0,\"dr\":1}"
+    ],
+    "families": {
+      "shift_and_compare": {
+        "count": 1,
+        "best_delta": -0.0016000186695771523,
+        "low_information_count": 1,
+        "informative_count": 0
+      }
+    }
+  },
+  "evidence": [
+    {
+      "evidence_id": "E001",
+      "experiment_id": "EXP_001",
+      "baseline_metric": 0.9357452392578125,
+      "observed_metric": 0.9341452205882353,
+      "delta": -0.0016000186695771523,
+      "threshold": 0.85,
+      "residual_gap": 0.0,
+      "valid_pixels": 65280,
+      "valid_fraction": 0.99609375,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H001"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "shift(dr=1,dc=0)"
+      },
+      "diagnostic_rationale": "A small shift would produce a characteristic pattern of differences concentrated at edges and boundaries. Comparing the original agreement to agreements after applying small shifts can reveal if a shift improves agreement, supporting H001, or if no shift improves agreement, weakening H001.",
+      "predicted_observation": "If H001 is true, at least one shift (e.g., dr=1, dc=0) will yield agreement > 0.9357 and the improvement will be consistent with a systematic shift. If H001 is false, all shifts will yield agreement <= 0.9357."
+    }
+  ],
+  "current_plan": {
+    "plan_id": "PLAN001",
+    "objective": "Test whether a small spatial shift explains the disagreement pattern",
+    "diagnostic_rationale": "A small shift would produce a characteristic pattern of differences concentrated at edges and boundaries. Comparing the original agreement to agreements after applying small shifts can reveal if a shift improves agreement, supporting H001, or if no shift improves agreement, weakening H001.",
+    "predicted_observation": "If H001 is true, at least one shift (e.g., dr=1, dc=0) will yield agreement > 0.9357 and the improvement will be consistent with a systematic shift. If H001 is false, all shifts will yield agreement <= 0.9357.",
+    "target_hypotheses": [
+      "H001"
+    ],
+    "tested_scope": [],
+    "tool": "shift_and_compare",
+    "arguments": {
+      "dr": 1,
+      "dc": 0
+    },
+    "expected_evidence": "Measure evidence that distinguishes the target hypotheses.",
+    "model_tested_scope": [],
+    "system_tested_scope": {
+      "kind": "candidate",
+      "signature": "shift(dr=1,dc=0)"
+    },
+    "coverage": {
+      "hypothesis_ids": [
+        "H001"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "shift(dr=1,dc=0)"
+      },
+      "novelty": {
+        "status": "novel"
+      }
+    },
+    "estimated_cost": 4
+  },
+  "budget_blocked": false,
+  "latest_result": {
+    "experiment_id": "EXP_001",
+    "tool": "shift_and_compare",
+    "arguments": {
+      "dr": 1,
+      "dc": 0
+    },
+    "backend": "ssh_direct",
+    "remote_host": "server-114",
+    "remote_pid": 187838,
+    "job_id": "RUN_V022_B03_API_SSH_10_EXP_001",
+    "status": "COMPLETED",
+    "cost": 4,
+    "result": {
+      "status": "success",
+      "experiment_id": "EXP_001",
+      "tool": "shift_and_compare",
+      "arguments": {
+        "dr": 1,
+        "dc": 0
+      },
+      "metrics": {
+        "dr": 1,
+        "dc": 0,
+        "agreement": 0.9341452205882353,
+        "agreement_all": 0.9343719482421875,
+        "agreement_valid": 0.9341452205882353,
+        "intersection": 22597,
+        "union": 26896,
+        "iou": 0.8401621058893516,
+        "precision": 0.9286947229985205,
+        "recall": 0.8980962600850523,
+        "valid_pixels": 65280,
+        "valid_fraction": 0.99609375
+      },
+      "scientific_metrics": {
+        "metric_count": 12,
+        "primary_metric": "agreement_valid",
+        "primary_value": 0.9341452205882353,
+        "values": {
+          "dr": 1,
+          "dc": 0,
+          "agreement": 0.9341452205882353,
+          "agreement_all": 0.9343719482421875,
+          "agreement_valid": 0.9341452205882353,
+          "intersection": 22597,
+          "union": 26896,
+          "iou": 0.8401621058893516,
+          "precision": 0.9286947229985205,
+          "recall": 0.8980962600850523,
+          "valid_pixels": 65280,
+          "valid_fraction": 0.99609375
+        }
+      },
+      "compute_metrics": {
+        "wall_seconds": 0.002544,
+        "cpu_seconds": 0.002538,
+        "process_cpu_cumulative_seconds": 1.163564,
+        "pid": 187838,
+        "python_version": "3.12.3",
+        "input_bytes": 196992,
+        "load_average_1m": 0.0,
+        "user_cpu_seconds": 0.002643,
+        "system_cpu_seconds": 0.0,
+        "peak_rss_kib": 34252,
+        "peak_rss_unit": "KiB (Linux ru_maxrss)"
+      },
+      "site_profile": {
+        "profile_version": "1",
+        "site_id": "remote-7804a56a5c7636cc",
+        "os_family": "linux"
+      },
+      "elapsed_seconds": 0.003
+    },
+    "compute_observation": {
+      "job_id": "RUN_V022_B03_API_SSH_10_EXP_001",
+      "backend": "ssh_direct",
+      "lifecycle_state": "COMPLETED",
+      "observed_at": 1788526506.874774,
+      "remote_pid": 187838,
+      "compute_metrics": {
+        "lifecycle": [
+          {
+            "state": "SUBMITTED",
+            "observed_at": 1788526504.8141482
+          },
+          {
+            "state": "COMPLETED",
+            "observed_at": 1788526505.3365035
+          }
+        ],
+        "submit_timestamp": 1788526504.8141482,
+        "finish_timestamp": 1788526505.3365035,
+        "wall_seconds": 0.002544,
+        "cpu_seconds": 0.002538,
+        "process_cpu_cumulative_seconds": 1.163564,
+        "pid": 187838,
+        "python_version": "3.12.3",
+        "input_bytes": 196992,
+        "load_average_1m": 0.0,
+        "user_cpu_seconds": 0.002643,
+        "system_cpu_seconds": 0.0,
+        "peak_rss_kib": 34252,
+        "peak_rss_unit": "KiB (Linux ru_maxrss)",
+        "executor_durations_seconds": {
+          "upload": 0.390027,
+          "wait": 0.522432,
+          "result_fetch": 0.305987
+        }
+      },
+      "scientific_metrics": {
+        "metric_count": 12,
+        "primary_metric": "agreement_valid",
+        "primary_value": 0.9341452205882353,
+        "values": {
+          "dr": 1,
+          "dc": 0,
+          "agreement": 0.9341452205882353,
+          "agreement_all": 0.9343719482421875,
+          "agreement_valid": 0.9341452205882353,
+          "intersection": 22597,
+          "union": 26896,
+          "iou": 0.8401621058893516,
+          "precision": 0.9286947229985205,
+          "recall": 0.8980962600850523,
+          "valid_pixels": 65280,
+          "valid_fraction": 0.99609375
+        }
+      },
+      "site_profile": {
+        "profile_version": "1",
+        "site_id": "ssh-642478ca63710924",
+        "backend": "ssh_direct"
+      }
+    },
+    "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_001\", \"tool\": \"shift_and_compare\", \"arguments\": {\"dr\": 1, \"dc\": 0}, \"metrics\": {\"dr\": 1, \"dc\": 0, \"agreement\": 0.9341452205882353, \"agreement_all\": 0.9343719482421875, \"agreement_valid\": 0.9341452205882353, \"intersection\": 22597, \"union\": 26896, \"iou\": 0.8401621058893516, \"precision\": 0.9286947229985205, \"recall\": 0.8980962600850523, \"valid_pixels\": 65280, \"valid_fraction\": 0.99609375}, \"scientific_metrics\": {\"metric_count\": 12, \"primary_metric\": \"agreement_valid\", \"primary_value\": 0.9341452205882353, \"values\": {\"dr\": 1, \"dc\": 0, \"agreement\": 0.9341452205882353, \"agreement_all\": 0.9343719482421875, \"agreement_valid\": 0.9341452205882353, \"intersection\": 22597, \"union\": 26896, \"iou\": 0.8401621058893516, \"precision\": 0.9286947229985205, \"recall\": 0.8980962600850523, \"valid_pixels\": 65280, \"valid_fraction\": 0.99609375}}, \"compute_metrics\": {\"wall_seconds\": 0.002544, \"cpu_seconds\": 0.002538, \"process_cpu_cumulative_seconds\": 1.163564, \"pid\": 187838, \"python_version\": \"3.12.3\", \"input_bytes\": 196992, \"load_average_1m\": 0.0, \"user_cpu_seconds\": 0.002643, \"system_cpu_seconds\": 0.0, \"peak_rss_kib\": 34252, \"peak_rss_unit\": \"KiB (Linux ru_maxrss)\"}, \"site_profile\": {\"profile_version\": \"1\", \"site_id\": \"remote-7804a56a5c7636cc\", \"os_family\": \"linux\"}, \"elapsed_seconds\": 0.003}\n",
+    "stderr": "",
+    "plan_id": "PLAN001",
+    "coverage": {
+      "hypothesis_ids": [
+        "H001"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "shift(dr=1,dc=0)"
+      },
+      "novelty": {
+        "status": "novel"
+      }
+    },
+    "diagnostic_rationale": "A small shift would produce a characteristic pattern of differences concentrated at edges and boundaries. Comparing the original agreement to agreements after applying small shifts can reveal if a shift improves agreement, supporting H001, or if no shift improves agreement, weakening H001.",
+    "predicted_observation": "If H001 is true, at least one shift (e.g., dr=1, dc=0) will yield agreement > 0.9357 and the improvement will be consistent with a systematic shift. If H001 is false, all shifts will yield agreement <= 0.9357."
+  },
+  "budget_total": 30,
+  "budget_remaining": 26,
+  "steps_used": 1,
+  "max_steps": 3,
+  "quality_threshold": 0.85,
+  "reflection": {
+    "decision": "propose_no_fault",
+    "best_hypothesis_id": null,
+    "unresolved_questions": [
+      "Does a different shift direction or magnitude improve agreement?",
+      "Are differences spatially clustered or random?"
+    ],
+    "summary": "EXP_001 tested a 1-pixel downward shift; agreement decreased slightly (0.9341 vs 0.9357), weakening H001 for that shift but not ruling out other shifts. No spatial distribution analysis has been performed, so H002 and H003 remain untested. Next, run a spatial-difference clustering experiment to distinguish localized anomaly from no_fault. Initial quality already satisfies the no-fault evidence contract."
+  },
+  "diagnosis_status": "accepted_no_fault",
+  "validated_decision": "no_fault",
+  "final_diagnosis": {
+    "decision": "no_fault",
+    "fault_family": "no_fault",
+    "root_cause": "The initial observed agreement (0.9357452392578125) meets or exceeds the quality threshold (0.85); the validation gate accepted no_fault. No untested fault family is ruled out by this conclusion.",
+    "confidence": 0.2,
+    "evidence_experiment_ids": [
+      "EXP_001"
+    ],
+    "recommended_repair": {},
+    "remaining_uncertainty": [
+      "Only one shift direction/magnitude was tested; other shifts or rotations were not evaluated.",
+      "Spatial distribution of differences was not analyzed, leaving localized anomaly and processing artifact hypotheses untested."
+    ]
+  },
+  "knowledge_queries": [],
+  "knowledge_evidence": []
+}

@@ -34,6 +34,58 @@ def _is_non_identity_repair(record: dict[str, Any]) -> bool:
     return False
 
 
+def _system_tested_scope(tool: str, arguments: dict[str, Any]) -> dict[str, Any]:
+    """Derive the authoritative execution scope from the normalized action."""
+    if tool == "shift_and_compare":
+        return {"kind": "candidate", "signature": f"shift(dr={arguments.get('dr')},dc={arguments.get('dc')})"}
+    if tool == "transform_and_compare":
+        return {"kind": "candidate", "signature": f"transform({arguments.get('operation')})"}
+    if tool == "evaluate_candidate":
+        steps = []
+        for step in arguments.get("pipeline", []):
+            if step.get("type") == "transform":
+                steps.append(f"transform({step.get('operation')})")
+            elif step.get("type") == "shift":
+                steps.append(f"shift(dr={step.get('dr')},dc={step.get('dc')})")
+        return {"kind": "pipeline", "signature": steps}
+    return {"kind": "observation", "signature": tool}
+
+
+def _scope_signature(scope: dict[str, Any]) -> str:
+    value = scope.get("signature")
+    return "|".join(value) if isinstance(value, list) else str(value)
+
+
+def _hypothesis_scope_kind(hypothesis: dict[str, Any]) -> str:
+    """Classify update semantics conservatively without symbolic reasoning."""
+    explicit = hypothesis.get("scope_kind")
+    if explicit in {"specific_candidate", "fault_family", "no_fault", "knowledge_claim"}:
+        return explicit
+    text = " ".join(str(value).lower() for value in (
+        hypothesis.get("category", ""), hypothesis.get("description", ""), *hypothesis.get("testable_scope", [])
+    ))
+    if "knowledge" in text:
+        return "knowledge_claim"
+    if "no_fault" in text or "no fault" in text or "normal variation" in text:
+        return "no_fault"
+    if "transform(" in text or "shift(dr=" in text:
+        return "specific_candidate"
+    return "fault_family"
+
+
+def _scope_compatible(hypothesis: dict[str, Any], scope: dict[str, Any]) -> bool:
+    kind = _hypothesis_scope_kind(hypothesis)
+    if kind == "knowledge_claim":
+        return False
+    if kind == "no_fault":
+        return True
+    if kind == "fault_family":
+        return scope.get("kind") in {"candidate", "pipeline"}
+    signature = _scope_signature(scope)
+    declared = " ".join(str(value) for value in hypothesis.get("testable_scope", []))
+    return signature in declared
+
+
 def _scope(values: Any) -> list[str]:
     """Normalize the small, auditable vocabulary used for evidence coverage."""
     if not isinstance(values, list): values = [values]
@@ -117,7 +169,17 @@ class DiagnosisGraph:
     def hypothesize(self, s: DiagnosisGraphState) -> dict[str, Any]:
         context = self._context(s)
         hypotheses = self.agent.generate_hypotheses(context) if not s.get("hypotheses") else s["hypotheses"]
-        hypotheses = [{**item, "testable_scope": _scope(item.get("testable_scope", [item.get("category", "unspecified")])) or ["unspecified"]} for item in hypotheses]
+        hypotheses = [
+            {
+                **item,
+                "testable_scope": _scope(item.get("testable_scope", [item.get("category", "unspecified")])) or ["unspecified"],
+                # Scope type controls deterministic evidence propagation.  It
+                # is normalized once at the graph boundary, rather than being
+                # trusted later as unconstrained model-authored prose.
+                "scope_kind": _hypothesis_scope_kind(item),
+            }
+            for item in hypotheses
+        ]
         self.log("hypothesize", hypotheses=hypotheses)
         return {"hypotheses": hypotheses}
 
@@ -133,19 +195,23 @@ class DiagnosisGraph:
             rejected: list[dict[str, Any]] = []
             for candidate in candidates[:3]:
                 targets = [item for item in candidate.get("target_hypotheses", []) if item in hypotheses]
-                # Older in-process agents predate the field; retain a narrow
-                # compatibility label for an omitted field.  An explicitly
-                # empty scope is still not a valid coverage contract.
-                raw_scope = candidate.get("tested_scope")
-                tested_scope = _scope(["legacy-unspecified"]) if raw_scope is None else _scope(raw_scope)
-                # Scope labels are model-facing semantic descriptions, not a
-                # shared enum.  An explicit valid target plus a non-empty
-                # normalized scope is the auditable coverage contract.
-                covered = targets if targets and tested_scope else []
+                model_scope = _scope(candidate.get("tested_scope", []))
+                system_scope = _system_tested_scope(str(candidate.get("tool")), candidate.get("arguments", {}))
+                # Model text may explain diagnostic intent, but the executed
+                # action alone defines authoritative evidence provenance.
+                covered = targets if targets and system_scope.get("signature") else []
                 novelty = self._novelty(s, candidate)
                 if covered and novelty["status"] == "novel":
-                    return {**candidate, "target_hypotheses": covered, "tested_scope": tested_scope, "coverage": {"hypothesis_ids": covered, "tested_scope": tested_scope, "novelty": novelty}}, rejected
-                rejected.append({"target_hypotheses": targets, "tested_scope": tested_scope, "novelty": novelty, "reason": "no covered hypothesis" if not covered else "not novel"})
+                    return {
+                        **candidate,
+                        "target_hypotheses": covered,
+                        "diagnostic_rationale": str(candidate.get("diagnostic_rationale", candidate.get("objective", ""))),
+                        "predicted_observation": str(candidate.get("predicted_observation", candidate.get("expected_evidence", ""))),
+                        "model_tested_scope": model_scope,
+                        "system_tested_scope": system_scope,
+                        "coverage": {"hypothesis_ids": covered, "system_tested_scope": system_scope, "novelty": novelty},
+                    }, rejected
+                rejected.append({"target_hypotheses": targets, "system_tested_scope": system_scope, "novelty": novelty, "reason": "no covered hypothesis" if not covered else "not novel"})
             return None, rejected
 
         plan, rejected = select(proposed)
@@ -195,7 +261,13 @@ class DiagnosisGraph:
         remaining = s["budget_remaining"] - record["cost"]
         if remaining < 0: raise RuntimeError("budget guard failed before remote execution")
         self.log("execute", plan_id=plan["plan_id"], experiment_id=record["experiment_id"], tool=record["tool"], arguments=record["arguments"], cost=record["cost"], backend=record["backend"], remote_host=record["remote_host"], remote_pid=record["remote_pid"], compute_observation=record.get("compute_observation"), result=record["result"])
-        record = {**record, "plan_id": plan["plan_id"], "coverage": plan.get("coverage", {})}
+        record = {
+            **record,
+            "plan_id": plan["plan_id"],
+            "coverage": plan.get("coverage", {}),
+            "diagnostic_rationale": plan.get("diagnostic_rationale", ""),
+            "predicted_observation": plan.get("predicted_observation", ""),
+        }
         experiments = s.get("experiments", []) + [record]
         experiment_coverage = self._experiment_coverage({**s, "experiments": experiments})
         return {"experiments": experiments, "latest_result": record, "experiment_coverage": experiment_coverage, "budget_remaining": remaining, "steps_used": s["steps_used"] + 1}
@@ -213,22 +285,47 @@ class DiagnosisGraph:
         # those legacy records as broad observations so they retain their old,
         # explicitly all-hypothesis update behaviour.
         tested_hypotheses = list(coverage.get("hypothesis_ids", [])) or [item["hypothesis_id"] for item in s.get("hypotheses", [])]
-        tested_scope = list(coverage.get("tested_scope", [])) or _scope([scope for item in s.get("hypotheses", []) for scope in item.get("testable_scope", [])])
-        item = {"evidence_id": evidence_id, "experiment_id": record["experiment_id"], "baseline_metric": baseline, "observed_metric": observed, "delta": delta, "threshold": s["quality_threshold"], "residual_gap": residual, "valid_pixels": metrics.get("valid_pixels"), "valid_fraction": metrics.get("valid_fraction"), "interpretation": "Metric evidence pending hypothesis update.", "supports": [], "contradicts": [], "tested_hypotheses": tested_hypotheses, "tested_scope": tested_scope}
+        system_scope = _system_tested_scope(record.get("tool", ""), record.get("arguments", {}))
+        item = {"evidence_id": evidence_id, "experiment_id": record["experiment_id"], "baseline_metric": baseline, "observed_metric": observed, "delta": delta, "threshold": s["quality_threshold"], "residual_gap": residual, "valid_pixels": metrics.get("valid_pixels"), "valid_fraction": metrics.get("valid_fraction"), "interpretation": "Metric evidence pending hypothesis update.", "supports": [], "contradicts": [], "tested_hypotheses": tested_hypotheses, "system_tested_scope": system_scope, "diagnostic_rationale": record.get("diagnostic_rationale", ""), "predicted_observation": record.get("predicted_observation", "")}
         self.log("extract_evidence", evidence=item)
         return {"evidence": s.get("evidence", []) + [item]}
 
     def update_hypotheses(self, s: DiagnosisGraphState) -> dict[str, Any]:
         context = self._context(s)
         context["latest_evidence"] = s["evidence"][-1]
-        allowed = set(context["latest_evidence"].get("tested_hypotheses", []))
+        system_scope = context["latest_evidence"].get("system_tested_scope", {})
+        allowed = {
+            item["hypothesis_id"] for item in s.get("hypotheses", [])
+            if item["hypothesis_id"] in set(context["latest_evidence"].get("tested_hypotheses", []))
+            and _scope_compatible(item, system_scope)
+        }
         context["scope_hypothesis_ids"] = sorted(allowed)
         returned = {item["hypothesis_id"]: item for item in self.agent.update_hypotheses(context) if item.get("hypothesis_id") in allowed}
+        latest = context["latest_evidence"]
+        material_improvement = (latest.get("delta") or 0.0) >= REPAIR_IMPROVEMENT_MARGIN
+        validated_repairs = set(self._validated_repairs(s))
         hypotheses = []
         for old in s.get("hypotheses", []):
             update = returned.get(old["hypothesis_id"])
-            hypotheses.append({**update, "testable_scope": old.get("testable_scope", [])} if update else old)
-        latest = dict(context["latest_evidence"])
+            scope_kind = _hypothesis_scope_kind(old)
+            if scope_kind == "knowledge_claim":
+                hypotheses.append(old)
+            elif scope_kind == "no_fault":
+                if validated_repairs:
+                    evidence_against = list(dict.fromkeys(old.get("evidence_against", []) + [latest["evidence_id"]]))
+                    hypotheses.append({**old, "status": "weakened", "confidence": min(float(old.get("confidence", .5)), .1), "evidence_against": evidence_against})
+                else:
+                    # Failed or unnecessary repair probes never count against a
+                    # valid no-fault explanation.
+                    hypotheses.append(old)
+            elif scope_kind == "fault_family" and not material_improvement:
+                # One failed candidate cannot reject its broader family.
+                hypotheses.append(old)
+            elif update:
+                hypotheses.append({**update, "testable_scope": old.get("testable_scope", []), "scope_kind": old.get("scope_kind", scope_kind)})
+            else:
+                hypotheses.append(old)
+        latest = dict(latest)
         latest["supports"] = [item["hypothesis_id"] for item in hypotheses if item["hypothesis_id"] in allowed and latest["evidence_id"] in item.get("evidence_for", [])]
         latest["contradicts"] = [item["hypothesis_id"] for item in hypotheses if item["hypothesis_id"] in allowed and latest["evidence_id"] in item.get("evidence_against", [])]
         evidence = s["evidence"][:-1] + [latest]
@@ -329,7 +426,21 @@ class DiagnosisGraph:
         if validated == "no_fault":
             # Use one canonical evaluator-facing representation for an accepted
             # abstention; a no-fault conclusion cannot carry a repair candidate.
-            final = {**final, "fault_family": "no_fault", "recommended_repair": {}}
+            # With no knowledge-evidence channel enabled, the only generic
+            # positive no-fault evidence is the validated initial threshold.
+            # Do not let a prose finalizer turn untested alternatives into a
+            # broader negative scientific claim.
+            initial_metric = agreement(s.get("initial_observation", {}))
+            final = {
+                **final,
+                "fault_family": "no_fault",
+                "root_cause": (
+                    f"The initial observed agreement ({initial_metric}) meets or exceeds the "
+                    f"quality threshold ({s['quality_threshold']}); the validation gate accepted no_fault. "
+                    "No untested fault family is ruled out by this conclusion."
+                ),
+                "recommended_repair": {},
+            }
         self.log("finalize", final=final, validated_decision=validated)
         return {"final_diagnosis": final}
 

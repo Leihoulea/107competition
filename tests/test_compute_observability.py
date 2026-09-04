@@ -53,13 +53,17 @@ def test_remote_runner_emits_scientific_and_compute_metrics():
         result = json.loads((tmp_path / "result.json").read_text())
     assert result["scientific_metrics"]["primary_value"] == 1.0
     assert result["compute_metrics"]["wall_seconds"] >= 0
+    assert result["compute_metrics"]["cpu_seconds"] >= 0
+    assert "process_cpu_cumulative_seconds" in result["compute_metrics"]
+    assert result["compute_metrics"]["cpu_seconds"] <= result["compute_metrics"]["process_cpu_cumulative_seconds"]
+    assert result["elapsed_seconds"] >= result["compute_metrics"]["wall_seconds"] - .01
     assert result["compute_metrics"]["input_bytes"] > 0
     assert result["compute_metrics"]["python_version"]
-    if "max_rss_kib" in result["compute_metrics"]:
+    if "peak_rss_kib" in result["compute_metrics"]:
         assert result["compute_metrics"]["user_cpu_seconds"] >= 0
         assert result["compute_metrics"]["system_cpu_seconds"] >= 0
-        assert result["compute_metrics"]["max_rss_kib"] > 0
-        assert result["compute_metrics"]["max_rss_unit"] == "KiB (Linux ru_maxrss)"
+        assert result["compute_metrics"]["peak_rss_kib"] > 0
+        assert result["compute_metrics"]["peak_rss_unit"] == "KiB (Linux ru_maxrss)"
     assert result["site_profile"]["site_id"].startswith("remote-")
     assert "hostname" not in result
 
@@ -71,7 +75,7 @@ def test_compute_summary_contains_only_observability_fields():
         experiments.mkdir(parents=True)
         (experiments / "EXP_001.json").write_text(json.dumps({
             "experiment_id": "EXP_001", "job_id": "REMOTE_001", "backend": "ssh_direct", "remote_pid": 9, "status": "COMPLETED", "cost": 3,
-            "compute_observation": {"lifecycle_state": "COMPLETED", "site_profile": {"site_id": "ssh-opaque"}, "compute_metrics": {"wall_seconds": 2.5, "user_cpu_seconds": 1.0, "system_cpu_seconds": 0.5, "max_rss_kib": 2048, "lifecycle": [{"state": "COMPLETED"}]}},
+            "compute_observation": {"lifecycle_state": "COMPLETED", "site_profile": {"site_id": "ssh-opaque"}, "compute_metrics": {"wall_seconds": 2.5, "cpu_seconds": 1.5, "user_cpu_seconds": 1.0, "system_cpu_seconds": 0.5, "peak_rss_kib": 2048, "lifecycle": [{"state": "COMPLETED"}]}},
         }))
         tools = ExperimentTools.__new__(ExperimentTools)
         tools.run_dir = run_dir

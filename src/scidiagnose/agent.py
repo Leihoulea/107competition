@@ -84,15 +84,18 @@ class OpenAICompatibleAgent:
             scope=item.get("testable_scope", [str(item.get("category", "unspecified"))])
             if not isinstance(scope, list): scope=[scope]
             scope=[str(x) for x in scope if str(x).strip()] or ["unspecified"]
-            result.append({"hypothesis_id":hypothesis_id,"category":str(item.get("category","unspecified")),"description":str(item.get("description","Plausible explanation requiring evidence.")),"status":status,"confidence":max(0.0,min(1.0,float(item.get("confidence",.5)))),"testable_scope":scope,"evidence_for":[str(x) for x in item.get("evidence_for",[])],"evidence_against":[str(x) for x in item.get("evidence_against",[])]})
+            scope_kind = item.get("scope_kind") if item.get("scope_kind") in {"specific_candidate", "fault_family", "no_fault", "knowledge_claim"} else None
+            normalized={"hypothesis_id":hypothesis_id,"category":str(item.get("category","unspecified")),"description":str(item.get("description","Plausible explanation requiring evidence.")),"status":status,"confidence":max(0.0,min(1.0,float(item.get("confidence",.5)))),"testable_scope":scope,"evidence_for":[str(x) for x in item.get("evidence_for",[])],"evidence_against":[str(x) for x in item.get("evidence_against",[])]}
+            if scope_kind: normalized["scope_kind"] = scope_kind
+            result.append(normalized)
         return result
 
     def generate_hypotheses(self, context: dict[str, Any]) -> list[dict[str, Any]]:
-        schema={"hypotheses":[{"hypothesis_id":"H001","category":"short label","description":"concise explanation","testable_scope":["named measurable condition"],"status":"active","confidence":0.5,"evidence_for":[],"evidence_against":[]}]}
+        schema={"hypotheses":[{"hypothesis_id":"H001","category":"short label","description":"concise explanation","scope_kind":"specific_candidate|fault_family|no_fault|knowledge_claim","testable_scope":["named measurable condition"],"status":"active","confidence":0.5,"evidence_for":[],"evidence_against":[]}]}
         return self._hypotheses(self._request_json("generate competing hypotheses",context,schema))
 
     def update_hypotheses(self, context: dict[str, Any]) -> list[dict[str, Any]]:
-        schema={"hypotheses":[{"hypothesis_id":"existing ID","category":"short label","description":"concise explanation","testable_scope":["preserve existing scope"],"status":"supported|weakened|rejected|validated|active","confidence":0.5,"evidence_for":["E001"],"evidence_against":[]}]}
+        schema={"hypotheses":[{"hypothesis_id":"existing ID","category":"short label","description":"concise explanation","scope_kind":"preserve existing value","testable_scope":["preserve existing scope"],"status":"supported|weakened|rejected|validated|active","confidence":0.5,"evidence_for":["E001"],"evidence_against":[]}]}
         existing=context.get("hypotheses",[]); updates=self._hypotheses(self._request_json("update only hypotheses covered by the latest experiment. Preserve every uncovered hypothesis exactly; link changes to the supplied evidence.",context,schema), existing, minimum=1)
         allowed=set(context.get("scope_hypothesis_ids", []))
         if allowed: updates=[item for item in updates if item["hypothesis_id"] in allowed]
@@ -100,7 +103,7 @@ class OpenAICompatibleAgent:
         return [by_id.get(item["hypothesis_id"],item) for item in existing] + [item for item in updates if item["hypothesis_id"] not in {old["hypothesis_id"] for old in existing}]
 
     def plan_experiment(self, context: dict[str, Any]) -> dict[str, Any]:
-        schema={"candidates":[{"objective":"distinguish named hypotheses","target_hypotheses":["H001"],"tested_scope":["named measurable condition"],"experiment":{"tool":"one supported tool name","arguments":{}},"expected_evidence":"short measurable outcome"}]}
+        schema={"candidates":[{"objective":"distinguish named hypotheses","target_hypotheses":["H001"],"diagnostic_rationale":"why the action is useful","predicted_observation":"expected measurable outcome","experiment":{"tool":"one supported tool name","arguments":{}}}]}
         def parse(value: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
             raw=value.get("candidates")
             if not isinstance(raw, list):
@@ -118,7 +121,7 @@ class OpenAICompatibleAgent:
                 targets=[item for item in candidate.get("target_hypotheses",[]) if item in valid] or list(valid)
                 scope=candidate.get("tested_scope", [])
                 if not isinstance(scope, list): scope=[scope]
-                candidates.append({"objective":str(candidate.get("objective",action.reason)),"target_hypotheses":targets,"tested_scope":[str(x) for x in scope if str(x).strip()],"tool":action.tool,"arguments":action.arguments,"expected_evidence":str(candidate.get("expected_evidence","Measure evidence that distinguishes the target hypotheses."))})
+                candidates.append({"objective":str(candidate.get("objective",action.reason)),"diagnostic_rationale":str(candidate.get("diagnostic_rationale",candidate.get("objective",action.reason))),"predicted_observation":str(candidate.get("predicted_observation",candidate.get("expected_evidence","Measure evidence that distinguishes the target hypotheses."))),"target_hypotheses":targets,"tested_scope":[str(x) for x in scope if str(x).strip()],"tool":action.tool,"arguments":action.arguments,"expected_evidence":str(candidate.get("expected_evidence","Measure evidence that distinguishes the target hypotheses."))})
             return candidates, rejected
 
         planner_context={**context, "tool_catalog": PLANNER_TOOL_CATALOG}
@@ -178,7 +181,11 @@ class OpenAICompatibleAgent:
         required=context.get("validated_decision")
         decision_schema=required if required in {"fault", "no_fault"} else "fault|no_fault"
         schema={"decision":decision_schema,"fault_family":"canonical category","root_cause":"concise evidence-based statement","confidence":0.0,"evidence_experiment_ids":["EXP_001"],"recommended_repair":{},"remaining_uncertainty":[]}
-        request_name="produce the final evidence-backed diagnosis"
+        request_name=(
+            "produce the final evidence-backed diagnosis. Claims must not exceed the scope of executed evidence; "
+            "a failed candidate only weakens that tested candidate unless multiple independent experiments justify a broader claim. "
+            "Distinguish observed, supported, not supported, validated, and inconclusive evidence."
+        )
         if required in {"fault", "no_fault"}:
             request_name += f". The validation gate has accepted {required}; return exactly decision={required}."
         if context.get("final_correction"):

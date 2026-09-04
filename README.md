@@ -10,6 +10,12 @@ Public task -> hypotheses -> ranked experiment plans -> novelty/coverage gate ->
 
 The current real backend is SSHDirectExecutor: it uses a pre-configured SSH alias, scp, nohup, a remote PID, and result.json / failure.json. Every remote experiment records scientific metrics plus wall time, CPU time, memory, Python version, input bytes, anonymous site profile, and lifecycle events. Per-run compute_summary.json aggregates those observations.
 
+### Evidence and compute provenance
+
+The graph derives each experiment's authoritative `system_tested_scope` from the normalized tool call that actually ran (for example, `shift(dr=1,dc=-2)`), rather than from model prose. A specific candidate can therefore update only that candidate; one unsuccessful probe cannot reject an entire fault family. Planner rationale and predicted observations remain traceable context, not evidence claims.
+
+Remote `cpu_seconds` and `wall_seconds` are per-experiment deltas. `process_cpu_cumulative_seconds` and `peak_rss_kib` are intentionally labelled as cumulative/peak process metrics, so summaries do not accidentally present them as per-job consumption.
+
 ## Install and configuration
 
 Python 3.10+ and NumPy are required locally. Configure an existing SSH alias without placing credentials in this repository:

@@ -1,0 +1,14 @@
+{
+  "decision": "no_fault",
+  "fault_family": "no_fault",
+  "root_cause": "The observed agreement of 0.9357 exceeds the quality threshold of 0.85, and the only executed experiment (EXP_001) tested a spatial shift of (dr=2, dc=2), which decreased agreement to 0.9299, providing no support for spatial misalignment at that shift. No evidence of data corruption, systematic bias, or other fault was found.",
+  "confidence": 0.6,
+  "evidence_experiment_ids": [
+    "EXP_001"
+  ],
+  "recommended_repair": {},
+  "remaining_uncertainty": [
+    "Only a single shift (dr=2, dc=2) was tested; other shifts were not evaluated, so spatial misalignment at other offsets is not fully ruled out.",
+    "Pixel-difference distribution and bias-correction analyses were not performed, leaving H002 and H004 not directly tested."
+  ]
+}

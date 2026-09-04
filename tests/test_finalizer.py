@@ -3,6 +3,7 @@ from tempfile import TemporaryDirectory
 import pytest
 
 from scidiagnose.diagnosis_graph import DiagnosisGraph
+from scidiagnose.agent import OpenAICompatibleAgent
 
 
 class Agent:
@@ -54,3 +55,15 @@ def test_accepted_no_fault_is_canonicalized_for_the_evaluator():
         final = DiagnosisGraph(agent, object(), Path(directory)).finalize(finalizer_state("no_fault"))["final_diagnosis"]
     assert final["fault_family"] == "no_fault"
     assert final["recommended_repair"] == {}
+    assert "No untested fault family is ruled out" in final["root_cause"]
+
+
+def test_finalizer_request_forbids_overclaiming_evidence_scope():
+    agent = object.__new__(OpenAICompatibleAgent)
+    calls = []
+    agent._request_json = lambda name, context, schema: calls.append(name) or {
+        "decision": "no_fault", "fault_family": "no_fault", "root_cause": "Specific candidate was not supported.",
+        "confidence": .5, "evidence_experiment_ids": [], "recommended_repair": {}, "remaining_uncertainty": [],
+    }
+    agent.final_diagnosis({"validated_decision": "no_fault"})
+    assert "Claims must not exceed the scope" in calls[0]

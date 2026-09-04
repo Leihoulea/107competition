@@ -121,7 +121,7 @@ def test_evidence_can_update_only_hypotheses_covered_by_its_scope():
                 {**context["hypotheses"][1], "status": "rejected", "evidence_against": ["E001"]},
             ]
     current = state()
-    current["evidence"] = [{"evidence_id": "E001", "experiment_id": "EXP_1", "tested_hypotheses": ["H001"], "tested_scope": ["independent measurement description"], "supports": [], "contradicts": []}]
+    current["evidence"] = [{"evidence_id": "E001", "experiment_id": "EXP_1", "tested_hypotheses": ["H001"], "system_tested_scope": {"kind": "candidate", "signature": "shift(dr=1,dc=0)"}, "delta": .2, "supports": [], "contradicts": []}]
     with TemporaryDirectory(dir=Path.cwd()) as directory:
         result = DiagnosisGraph(ScopeAgent(), object(), Path(directory)).update_hypotheses(current)
     assert result["hypotheses"][0]["status"] == "supported"

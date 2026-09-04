@@ -148,7 +148,7 @@ def _record(case: PublicCase, method: str, repeat: int, started: float, final: d
     cpu = [
         (_number(_compute_metrics(x).get("user_cpu_seconds")) or 0.0) + (_number(_compute_metrics(x).get("system_cpu_seconds")) or 0.0)
         if _number(_compute_metrics(x).get("user_cpu_seconds")) is not None or _number(_compute_metrics(x).get("system_cpu_seconds")) is not None
-        else _number(_compute_metrics(x).get("process_cpu_seconds", _compute_metrics(x).get("cpu_seconds")))
+        else _number(_compute_metrics(x).get("cpu_seconds", _compute_metrics(x).get("process_cpu_seconds")))
         for x in experiments
     ]
     budget_used = sum(cost for cost in costs if cost is not None) if costs and all(cost is not None for cost in costs) else None
