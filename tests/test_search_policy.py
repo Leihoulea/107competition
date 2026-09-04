@@ -54,6 +54,26 @@ def test_planner_rejects_when_every_candidate_repeats_existing_probe():
             graph.plan(state([{"experiment_id": "EXP_1", "tool": "compare", "arguments": {}}]))
 
 
+def test_novelty_rejection_gets_one_graph_replan_and_trace_event():
+    class ReplanningAgent:
+        def __init__(self): self.contexts = []
+        def plan_experiment(self, context):
+            self.contexts.append(context)
+            if len(self.contexts) == 1:
+                return {"target_hypotheses": ["H001"], "tested_scope": ["scope-a"], "tool": "compare", "arguments": {}}
+            return {"target_hypotheses": ["H001"], "tested_scope": ["scope-a"], "tool": "inspect", "arguments": {}}
+    previous = [{"experiment_id": "EXP_1", "tool": "compare", "arguments": {}}]
+    with TemporaryDirectory(dir=Path.cwd()) as directory:
+        agent = ReplanningAgent()
+        graph = DiagnosisGraph(agent, object(), Path(directory))
+        planned = graph.plan(state(previous))["current_plan"]
+        trace = (Path(directory) / "trace.jsonl").read_text()
+    assert planned["tool"] == "inspect"
+    assert len(agent.contexts) == 2
+    assert agent.contexts[1]["planner_feedback"] == "proposed experiment too similar to previous low-information experiments; select materially different diagnostic experiment"
+    assert '"node": "plan_replan"' in trace
+
+
 def test_planner_receives_coverage():
     class CoverageAgent:
         def plan_experiment(self, context):

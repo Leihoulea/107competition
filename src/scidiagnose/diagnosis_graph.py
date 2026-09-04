@@ -109,24 +109,35 @@ class DiagnosisGraph:
         proposed = self.agent.plan_experiment(self._context(s))
         if "final" in proposed:
             raise RuntimeError("planner may only return an experiment plan; final decisions require reflection and validation")
-        if proposed.get("rejected_candidates"):
-            self.log("plan_candidates_filtered", rejected_candidates=proposed["rejected_candidates"])
-        candidates = proposed.get("candidate_plans") if isinstance(proposed.get("candidate_plans"), list) else [proposed]
         hypotheses = {item["hypothesis_id"]: item for item in s.get("hypotheses", [])}
-        plan = None
-        rejected: list[dict[str, Any]] = []
-        for candidate in candidates[:3]:
-            targets = [item for item in candidate.get("target_hypotheses", []) if item in hypotheses]
-            if not targets: targets = [key for key, item in hypotheses.items() if item.get("status") in {"active", "supported"}]
-            tested_scope = _scope(candidate.get("tested_scope", []))
-            if not tested_scope:
-                tested_scope = _scope([scope for key in targets for scope in hypotheses[key].get("testable_scope", [])])
-            covered = [key for key in targets if set(tested_scope) & set(hypotheses[key].get("testable_scope", []))]
-            novelty = self._novelty(s, candidate)
-            if covered and novelty["status"] == "novel":
-                plan = {**candidate, "target_hypotheses": covered, "tested_scope": tested_scope, "coverage": {"hypothesis_ids": covered, "tested_scope": tested_scope, "novelty": novelty}}
-                break
-            rejected.append({"target_hypotheses": targets, "tested_scope": tested_scope, "novelty": novelty, "reason": "no covered hypothesis" if not covered else "not novel"})
+        def select(value: dict[str, Any]) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
+            if value.get("rejected_candidates"):
+                self.log("plan_candidates_filtered", rejected_candidates=value["rejected_candidates"])
+            candidates = value.get("candidate_plans") if isinstance(value.get("candidate_plans"), list) else [value]
+            rejected: list[dict[str, Any]] = []
+            for candidate in candidates[:3]:
+                targets = [item for item in candidate.get("target_hypotheses", []) if item in hypotheses]
+                if not targets: targets = [key for key, item in hypotheses.items() if item.get("status") in {"active", "supported"}]
+                tested_scope = _scope(candidate.get("tested_scope", []))
+                if not tested_scope:
+                    tested_scope = _scope([scope for key in targets for scope in hypotheses[key].get("testable_scope", [])])
+                covered = [key for key in targets if set(tested_scope) & set(hypotheses[key].get("testable_scope", []))]
+                novelty = self._novelty(s, candidate)
+                if covered and novelty["status"] == "novel":
+                    return {**candidate, "target_hypotheses": covered, "tested_scope": tested_scope, "coverage": {"hypothesis_ids": covered, "tested_scope": tested_scope, "novelty": novelty}}, rejected
+                rejected.append({"target_hypotheses": targets, "tested_scope": tested_scope, "novelty": novelty, "reason": "no covered hypothesis" if not covered else "not novel"})
+            return None, rejected
+
+        plan, rejected = select(proposed)
+        if plan is None:
+            feedback = "proposed experiment too similar to previous low-information experiments; select materially different diagnostic experiment"
+            self.log("plan_replan", rejected_candidates=rejected, planner_feedback=feedback)
+            retry_context = {**self._context(s), "planner_feedback": feedback}
+            proposed = self.agent.plan_experiment(retry_context)
+            if "final" in proposed:
+                raise RuntimeError("planner may only return an experiment plan; final decisions require reflection and validation")
+            plan, retry_rejected = select(proposed)
+            rejected += retry_rejected
         if plan is None:
             self.log("plan_rejected", candidates=rejected)
             raise RuntimeError("planner produced no novel candidate with testable hypothesis coverage")
