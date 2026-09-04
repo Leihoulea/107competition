@@ -10,11 +10,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from scidiagnose.agent import AgentAPIError, ManualAgent, OpenAICompatibleAgent
+from scidiagnose.agent import ManualAgent, OpenAICompatibleAgent
 from scidiagnose.config import Settings
 from scidiagnose.diagnosis_graph import DiagnosisGraph
 from scidiagnose.experiment_tools import ExperimentTools
-from scidiagnose.ssh_executor import RemoteExecutionError, SSHDirectExecutor
+from scidiagnose.run_artifacts import write_failure_artifact
+from scidiagnose.ssh_executor import SSHDirectExecutor
 
 
 parser = argparse.ArgumentParser()
@@ -24,6 +25,7 @@ parser.add_argument("--agent", choices=["manual", "api"], default="manual")
 parser.add_argument("--max-steps", type=int, default=8)
 parser.add_argument("--run-id", help="Optional stable run directory name under runs/.")
 args = parser.parse_args()
+
 
 case = ROOT / "cases" / args.case
 task = json.loads((case / "task.json").read_text())
@@ -54,8 +56,9 @@ try:
         "knowledge_evidence": [],
     }
     result = DiagnosisGraph(agent, ExperimentTools(executor, case, run), run).run(state)
-except (RemoteExecutionError, TimeoutError, AgentAPIError) as exc:
-    raise SystemExit(f"SciDiagnose graph execution error: {exc}")
+except Exception as exc:
+    artifact = write_failure_artifact(run, exc)
+    raise SystemExit(f"SciDiagnose graph execution error: {exc}\nFailure artifact: {artifact}")
 
 print(f"Trace: {run / 'trace.jsonl'}")
 print("FINAL DIAGNOSIS\n" + json.dumps(result["final_diagnosis"], indent=2))
