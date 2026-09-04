@@ -2,6 +2,7 @@
 from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from typing import Any, Literal
+from .executor_base import ComputeObservation
 @dataclass
 class ExperimentRequest:
     experiment_id: str; tool: Literal["inspect","compare","transform_and_compare","shift_and_compare"]; arguments: dict[str,Any]=field(default_factory=dict)

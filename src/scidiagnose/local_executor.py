@@ -3,7 +3,7 @@ from __future__ import annotations
 import json, subprocess, time
 from pathlib import Path
 from typing import Any
-from .executor_base import ComputeExecutor, JobHandle
+from .executor_base import ComputeExecutor, ComputeObservation, JobHandle
 class LocalExecutor(ComputeExecutor):
     def __init__(self, workspace: Path = Path(".scidiagnose-local")) -> None: self.workspace=workspace; self.jobs:dict[str,subprocess.Popen[str]]={}
     def probe(self)->dict[str,Any]: return {"backend":"local"}
@@ -18,3 +18,5 @@ class LocalExecutor(ComputeExecutor):
     def logs(self,job:JobHandle,tail:int=100)->tuple[str,str]:
         d=Path(job.job_dir); return ((d/"stdout.log").read_text() if (d/"stdout.log").exists() else "",(d/"stderr.log").read_text() if (d/"stderr.log").exists() else "")
     def fetch_result(self,job:JobHandle)->dict[str,Any]: return json.loads((Path(job.job_dir)/"result.json").read_text())
+    def observe(self, job: JobHandle) -> ComputeObservation:
+        return ComputeObservation(job.job_id, job.backend, self.status(job), remote_pid=job.remote_pid, site_profile={"profile_version":"1", "site_id":"local", "backend":"local"})

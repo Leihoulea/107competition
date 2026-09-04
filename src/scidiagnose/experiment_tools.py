@@ -20,6 +20,31 @@ class ExperimentTools:
             path=self.case_dir/"public"/"data"/name
             if path.exists(): self.executor.upload(path,f"{base}/{name}")
         self.executor.upload(Path(__file__).resolve().parents[2]/"remote"/"run_experiment.py",f"{self.executor.workspace}/scripts/run_experiment.py"); self.uploaded=True
+
+    def _write_compute_summary(self) -> None:
+        """Persist a compact, host-anonymous compute view alongside diagnosis artifacts."""
+        records: list[dict[str, Any]] = []
+        for path in sorted((self.run_dir / "experiments").glob("EXP_*.json")):
+            if path.name.endswith(".request.json"):
+                continue
+            try:
+                records.append(json.loads(path.read_text()))
+            except json.JSONDecodeError:
+                continue
+        observations = [item.get("compute_observation", {}) for item in records]
+        terminal = sum(item.get("lifecycle_state") in {"COMPLETED", "FAILED"} for item in observations)
+        summary = {
+            "schema_version": "1",
+            "experiment_count": len(records),
+            "terminal_observation_count": terminal,
+            "status_counts": {state: sum(item.get("status") == state for item in records) for state in ("COMPLETED", "FAILED", "RUNNING")},
+            "total_cost": sum(int(item.get("cost", 0)) for item in records),
+            "site_profiles": sorted({json.dumps(item.get("site_profile", {}), sort_keys=True) for item in observations}),
+            "experiments": [{"experiment_id": item.get("experiment_id"), "status": item.get("status"), "compute_observation": item.get("compute_observation", {})} for item in records],
+        }
+        # Convert the set-friendly representation back to JSON objects.
+        summary["site_profiles"] = [json.loads(item) for item in summary["site_profiles"]]
+        (self.run_dir / "compute_summary.json").write_text(json.dumps(summary, indent=2))
     def execute(self, tool: str, arguments: dict[str,Any] | None=None) -> dict[str,Any]:
         if tool not in COSTS: raise ValueError(f"Unsupported tool: {tool}")
         if tool=="evaluate_candidate":
@@ -31,7 +56,10 @@ class ExperimentTools:
         status=self.executor.wait(job,callback=lambda s: print("Status:",s)); stdout,stderr=self.executor.logs(job)
         result=self.executor.fetch_result(job) if status=="COMPLETED" else self.executor.fetch_failure(job)
         cost=COSTS[tool]+(len((arguments or {}).get("pipeline",[])) if tool=="evaluate_candidate" else 0)
-        record={"experiment_id":exp_id,"tool":tool,"arguments":arguments or {},"backend":job.backend,"remote_host":job.remote_host,"remote_pid":job.remote_pid,"job_id":job.job_id,"status":status,"cost":cost,"result":result,"stdout":stdout,"stderr":stderr}; (self.run_dir/"experiments"/f"{exp_id}.json").write_text(json.dumps(record,indent=2)); return record
+        observation = self.executor.observe(job).to_dict()
+        observation["compute_metrics"] = {**observation["compute_metrics"], **result.get("compute_metrics", {})}
+        observation["scientific_metrics"] = result.get("scientific_metrics", {})
+        record={"experiment_id":exp_id,"tool":tool,"arguments":arguments or {},"backend":job.backend,"remote_host":job.remote_host,"remote_pid":job.remote_pid,"job_id":job.job_id,"status":status,"cost":cost,"result":result,"compute_observation":observation,"stdout":stdout,"stderr":stderr}; (self.run_dir/"experiments"/f"{exp_id}.json").write_text(json.dumps(record,indent=2)); self._write_compute_summary(); return record
     def inspect(self)->dict[str,Any]: return self.execute("inspect")
     def compare(self)->dict[str,Any]: return self.execute("compare")
     def transform_and_compare(self,operation:str)->dict[str,Any]: return self.execute("transform_and_compare",{"operation":operation})

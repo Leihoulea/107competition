@@ -1,11 +1,11 @@
 """SSH Direct backend using nohup, a PID, and structured result files."""
 from __future__ import annotations
-import json, re, subprocess, time
+import hashlib, json, re, subprocess, time
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 from .config import Settings
-from .executor_base import ComputeExecutor, JobHandle
+from .executor_base import ComputeExecutor, ComputeObservation, JobHandle
 
 _EXP = re.compile(r"^[A-Za-z0-9_-]+$")
 class RemoteExecutionError(RuntimeError): pass
@@ -16,6 +16,17 @@ class SSHDirectExecutor(ComputeExecutor):
         self.settings = settings or Settings()
         self._workspace = self._safe(self.settings.remote_workspace, "path")
         self._python = self._safe(self.settings.remote_python, "Python path")
+        self._lifecycle: dict[str, list[dict[str, Any]]] = {}
+
+    def _record_lifecycle(self, job_id: str, state: str) -> None:
+        events = self._lifecycle.setdefault(job_id, [])
+        if not events or events[-1]["state"] != state:
+            events.append({"state": state, "observed_at": time.time()})
+
+    def anonymous_site_profile(self) -> dict[str, str]:
+        """Return a stable site token without exposing an SSH alias or hostname."""
+        token = hashlib.sha256(self.settings.remote_host.encode("utf-8")).hexdigest()[:16]
+        return {"profile_version": "1", "site_id": f"ssh-{token}", "backend": "ssh_direct"}
     def _connection_options(self) -> list[str]:
         # Deliberately use short independent sessions. Windows OpenSSH control
         # sockets can become stale after an intermittent network disconnect.
@@ -95,14 +106,18 @@ class SSHDirectExecutor(ComputeExecutor):
         output = self._ssh(launch, retries=1).stdout.strip()
         pid = output.splitlines()[-1] if output else ""
         if not pid.isdigit(): raise RemoteExecutionError(f"Could not parse remote PID from: {output!r}")
-        return JobHandle(experiment_id, "ssh_direct", self.settings.remote_host, int(pid), directory)
+        job = JobHandle(experiment_id, "ssh_direct", self.settings.remote_host, int(pid), directory)
+        self._record_lifecycle(job.job_id, "SUBMITTED")
+        return job
     def is_process_alive(self, job: JobHandle) -> bool:
         return bool(job.remote_pid) and self._ssh(f"kill -0 {job.remote_pid}", False).returncode == 0
     def status(self, job: JobHandle) -> str:
         if job.remote_pid is None: return "FAILED"
         check = f"if test -f {job.job_dir}/result.json; then echo COMPLETED; elif test -f {job.job_dir}/failure.json; then echo FAILED; elif kill -0 {job.remote_pid} 2>/dev/null; then echo RUNNING; else echo FAILED; fi"
         state = self._ssh(check).stdout.strip()
-        if state in {"COMPLETED", "FAILED", "RUNNING"}: return state
+        if state in {"COMPLETED", "FAILED", "RUNNING"}:
+            self._record_lifecycle(job.job_id, state)
+            return state
         raise RemoteExecutionError(f"Unexpected remote status response for {job.job_id}: {state!r}")
     def wait(self, job: JobHandle, poll_interval: float = 1, timeout: float = 300, callback: Callable[[str], None] | None = None) -> str:
         deadline, previous, last_error = time.monotonic() + timeout, None, None
@@ -124,6 +139,16 @@ class SSHDirectExecutor(ComputeExecutor):
             return (self._ssh(f"tail -n {tail} {job.job_dir}/stdout.log", False).stdout, self._ssh(f"tail -n {tail} {job.job_dir}/stderr.log", False).stdout)
         except RemoteExecutionError as exc:
             return ("", f"log retrieval unavailable: {exc}")
+    def observe(self, job: JobHandle) -> ComputeObservation:
+        state = self.status(job)
+        return ComputeObservation(
+            job_id=job.job_id,
+            backend=job.backend,
+            lifecycle_state=state,
+            remote_pid=job.remote_pid,
+            compute_metrics={"lifecycle": list(self._lifecycle.get(job.job_id, []))},
+            site_profile=self.anonymous_site_profile(),
+        )
     def _json(self, path: str) -> dict[str, Any]:
         for attempt in range(3):
             try:
