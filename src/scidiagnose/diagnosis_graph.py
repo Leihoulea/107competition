@@ -326,6 +326,10 @@ class DiagnosisGraph:
             final = self.agent.final_diagnosis(correction_context)
         if final.get("decision") != validated:
             raise RuntimeError(f"finalizer decision conflicts with validation gate: required {validated!r}, received {final.get('decision')!r}")
+        if validated == "no_fault":
+            # Use one canonical evaluator-facing representation for an accepted
+            # abstention; a no-fault conclusion cannot carry a repair candidate.
+            final = {**final, "fault_family": "no_fault", "recommended_repair": {}}
         self.log("finalize", final=final, validated_decision=validated)
         return {"final_diagnosis": final}
 

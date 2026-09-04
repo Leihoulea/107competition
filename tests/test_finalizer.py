@@ -46,3 +46,11 @@ def test_finalizer_cannot_reverse_validated_decision(validated_decision, model_d
             graph.finalize(finalizer_state(validated_decision))
         assert len(agent.contexts) == 2
         assert "final_correction" in agent.contexts[1]
+
+
+def test_accepted_no_fault_is_canonicalized_for_the_evaluator():
+    with TemporaryDirectory(dir=Path.cwd()) as directory:
+        agent = ConflictingAgent("no_fault")
+        final = DiagnosisGraph(agent, object(), Path(directory)).finalize(finalizer_state("no_fault"))["final_diagnosis"]
+    assert final["fault_family"] == "no_fault"
+    assert final["recommended_repair"] == {}
