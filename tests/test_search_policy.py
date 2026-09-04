@@ -74,6 +74,15 @@ def test_novelty_rejection_gets_one_graph_replan_and_trace_event():
     assert '"node": "plan_replan"' in trace
 
 
+def test_semantically_different_scope_text_still_covers_explicit_target():
+    class ScopeTextAgent:
+        def plan_experiment(self, context):
+            return {"target_hypotheses": ["H001"], "tested_scope": ["independent measurement description"], "tool": "inspect", "arguments": {}}
+    with TemporaryDirectory(dir=Path.cwd()) as directory:
+        planned = DiagnosisGraph(ScopeTextAgent(), object(), Path(directory)).plan(state())["current_plan"]
+    assert planned["coverage"]["hypothesis_ids"] == ["H001"]
+
+
 def test_planner_receives_coverage():
     class CoverageAgent:
         def plan_experiment(self, context):
@@ -112,7 +121,7 @@ def test_evidence_can_update_only_hypotheses_covered_by_its_scope():
                 {**context["hypotheses"][1], "status": "rejected", "evidence_against": ["E001"]},
             ]
     current = state()
-    current["evidence"] = [{"evidence_id": "E001", "experiment_id": "EXP_1", "tested_hypotheses": ["H001"], "tested_scope": ["scope-a"], "supports": [], "contradicts": []}]
+    current["evidence"] = [{"evidence_id": "E001", "experiment_id": "EXP_1", "tested_hypotheses": ["H001"], "tested_scope": ["independent measurement description"], "supports": [], "contradicts": []}]
     with TemporaryDirectory(dir=Path.cwd()) as directory:
         result = DiagnosisGraph(ScopeAgent(), object(), Path(directory)).update_hypotheses(current)
     assert result["hypotheses"][0]["status"] == "supported"

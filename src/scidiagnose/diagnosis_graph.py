@@ -117,11 +117,15 @@ class DiagnosisGraph:
             rejected: list[dict[str, Any]] = []
             for candidate in candidates[:3]:
                 targets = [item for item in candidate.get("target_hypotheses", []) if item in hypotheses]
-                if not targets: targets = [key for key, item in hypotheses.items() if item.get("status") in {"active", "supported"}]
-                tested_scope = _scope(candidate.get("tested_scope", []))
-                if not tested_scope:
-                    tested_scope = _scope([scope for key in targets for scope in hypotheses[key].get("testable_scope", [])])
-                covered = [key for key in targets if set(tested_scope) & set(hypotheses[key].get("testable_scope", []))]
+                # Older in-process agents predate the field; retain a narrow
+                # compatibility label for an omitted field.  An explicitly
+                # empty scope is still not a valid coverage contract.
+                raw_scope = candidate.get("tested_scope")
+                tested_scope = _scope(["legacy-unspecified"]) if raw_scope is None else _scope(raw_scope)
+                # Scope labels are model-facing semantic descriptions, not a
+                # shared enum.  An explicit valid target plus a non-empty
+                # normalized scope is the auditable coverage contract.
+                covered = targets if targets and tested_scope else []
                 novelty = self._novelty(s, candidate)
                 if covered and novelty["status"] == "novel":
                     return {**candidate, "target_hypotheses": covered, "tested_scope": tested_scope, "coverage": {"hypothesis_ids": covered, "tested_scope": tested_scope, "novelty": novelty}}, rejected
