@@ -3,7 +3,9 @@
 ## Document metadata
 
 - Publisher: EUMETSAT
-- Version: not stated in extracted cover metadata
+- Document ID: EUM/MSG/SPE/022
+- Version: v7B e-signed
+- Document date: 2015-10-23
 - Original file: eumetsat_msg_met_products_atbd.pdf
 - Raw SHA-256: 2707af6c4f55b8dfc1814e65dba0d7cc551a7536cf18928e52b3a553cb578296
 

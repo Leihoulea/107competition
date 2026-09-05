@@ -29,6 +29,21 @@ def test_manifest_all_sources_exist_and_raw_hashes_match():
         assert hashlib.sha256(normalized.read_bytes()).hexdigest() == source["normalized_sha256"]
 
 
+def test_manifest_paths_are_repo_relative_and_source_metadata_is_reviewed():
+    sources = {item["source_id"]: item for item in manifest_sources()}
+    for source in sources.values():
+        serialized = json.dumps(source)
+        assert ":\\" not in serialized
+        assert not Path(source["path"]).is_absolute()
+        assert not Path(source["normalized_path"]).is_absolute()
+        assert "title" in source and "publisher" in source and "product" in source
+        assert "document_id" in source and "document_date" in source
+    atbd = sources["EUMETSAT_MSG_MET_PRODUCTS_ATBD"]
+    assert atbd["document_id"] == "EUM/MSG/SPE/022"
+    assert atbd["version"] == "v7B e-signed"
+    assert atbd["document_date"] == "2015-10-23"
+
+
 def test_normalized_sources_have_provenance_and_correct_authority():
     sources = {item["source_id"]: item for item in manifest_sources()}
     assert all(item["authority"] == "official" for key, item in sources.items() if key.startswith("EUMETSAT_"))
@@ -45,6 +60,19 @@ def test_index_chunks_keep_source_and_page_provenance():
     assert len(index.chunks) > 100
     assert all(chunk.source_id and chunk.section for chunk in index.chunks)
     assert all(chunk.page for chunk in index.chunks if chunk.source_id != "SATPY_SEVIRI_READER")
+    assert all(chunk.page_start and chunk.page_end for chunk in index.chunks if chunk.source_id != "SATPY_SEVIRI_READER")
+    assert all(chunk.page_start == chunk.page_end for chunk in index.chunks if chunk.source_id != "SATPY_SEVIRI_READER")
+
+
+def test_bm25_chunk_store_rebuilds_at_load_time_without_a_database(tmp_path):
+    from scidiagnose.knowledge.index import build_bm25_index
+
+    persisted = tmp_path / "bm25.json"
+    original = load_bm25_index(KNOWLEDGE / "index" / "bm25.json")
+    rebuilt = build_bm25_index(original.chunks, persisted)
+    loaded = load_bm25_index(persisted)
+    assert len(rebuilt.chunks) == len(loaded.chunks) == len(original.chunks)
+    assert loaded.search("SEVIRI scan directions", top_k=1)[0].source_id == "EUMETSAT_MSG_IMAGE_DATA"
 
 
 def test_orientation_scan_and_satpy_queries_retrieve_relevant_sources():
@@ -64,6 +92,10 @@ def test_cloud_mask_query_retrieves_official_atbd_source():
 
 
 def test_normalized_knowledge_excludes_project_repair_and_evaluator_terms():
-    text = "\n".join(path.read_text(encoding="utf-8") for path in (KNOWLEDGE / "sources" / "normalized").glob("*.md")).lower()
-    assert "rot180" not in text
-    assert "ground_truth" not in text
+    targets = [
+        KNOWLEDGE / "manifest.json", KNOWLEDGE / "corpus" / "chunks.json", KNOWLEDGE / "index" / "bm25.json",
+        *(KNOWLEDGE / "sources" / "normalized").glob("*.md"),
+    ]
+    text = "\n".join(path.read_text(encoding="utf-8") for path in targets).lower()
+    for forbidden in ("rot180", "known_repair", "ground_truth", "r01", "validated_repair", "navigation_error"):
+        assert forbidden not in text

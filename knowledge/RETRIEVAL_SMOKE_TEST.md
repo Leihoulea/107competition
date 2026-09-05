@@ -6,7 +6,8 @@ This report records lexical retrieval only. It does not infer a repair and conta
 
 > What is the native image orientation of MSG SEVIRI data?
 
-Expected documentary source appears in top 3: **True**
+Manual relevance assessment — Relevant@1: **True**; Relevant@3: **True**.
+The assessment checks whether the returned passage comes from a source suitable for the stated semantic question, not merely whether lexical tokens overlap.
 
 | Rank | Source | Section | Page | BM25 | Excerpt |
 | ---: | --- | --- | --- | ---: | --- |
@@ -20,7 +21,8 @@ Expected documentary source appears in top 3: **True**
 
 > What are the SEVIRI image scan directions?
 
-Expected documentary source appears in top 3: **True**
+Manual relevance assessment — Relevant@1: **True**; Relevant@3: **True**.
+The assessment checks whether the returned passage comes from a source suitable for the stated semantic question, not merely whether lexical tokens overlap.
 
 | Rank | Source | Section | Page | BM25 | Excerpt |
 | ---: | --- | --- | --- | ---: | --- |
@@ -34,7 +36,8 @@ Expected documentary source appears in top 3: **True**
 
 > How are MSG image line and column coordinates defined?
 
-Expected documentary source appears in top 3: **True**
+Manual relevance assessment — Relevant@1: **True**; Relevant@3: **True**.
+The assessment checks whether the returned passage comes from a source suitable for the stated semantic question, not merely whether lexical tokens overlap.
 
 | Rank | Source | Section | Page | BM25 | Excerpt |
 | ---: | --- | --- | --- | ---: | --- |
@@ -48,13 +51,14 @@ Expected documentary source appears in top 3: **True**
 
 > How does Satpy handle the native SEVIRI image orientation?
 
-Expected documentary source appears in top 3: **True**
+Manual relevance assessment — Relevant@1: **True**; Relevant@3: **True**.
+The assessment checks whether the returned passage comes from a source suitable for the stated semantic question, not merely whether lexical tokens overlap.
 
 | Rank | Source | Section | Page | BM25 | Excerpt |
 | ---: | --- | --- | --- | ---: | --- |
 | 1 | SATPY_SEVIRI_READER | Load data | — | 18.4274 | ([0.6, 10.8], pad_data=False) For geostationary products, where the imagery is stored in the files in an unconventional orientation (e.g. MSG SEVIRI L1.5 data are stored with the southwest corner in the upper right), the keyword argument ``upper_right_corner`` can be passed into the load call to automatically flip the datasets to the wished orientation. Accepted argument values are ``'NE'``, ``'NW'``, ``'SE'``, ``'SW'``, and ``'native'``. By default, no flipping is applied (corresponding to ``upper_right_corner='native'``) and the data are delivered in the original format. To get the data in the common upright orientation, load the datasets using e.g.:: >>> scn.load(['VIS008'], upper_right_c |
 | 2 | SATPY_SEVIRI_READER | Reading | — | 10.5951 | .. todo:: How to read cloud products from NWCSAF software. (separate document?) Satpy supports reading and loading data from many input file formats and schemes through the concept of *readers*. Each reader supports a specific type of input data. The :class:`~satpy.scene.Scene` object provides a simple interface around all the complexity of these various formats through its ``load`` method. The following sections describe the different way data can be loaded, requested, or added to a Scene object. |
-| 3 | EUMETSAT_MSG_MET_PRODUCTS_ATBD | 22.1.3 Algorithm Specification Version History | 257 | 9.6171 | e the emissivity calculation. 1.7 17/06/11 J. Jackson The TOZ product is generated as part of the GII OE framework. The SEVIRI ozone channel and ozone forecast data are added into the OE framework of GII. The pixel emissivity maps are used and replace the previous LUT method. RTTOV upgrade to handle arbitrary number of profile levels is removed from the Future Enhancements list. The version of RTTOV used can already handle an arbitrary number of profiles. Addition of the “ATBD for the MSG GII/TOZ Product” to the reference list. |
+| 3 | EUMETSAT_MSG_MET_PRODUCTS_ATBD | 22.1.3 Algorithm Specification Version History | 257 | 9.6171 |  into the OE framework of GII. The pixel emissivity maps are used and replace the previous LUT method. RTTOV upgrade to handle arbitrary number of profile levels is removed from the Future Enhancements list. The version of RTTOV used can already handle an arbitrary number of profiles. Addition of the “ATBD for the MSG GII/TOZ Product” to the reference list. |
 | 4 | SATPY_SEVIRI_READER | Metadata | — | 9.5115 | ng attributes are standardized across all readers: * ``name``, and other identifying metadata keys: See :doc:`dev_guide/satpy_internals`. * ``start_time``: Left boundary of the time interval covered by the dataset. For more information see the :ref:`time_metadata` section below. * ``end_time``: Right boundary of the time interval covered by the dataset. For more information see the :ref:`time_metadata` section below. * ``area``: :class:`~pyresample.geometry.AreaDefinition` or :class:`~pyresample.geometry.SwathDefinition` if data is geolocated. Areas are used for gridded projected data and Swaths when data must be described by individual longitude/latitude coordinates. See the Coordinates sec |
 | 5 | EUMETSAT_MSG_IMAGE_DATA | 4.1 Data Formats | 33 | 8.4617 | Before the Structure of the Level 1.5 data is presented, it is important to note the following aspects: The native Level 1.5 data, as produced and distribut ed within the MSG Ground Segment, is distributed as MSG Ground Segment packets. The actual data content of the Ground Segment packets is either: 1. Level 1.5 Data Header, holding the ancillary data that is known at the start of the repeat cycle. 2. Level 1.5 Image Line, comprising groups of image lines, with each group holding the scanlines for the 12 spectral channels (3 for HRV, and one for each of the other 11 channels). This group is repeated (nominally) 3712 times. 3. Level 1.5 Data Trailer, holding the ancillary data that has been  |
 
@@ -62,7 +66,8 @@ Expected documentary source appears in top 3: **True**
 
 > What does upper_right_corner mean for the Satpy SEVIRI reader?
 
-Expected documentary source appears in top 3: **True**
+Manual relevance assessment — Relevant@1: **True**; Relevant@3: **True**.
+The assessment checks whether the returned passage comes from a source suitable for the stated semantic question, not merely whether lexical tokens overlap.
 
 | Rank | Source | Section | Page | BM25 | Excerpt |
 | ---: | --- | --- | --- | ---: | --- |
@@ -76,11 +81,12 @@ Expected documentary source appears in top 3: **True**
 
 > What is the MSG Cloud Mask Product Generation and how are cloud classes defined?
 
-Expected documentary source appears in top 3: **True**
+Manual relevance assessment — Relevant@1: **True**; Relevant@3: **True**.
+The assessment checks whether the returned passage comes from a source suitable for the stated semantic question, not merely whether lexical tokens overlap.
 
 | Rank | Source | Section | Page | BM25 | Excerpt |
 | ---: | --- | --- | --- | ---: | --- |
-| 1 | EUMETSAT_MSG_MET_PRODUCTS_ATBD | 20.4 Outputs | 253 | 18.2597 | The following data shall be produced for the cloud mask product for every pixel in the form of a GRIB Edition 2 encoded product. Parameter Mnemonic Units Min Max Prec Acc To Cloud Mask cloud_mask - 0 3 1 1 CLM The parameter value is defined in code table 4.217 of GRIB Edition 2. A specific entry (7) was added to code table 4.2 (Product Discipline 3, Parameter Category 0) to specify cloud mask data. Parameter Value Meaning Cloud Mask 0 Clear sky over water |
+| 1 | EUMETSAT_MSG_MET_PRODUCTS_ATBD | 20.4 Outputs | 253 | 18.2597 | ncoded product. Parameter Mnemonic Units Min Max Prec Acc To Cloud Mask cloud_mask - 0 3 1 1 CLM The parameter value is defined in code table 4.217 of GRIB Edition 2. A specific entry (7) was added to code table 4.2 (Product Discipline 3, Parameter Category 0) to specify cloud mask data. Parameter Value Meaning Cloud Mask 0 Clear sky over water |
 | 2 | EUMETSAT_MSG_MET_PRODUCTS_ATBD | 14.3.1 Overview | 204 | 15.5998 | This algorithm is responsible for the generation of the precipitation index data set EUMETSAT have to provide to the Global Precipitation Climatology Project (GPCP). The distribution of water in the atmosphere, its transport and its diurnal and seasonal change play an important role in the Earth’s weather and climate. Precipitation is a meteorological parameter which is important in climatological studies, general circulation studies and for the validation of numerical weather prediction (NWP) models. Because there is rather limited information about the amount and distribution of precipitation in many regions, the use of satellite data can provide the required information. The precipitation |
 | 3 | EUMETSAT_MSG_MET_PRODUCTS_ATBD | 3.2.2 New Products | 34 | 15.5142 | This section provides a top-level description of the new products which have been added during the course of the MPEF development is provided. Aerosol Properties Over Sea (AES) The AES intermediate product,, generated every repeat cycle, consists of the optical thickness for the three visible channels and the Angström coefficient, for every pixel over sea. The retrieval is based on pre-calculated look-up tables. A daily product is also derived by temporally and spatially averaging the intermediate products over processing segments. All Sky Radiances (ASR) The ASR product is (as with CSR) a subset of the information derived during the Scenes Analysis processing. The product provides brightnes |
 | 4 | EUMETSAT_MSG_MET_PRODUCTS_ATBD | 27.6 Future Enhancements | 290 | 14.7937 | This process also derives optical depth values over small water bodies like rivers and lakes. For an optimal product, such non-ocean pixels should be removed from the product, which is difficult with the existing cloud mask. We should consider the production of such an “open ocean mask” for this product (not available in MPEF at the moment). |

@@ -60,6 +60,8 @@ def chunk_scientific_text(source: KnowledgeSource, text: str, max_chars: int = 4
             chunk_id=f"{source.source_id}:{index:04d}", source_id=source.source_id,
             title=source.title, section=item_section, page=item_page, version=source.version,
             authority=source.authority, domain=source.domain, product=source.product, text=body,
+            page_start=int(item_page) if item_page and item_page.isdigit() else None,
+            page_end=int(item_page) if item_page and item_page.isdigit() else None,
         )
         for index, (item_section, item_page, body) in enumerate(chunks, 1)
     ]

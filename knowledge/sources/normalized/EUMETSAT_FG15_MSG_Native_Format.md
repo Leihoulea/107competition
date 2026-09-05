@@ -3,7 +3,9 @@
 ## Document metadata
 
 - Publisher: EUMETSAT
-- Version: not stated in extracted cover metadata
+- Document ID: unknown
+- Version: unknown
+- Document date: 2002-12-10
 - Original file: eumetsat_fg15_msg_native_format.pdf
 - Raw SHA-256: 30afd3c2fa4bda3f32ca7081fb63a21ce1343fed4e9f6a7010116b9a43698e76
 

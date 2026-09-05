@@ -3,7 +3,9 @@
 ## Document metadata
 
 - Publisher: Satpy project
-- Version: source snapshot; version not stated
+- Document ID: unknown
+- Version: unknown
+- Document date: unknown
 - Original file: satpy_seviri_reading.rst.txt
 - Raw SHA-256: a88b0b9125cc7b43abf3dd720b3deaed8d8261afd2c94527ecae206b5e9133b1
 

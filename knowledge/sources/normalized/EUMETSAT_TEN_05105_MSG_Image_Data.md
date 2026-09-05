@@ -3,7 +3,9 @@
 ## Document metadata
 
 - Publisher: EUMETSAT
-- Version: v8 e-signed, 26 September 2017
+- Document ID: EUM/MSG/ICD/105
+- Version: v8 e-signed
+- Document date: 2017-09-26
 - Original file: eumetsat_ten_05105_msg_image_data.pdf
 - Raw SHA-256: b70c47c67b7961d1f9a9741cacb6313241f163a39dd4518b7f5e83296739f8c1
 

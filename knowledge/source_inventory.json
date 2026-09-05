@@ -2,8 +2,7 @@
   {
     "source_id": "EUMETSAT_MSG_NATIVE_FORMAT",
     "original_filename": "pdf_fg15_msg_native_format_15_6b513c5bb3.pdf",
-    "resolved_path": "E:\\107competition\\pdf_fg15_msg_native_format_15_6b513c5bb3.pdf",
-    "ingested_raw_path": "C:\\Users\\Administrator\\.codex\\worktrees\\fb8b\\107competition\\knowledge\\sources\\raw\\eumetsat_fg15_msg_native_format.pdf",
+    "raw_path": "sources/raw/eumetsat_fg15_msg_native_format.pdf",
     "file_type": "pdf",
     "size_bytes": 347567,
     "sha256": "30afd3c2fa4bda3f32ca7081fb63a21ce1343fed4e9f6a7010116b9a43698e76",
@@ -22,8 +21,7 @@
   {
     "source_id": "EUMETSAT_MSG_IMAGE_DATA",
     "original_filename": "pdf_ten_05105_msg_img_data_e7c8b315e6.pdf",
-    "resolved_path": "E:\\107competition\\pdf_ten_05105_msg_img_data_e7c8b315e6.pdf",
-    "ingested_raw_path": "C:\\Users\\Administrator\\.codex\\worktrees\\fb8b\\107competition\\knowledge\\sources\\raw\\eumetsat_ten_05105_msg_image_data.pdf",
+    "raw_path": "sources/raw/eumetsat_ten_05105_msg_image_data.pdf",
     "file_type": "pdf",
     "size_bytes": 1980925,
     "sha256": "b70c47c67b7961d1f9a9741cacb6313241f163a39dd4518b7f5e83296739f8c1",
@@ -42,8 +40,7 @@
   {
     "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
     "original_filename": "pdf_msg_met_prod_atbd_15e4917e25.pdf",
-    "resolved_path": "E:\\107competition\\pdf_msg_met_prod_atbd_15e4917e25.pdf",
-    "ingested_raw_path": "C:\\Users\\Administrator\\.codex\\worktrees\\fb8b\\107competition\\knowledge\\sources\\raw\\eumetsat_msg_met_products_atbd.pdf",
+    "raw_path": "sources/raw/eumetsat_msg_met_products_atbd.pdf",
     "file_type": "pdf",
     "size_bytes": 2304120,
     "sha256": "2707af6c4f55b8dfc1814e65dba0d7cc551a7536cf18928e52b3a553cb578296",
@@ -64,8 +61,7 @@
   {
     "source_id": "SATPY_SEVIRI_READER",
     "original_filename": "reading.rst.txt",
-    "resolved_path": "E:\\107competition\\reading.rst.txt",
-    "ingested_raw_path": "C:\\Users\\Administrator\\.codex\\worktrees\\fb8b\\107competition\\knowledge\\sources\\raw\\satpy_seviri_reading.rst.txt",
+    "raw_path": "sources/raw/satpy_seviri_reading.rst.txt",
     "file_type": "rst",
     "size_bytes": 15551,
     "sha256": "a88b0b9125cc7b43abf3dd720b3deaed8d8261afd2c94527ecae206b5e9133b1",

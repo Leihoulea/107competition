@@ -21,6 +21,8 @@ class KnowledgeSource:
     product: str
     license_or_usage_note: str
     path: str
+    document_id: str | None = None
+    document_date: str | None = None
 
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> "KnowledgeSource":
@@ -34,7 +36,10 @@ class KnowledgeSource:
             raise ValueError(f"knowledge source missing required fields: {', '.join(missing)}")
         if value["authority"] not in {"official", "peer_reviewed", "project_documentation", "project_note"}:
             raise ValueError("knowledge source authority must be official, peer_reviewed, project_documentation, or project_note")
-        return cls(**{name: str(value[name]) for name in required})  # type: ignore[arg-type]
+        fields = {name: str(value[name]) for name in required}
+        fields["document_id"] = None if value.get("document_id") is None else str(value["document_id"])
+        fields["document_date"] = None if value.get("document_date") is None else str(value["document_date"])
+        return cls(**fields)  # type: ignore[arg-type]
 
     def to_dict(self) -> dict[str, str]:
         return asdict(self)
@@ -52,6 +57,11 @@ class KnowledgeChunk:
     domain: str
     product: str
     text: str
+    # ``page`` is retained for the first public index schema. The explicit
+    # range fields make page provenance unambiguous for future multi-page
+    # chunks without invalidating existing readers.
+    page_start: int | None = None
+    page_end: int | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

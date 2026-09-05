@@ -21,7 +21,6 @@ SOURCES = (
         "source_id": "EUMETSAT_MSG_NATIVE_FORMAT",
         "raw_name": "eumetsat_fg15_msg_native_format.pdf",
         "original_filename": "pdf_fg15_msg_native_format_15_6b513c5bb3.pdf",
-        "original_resolved_path": "E:\\107competition\\pdf_fg15_msg_native_format_15_6b513c5bb3.pdf",
         "normalized_name": "EUMETSAT_FG15_MSG_Native_Format.md",
         "authority": "official",
         "publisher": "EUMETSAT",
@@ -34,7 +33,6 @@ SOURCES = (
         "source_id": "EUMETSAT_MSG_IMAGE_DATA",
         "raw_name": "eumetsat_ten_05105_msg_image_data.pdf",
         "original_filename": "pdf_ten_05105_msg_img_data_e7c8b315e6.pdf",
-        "original_resolved_path": "E:\\107competition\\pdf_ten_05105_msg_img_data_e7c8b315e6.pdf",
         "normalized_name": "EUMETSAT_TEN_05105_MSG_Image_Data.md",
         "authority": "official",
         "publisher": "EUMETSAT",
@@ -47,7 +45,6 @@ SOURCES = (
         "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
         "raw_name": "eumetsat_msg_met_products_atbd.pdf",
         "original_filename": "pdf_msg_met_prod_atbd_15e4917e25.pdf",
-        "original_resolved_path": "E:\\107competition\\pdf_msg_met_prod_atbd_15e4917e25.pdf",
         "normalized_name": "EUMETSAT_MSG_Meteorological_Products_ATBD.md",
         "authority": "official",
         "publisher": "EUMETSAT",
@@ -60,7 +57,6 @@ SOURCES = (
         "source_id": "SATPY_SEVIRI_READER",
         "raw_name": "satpy_seviri_reading.rst.txt",
         "original_filename": "reading.rst.txt",
-        "original_resolved_path": "E:\\107competition\\reading.rst.txt",
         "normalized_name": "SATPY_SEVIRI_Reader_Documentation.md",
         "authority": "project_documentation",
         "publisher": "Satpy project",
@@ -109,7 +105,7 @@ def inventory() -> list[dict[str, object]]:
         is_pdf = raw.suffix.lower() == ".pdf"
         record: dict[str, object] = {
             "source_id": spec["source_id"], "original_filename": spec["original_filename"],
-            "resolved_path": spec["original_resolved_path"], "ingested_raw_path": str(raw.resolve()),
+            "raw_path": f"sources/raw/{raw.name}",
             "file_type": "pdf" if is_pdf else "rst",
             "size_bytes": raw.stat().st_size, "sha256": sha256(raw),
         }
@@ -127,7 +123,7 @@ def inventory() -> list[dict[str, object]]:
 def _normalize_pdf(raw: Path, destination: Path, metadata: dict[str, str]) -> tuple[int, str]:
     PdfReader = _require_pypdf(); reader = PdfReader(str(raw))
     lines = [f"# {metadata['title']}", "", "## Document metadata", ""]
-    for label in ("Publisher", "Version", "Original file", "Raw SHA-256"):
+    for label in ("Publisher", "Document ID", "Version", "Document date", "Original file", "Raw SHA-256"):
         key = label.lower().replace(" ", "_").replace("-", "_")
         lines.append(f"- {label}: {metadata[key]}")
     for number, page in enumerate(reader.pages, 1):
@@ -155,7 +151,7 @@ def _normalize_rst(raw: Path, destination: Path, metadata: dict[str, str]) -> st
             rendered.extend([f"{level} {line.strip()}", ""]); index += 2; continue
         rendered.append(line); index += 1
     lines = [f"# {metadata['title']}", "", "## Document metadata", ""]
-    for label in ("Publisher", "Version", "Original file", "Raw SHA-256"):
+    for label in ("Publisher", "Document ID", "Version", "Document date", "Original file", "Raw SHA-256"):
         key = label.lower().replace(" ", "_").replace("-", "_")
         lines.append(f"- {label}: {metadata[key]}")
     lines.extend(["", "<!-- source_page: source_document -->", "", "\n".join(rendered).strip()])
@@ -169,17 +165,36 @@ def normalize(records: list[dict[str, object]]) -> None:
     # Titles and versions are copied from the source's own extracted cover text,
     # not inferred from any diagnostic experiment or evaluator data.
     reviewed = {
-        "EUMETSAT_MSG_NATIVE_FORMAT": ("MSG Level 1.5 Native Format File Definition", "not stated in extracted cover metadata"),
-        "EUMETSAT_MSG_IMAGE_DATA": ("MSG Level 1.5 Image Data Format Description", "v8 e-signed, 26 September 2017"),
-        "EUMETSAT_MSG_MET_PRODUCTS_ATBD": ("MSG MPEF Algorithm Specification Document", "not stated in extracted cover metadata"),
-        "SATPY_SEVIRI_READER": ("Satpy Reading Documentation", "source snapshot; version not stated"),
+        "EUMETSAT_MSG_NATIVE_FORMAT": {
+            "title": "MSG Level 1.5 Native Format File Definition", "document_id": None,
+            "version": "unknown", "document_date": "2002-12-10",
+        },
+        "EUMETSAT_MSG_IMAGE_DATA": {
+            "title": "MSG Level 1.5 Image Data Format Description", "document_id": "EUM/MSG/ICD/105",
+            "version": "v8 e-signed", "document_date": "2017-09-26",
+        },
+        "EUMETSAT_MSG_MET_PRODUCTS_ATBD": {
+            "title": "MSG MPEF Algorithm Specification Document", "document_id": "EUM/MSG/SPE/022",
+            "version": "v7B e-signed", "document_date": "2015-10-23",
+        },
+        "SATPY_SEVIRI_READER": {
+            "title": "Satpy Reading Documentation", "document_id": None,
+            "version": "unknown", "document_date": None,
+        },
     }
     manifest: list[dict[str, object]] = []
     normalized_dir = KNOWLEDGE / "sources" / "normalized"; normalized_dir.mkdir(parents=True, exist_ok=True)
     for spec in SOURCES:
         raw = KNOWLEDGE / "sources" / "raw" / spec["raw_name"]
-        title, version = reviewed[spec["source_id"]]
-        metadata = {"title": title, "publisher": str(spec["publisher"]), "version": version, "original_file": raw.name, "raw_sha_256": sha256(raw)}
+        reviewed_metadata = reviewed[spec["source_id"]]
+        title = str(reviewed_metadata["title"])
+        metadata = {
+            "title": title, "publisher": str(spec["publisher"]),
+            "document_id": str(reviewed_metadata["document_id"] or "unknown"),
+            "version": str(reviewed_metadata["version"]),
+            "document_date": str(reviewed_metadata["document_date"] or "unknown"),
+            "original_file": raw.name, "raw_sha_256": sha256(raw),
+        }
         destination = normalized_dir / str(spec["normalized_name"])
         if raw.suffix.lower() == ".pdf":
             pages, normalized_hash = _normalize_pdf(raw, destination, metadata)
@@ -187,7 +202,9 @@ def normalize(records: list[dict[str, object]]) -> None:
             pages, normalized_hash = None, _normalize_rst(raw, destination, metadata)
         inventory_record = by_id[str(spec["source_id"])]
         manifest.append({
-            **spec, "title": title, "version": version, "retrieved_at": str(date.today()),
+            **spec, "title": title, "document_id": reviewed_metadata["document_id"],
+            "version": reviewed_metadata["version"], "document_date": reviewed_metadata["document_date"],
+            "retrieved_at": str(date.today()),
             "license_or_usage_note": str(spec["usage_note"]),
             "path": f"normalized/{destination.name}", "normalized_path": f"sources/normalized/{destination.name}",
             "sha256": normalized_hash, "raw_sha256": sha256(raw), "normalized_sha256": normalized_hash,

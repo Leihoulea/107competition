@@ -52,6 +52,7 @@ class KnowledgeIndex:
 
 
 def build_bm25_index(chunks: list[KnowledgeChunk], output_path: Path | None = None) -> KnowledgeIndex:
+    """Persist the searchable chunk store; BM25 statistics are built at search time."""
     index = KnowledgeIndex(chunks=list(chunks))
     if output_path is not None:
         output_path.parent.mkdir(parents=True, exist_ok=True)
