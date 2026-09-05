@@ -25,22 +25,49 @@ The transform label is an executable benchmark diagnostic, not a claim about a p
 
 The deterministic artifacts are in `benchmark/results/R01_TRANSFORM_SWEEP/` and `benchmark/results/R01_FULL_SEARCH/`. The full-search action space is the frozen 7 transforms × 11 row shifts × 11 column shifts; it was not changed for R01.
 
-## Frozen SciDiagnose no-RAG runs
+## Frozen SciDiagnose no-RAG cohort
 
-All three runs used the same commit, public case, school OpenAI-compatible API configuration (`deepseek-v4-flash`, `temperature=0`), SSH Direct on `server-114`, `budget=30`, and `max_steps=8`. No RAG data, private evaluator artifact, or corrected target was presented to the Agent or uploaded remotely.
+### Protocol
 
-| Run | Completion / decision | Raw fault family | Experiments | Budget used | Remote jobs | Remote wall | Remote CPU | Peak memory | Evaluator |
-|---|---|---|---:|---:|---:|---:|---:|---:|---:|
-| `R01_V022_NORAG_01` | API transport failure after `EXP_001` | — | 1 | 1 | 1 | 0.666664 s | 0.654129 s | 191.8125 MB | not scored |
-| `R01_V022_NORAG_02` | schema failure before execution | — | 0 | 0 | 0 | — | — | — | not scored |
-| `R01_V022_NORAG_03` | `inconclusive` (budget exhausted) | `null` | 8 | 26 | 8 | 2.433613 s | 3.455024 s | 191.8125 MB | 0.0 / 100 |
+Every attempt used the same frozen commit, public case, school OpenAI-compatible API configuration (`deepseek-v4-flash`, `temperature=0`), SSH Direct on `server-114`, `budget=30`, and `max_steps=8`. No RAG data, evaluator-private artifact, corrected target, or deterministic-search result was presented to the Agent or uploaded remotely.
 
-Run 01 reached a real remote inspect experiment, then the school API connection reset (`WinError 10054`) during hypothesis update. Run 02 failed because the provider returned a hypothesis count outside the frozen 2–5 item response schema. Run 03 completed eight real remote experiments but spent its budget on small shifts, `flip_x`, `rot90`, identity evaluation, and transpose. It did not test the high-value diagnostic candidate, so no repair reached the `0.75` threshold; the validation gate correctly emitted `inconclusive` rather than accepting a fault or no-fault claim.
+The protocol allowed at most eight attempts and targeted three attempts with a completed final diagnosis. The target was reached at attempt 06, so attempts 07–08 were not started. All six attempts, including failures, are retained below.
 
-Each run directory contains `trace.jsonl`, `compute_summary.json`, its per-experiment artifacts, and `evaluator.json`; run 03 also contains `state.json` and `final.json`.
+### A. End-to-end operational reliability (all attempts)
+
+| Run | Operational status | Experiments | Budget used | Remote jobs | Remote wall | Remote CPU | Peak memory |
+|---|---|---:|---:|---:|---:|---:|---:|
+| `R01_V022_NORAG_01` | failed: API connection reset after `EXP_001` | 1 | 1 | 1 | 0.666664 s | 0.654129 s | 191.8125 MB |
+| `R01_V022_NORAG_02` | failed: hypothesis count violated the 2–5 schema before execution | 0 | 0 | 0 | — | — | — |
+| `R01_V022_NORAG_03` | completed: final `inconclusive` | 8 | 26 | 8 | 2.433613 s | 3.455024 s | 191.8125 MB |
+| `R01_V022_NORAG_04` | completed: final `inconclusive` | 8 | 26 | 8 | 2.011874 s | 2.897798 s | 191.785156 MB |
+| `R01_V022_NORAG_05` | failed: reflection response used unsupported `response` wrapper after `EXP_004` | 4 | 16 | 4 | 0.784797 s | 1.312831 s | 157.027344 MB |
+| `R01_V022_NORAG_06` | completed: final `inconclusive` | 8 | 26 | 8 | 2.065500 s | 2.745305 s | 191.808594 MB |
+
+Operational completion is **3 / 6 = 50.0%**. Failures 01, 02, and 05 remain in the denominator: API transport, structured-output non-compliance, and response-wrapper incompatibility are all end-to-end reliability outcomes, not network-only exclusions.
+
+### B. Conditional scientific performance (completed final diagnoses only)
+
+| Run | Final decision | Fault family | Evidence reaching 0.75 | Evaluator total |
+|---|---|---|---|---:|
+| `R01_V022_NORAG_03` | `inconclusive` | `null` | none | 0.0 / 100 |
+| `R01_V022_NORAG_04` | `inconclusive` | `null` | none | 0.0 / 100 |
+| `R01_V022_NORAG_06` | `inconclusive` | `null` | none | 0.0 / 100 |
+
+Conditional fault detection, fault-family identification, and validated repair are each **0 / 3**. This is not a claim that the three attempts were operational failures; it is the no-RAG scientific baseline result under the frozen policy.
+
+### Trace interpretation
+
+Run 03 tested small shifts, `flip_x`, identity comparison, `rot90`, and transpose, but never tested `rot180` (the deterministic sweep's clearly separated single-transform candidate). Its reflection inferred that the masks were correctly oriented because `rot90` and transpose reduced agreement. That inference is unsupported: without testing `rot180`, those negative results cannot establish that orientation is correct. This is retained as an observed experiment-selection/evidence-interpretation failure, not repaired by prompt tuning.
+
+Runs 04 and 06 also used eight real remote experiments without producing a validated repair. All three completed runs stopped at the eight-step limit with 4 budget units remaining. The frozen graph reports this state as `budget_exhausted` / “available budget ended”, although the operative constraint was `max_steps=8`, not exhausted budget. This is recorded only as a v0.3 generic semantics backlog: `stop_reason = budget_exhausted | max_steps_reached | no_affordable_novel_action`. It was not changed in the R01 baseline.
+
+The deterministic full search finding of `rot180` followed by shift `(4, 1)` at `0.8094529529` does not invalidate the historical orientation/navigation root-cause family: it shows that the reconstructed comparison grid can retain a small registration residual. Future evaluation should distinguish root-cause family from metric-optimal repair pipeline rather than require an exact `rot180`-only answer.
+
+Each attempt directory contains its trace and compute summary; completed attempts contain `state.json`, `final.json`, and a scored `evaluator.json`; failed attempts contain `run_failure.json` and an explicitly `not_scored` evaluator artifact.
 
 ## Failure analysis and frozen-Agent proof
 
-The observed failure modes are: provider transport instability (run 01), provider schema non-compliance (run 02), and hypothesis generation / experiment-selection inefficiency leading to budget exhaustion (run 03). They are benchmark observations, not targets for prompt tuning. `git diff v0.2.2-agent-freeze..c90b87d -- src/scidiagnose/agent.py src/scidiagnose/diagnosis_graph.py` is empty: no frozen Agent prompt, planner, reflection, validation, search policy, or experiment-selection policy was modified for R01.
+The cohort records provider transport instability (01), provider schema non-compliance (02), reflection-wrapper incompatibility (05), and repeated hypothesis generation / experiment-selection / evidence-interpretation failures in the completed runs (03, 04, 06). These are benchmark observations, not targets for prompt tuning. `git diff v0.2.2-agent-freeze..c90b87d -- src/scidiagnose/agent.py src/scidiagnose/diagnosis_graph.py` is empty: no frozen Agent prompt, planner, reflection, validation, search policy, or experiment-selection policy was modified for R01.
 
-No RAG implementation, new scientific tool, or UI work was started. This baseline is ready for integration review.
+No RAG implementation, new scientific tool, or UI work was started. The no-RAG cohort is complete and ready for integration review.

@@ -1,0 +1,7 @@
+{
+  "schema_version": "1",
+  "run_id": "R01_V022_NORAG_05",
+  "benchmark_commit": "c90b87d6166679b0f107693da5a9cbe7f6b50bc8",
+  "evaluation_status": "not_scored",
+  "reason": "AgentAPIError during reflection: provider response used an unsupported response wrapper, so no final diagnosis was produced."
+}

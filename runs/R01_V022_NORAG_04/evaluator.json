@@ -1,0 +1,12 @@
+{
+  "schema_version": "1",
+  "run_id": "R01_V022_NORAG_04",
+  "benchmark_commit": "c90b87d6166679b0f107693da5a9cbe7f6b50bc8",
+  "evaluation_status": "scored",
+  "fault_detection": 0.0,
+  "fault_family": 0.0,
+  "repair_validation": 0.0,
+  "evidence_quality": 0.0,
+  "efficiency": 0.0,
+  "total": 0.0
+}

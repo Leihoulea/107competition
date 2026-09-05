@@ -1,0 +1,20 @@
+{
+  "decision": "inconclusive",
+  "fault_family": null,
+  "root_cause": "The available budget ended before either a fault repair or a scientifically supported no-fault conclusion was validated.",
+  "confidence": 0.0,
+  "evidence_experiment_ids": [
+    "EXP_001",
+    "EXP_002",
+    "EXP_003",
+    "EXP_004",
+    "EXP_005",
+    "EXP_006",
+    "EXP_007",
+    "EXP_008"
+  ],
+  "recommended_repair": {},
+  "remaining_uncertainty": [
+    "Additional diagnostic experiments or explicit normal-range scientific evidence are required."
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "experiment_id": "EXP_006",
+  "tool": "shift_and_compare",
+  "arguments": {
+    "dr": 2,
+    "dc": -3
+  }
+}
