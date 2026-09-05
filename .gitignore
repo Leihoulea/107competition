@@ -4,3 +4,4 @@ __pycache__/
 .pytest_cache/
 runs/*
 !runs/.gitkeep
+knowledge/local_source_inventory.json

@@ -1,0 +1,3 @@
+# Immutable source captures may contain valid RST heading underlines (=======).
+# Keep them byte-for-byte rather than applying text conversion or code-diff checks.
+knowledge/sources/raw/*.rst.txt -text -diff
