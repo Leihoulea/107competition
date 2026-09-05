@@ -114,6 +114,10 @@ def _signature(tool: Any, arguments: Any) -> str:
     return f"{tool}:{json.dumps(arguments if isinstance(arguments, dict) else {}, sort_keys=True, separators=(',', ':'))}"
 
 
+def _normalized_knowledge_query(value: Any) -> str:
+    return " ".join(str(value).lower().split())
+
+
 class DiagnosisGraph:
     """State transitions are auditable; model calls receive only public cognitive state."""
     def __init__(self, agent: Any, tools: ExperimentTools, run_dir: Path, knowledge_tool: ScientificKnowledgeTool | None = None) -> None:
@@ -121,7 +125,7 @@ class DiagnosisGraph:
         self.trace = run_dir / "trace.jsonl"
         self.checkpointer = InMemorySaver()
         graph = StateGraph(DiagnosisGraphState)
-        for name, node in (("observe", self.observe), ("hypothesize", self.hypothesize), ("plan", self.plan), ("budget_check", self.budget_check), ("execute", self.execute), ("extract_evidence", self.extract_evidence), ("extract_knowledge_evidence", self.extract_knowledge_evidence), ("update_hypotheses", self.update_hypotheses), ("reflect", self.reflect), ("validation_gate", self.validation_gate), ("finalize", self.finalize)):
+        for name, node in (("observe", self.observe), ("hypothesize", self.hypothesize), ("plan", self.plan), ("budget_check", self.budget_check), ("execute", self.execute), ("extract_evidence", self.extract_evidence), ("extract_knowledge_evidence", self.extract_knowledge_evidence), ("update_hypotheses", self.update_hypotheses), ("update_hypotheses_from_knowledge", self.update_hypotheses_from_knowledge), ("reflect", self.reflect), ("validation_gate", self.validation_gate), ("finalize", self.finalize)):
             graph.add_node(name, node)
         graph.add_edge(START, "observe")
         graph.add_edge("observe", "hypothesize")
@@ -130,7 +134,8 @@ class DiagnosisGraph:
         graph.add_conditional_edges("budget_check", lambda s: "reflect" if s.get("budget_blocked") else "execute", {"reflect": "reflect", "execute": "execute"})
         graph.add_conditional_edges("execute", lambda s: "extract_knowledge_evidence" if s.get("latest_action_kind") == "knowledge_query" else "extract_evidence", {"extract_evidence": "extract_evidence", "extract_knowledge_evidence": "extract_knowledge_evidence"})
         graph.add_edge("extract_evidence", "update_hypotheses")
-        graph.add_edge("extract_knowledge_evidence", "reflect")
+        graph.add_edge("extract_knowledge_evidence", "update_hypotheses_from_knowledge")
+        graph.add_edge("update_hypotheses_from_knowledge", "reflect")
         graph.add_edge("update_hypotheses", "reflect")
         graph.add_conditional_edges("reflect", lambda s: "plan" if s["diagnosis_status"] == "continue" else "validation_gate", {"plan": "plan", "validation_gate": "validation_gate"})
         graph.add_conditional_edges("validation_gate", lambda s: "finalize" if s["diagnosis_status"] in {"accepted_fault", "accepted_no_fault", "max_steps_reached", "budget_exhausted", "no_affordable_novel_action", "provider_failure"} else "plan", {"finalize": "finalize", "plan": "plan"})
@@ -245,6 +250,12 @@ class DiagnosisGraph:
 
     @staticmethod
     def _novelty(s: DiagnosisGraphState, candidate: dict[str, Any]) -> dict[str, Any]:
+        if candidate.get("tool") == "retrieve_scientific_knowledge":
+            query = _normalized_knowledge_query(candidate.get("arguments", {}).get("query", ""))
+            for previous in s.get("knowledge_queries", []):
+                if _normalized_knowledge_query(previous.get("query", "")) == query:
+                    return {"status": "duplicate", "query_id": previous.get("query_id"), "query": query}
+            return {"status": "novel"}
         coverage = s.get("experiment_coverage") or DiagnosisGraph._experiment_coverage(s)
         family = str(candidate.get("family", candidate.get("tool", "unknown")))
         family_coverage = coverage.get("families", {}).get(family, {})
@@ -278,7 +289,13 @@ class DiagnosisGraph:
                 raise RuntimeError("knowledge action selected while knowledge retrieval is disabled")
             record = self.knowledge_tool.execute(plan["arguments"])
             remaining = s["budget_remaining"] - record["cost"]
-            query = {"query_id": f"Q{len(s.get('knowledge_queries', [])) + 1:03d}", "plan_id": plan["plan_id"], **record}
+            query = {
+                "query_id": f"Q{len(s.get('knowledge_queries', [])) + 1:03d}", "plan_id": plan["plan_id"],
+                "target_hypotheses": list(plan.get("target_hypotheses", [])),
+                "diagnostic_rationale": plan.get("diagnostic_rationale", ""),
+                "predicted_observation": plan.get("predicted_observation", ""),
+                **record,
+            }
             self.log("execute_knowledge", plan_id=plan["plan_id"], query=query)
             return {"knowledge_queries": s.get("knowledge_queries", []) + [query], "latest_result": query, "latest_action_kind": "knowledge_query", "budget_remaining": remaining, "steps_used": s["steps_used"] + 1}
         record = self.tools.execute(plan["tool"], plan["arguments"])
@@ -321,13 +338,49 @@ class DiagnosisGraph:
         for hit in query.get("hits", []):
             evidence.append({
                 "evidence_id": f"K{len(evidence) + 1:03d}", "kind": "knowledge",
-                "source": {key: hit.get(key) for key in ("source_id", "title", "authority", "section", "page")},
+                "query_id": query.get("query_id"),
+                "source": {key: hit.get(key) for key in ("source_id", "title", "authority", "version", "section", "page", "chunk_id")},
                 "claim": f"Retrieved documentary material relevant to: {query.get('query', '')}",
                 "supports_hypotheses": [], "contradicts_hypotheses": [], "validated": False,
                 "excerpt": hit.get("excerpt", ""), "retrieval_score": hit.get("retrieval_score"),
+                "target_hypotheses": list(query.get("target_hypotheses", [])),
             })
         self.log("extract_knowledge_evidence", query_id=query.get("query_id"), evidence=evidence[len(s.get("knowledge_evidence", [])):])
         return {"knowledge_evidence": evidence}
+
+    def update_hypotheses_from_knowledge(self, s: DiagnosisGraphState) -> dict[str, Any]:
+        query = s.get("latest_result") or {}
+        targets = set(query.get("target_hypotheses", []))
+        new_evidence = [item for item in s.get("knowledge_evidence", []) if item.get("query_id") == query.get("query_id")]
+        evidence_ids = {item.get("evidence_id") for item in new_evidence if item.get("evidence_id")}
+        if not targets or not evidence_ids or not hasattr(self.agent, "update_hypotheses_from_knowledge"):
+            return {}
+        context = self._context(s)
+        context.update({"latest_knowledge_evidence": new_evidence, "knowledge_evidence_ids": sorted(evidence_ids), "knowledge_target_hypothesis_ids": sorted(targets)})
+        returned = self.agent.update_hypotheses_from_knowledge(context)
+        if isinstance(returned, list):
+            returned = {"hypotheses": returned, "evidence_interpretations": []}
+        proposed = {item.get("hypothesis_id"): item for item in returned.get("hypotheses", []) if isinstance(item, dict)} if isinstance(returned, dict) else {}
+        hypotheses = []
+        for old in s.get("hypotheses", []):
+            update = proposed.get(old["hypothesis_id"])
+            if old["hypothesis_id"] not in targets or not update:
+                hypotheses.append(old); continue
+            cited = set(update.get("evidence_for", [])) | set(update.get("evidence_against", []))
+            if not (cited & evidence_ids):
+                hypotheses.append(old); continue
+            hypotheses.append({**update, "hypothesis_id": old["hypothesis_id"], "testable_scope": old.get("testable_scope", []), "scope_kind": old.get("scope_kind", _hypothesis_scope_kind(old))})
+        by_id = {item["hypothesis_id"]: item for item in hypotheses}
+        interpretations = {item.get("evidence_id"): item for item in returned.get("evidence_interpretations", []) if isinstance(item, dict)} if isinstance(returned, dict) else {}
+        knowledge = []
+        for item in s.get("knowledge_evidence", []):
+            interpretation = interpretations.get(item.get("evidence_id"), {})
+            supports = [hid for hid in interpretation.get("supports_hypotheses", []) if hid in targets and item.get("evidence_id") in by_id.get(hid, {}).get("evidence_for", [])]
+            contradicts = [hid for hid in interpretation.get("contradicts_hypotheses", []) if hid in targets and item.get("evidence_id") in by_id.get(hid, {}).get("evidence_against", [])]
+            claim = str(interpretation.get("claim", "")).strip() or item.get("claim", "")
+            knowledge.append({**item, "claim": claim, "supports_hypotheses": supports, "contradicts_hypotheses": contradicts})
+        self.log("update_hypotheses_from_knowledge", query_id=query.get("query_id"), target_hypotheses=sorted(targets), knowledge_evidence_ids=sorted(evidence_ids), hypotheses=hypotheses)
+        return {"hypotheses": hypotheses, "knowledge_evidence": knowledge}
 
     def update_hypotheses(self, s: DiagnosisGraphState) -> dict[str, Any]:
         context = self._context(s)
@@ -462,7 +515,14 @@ class DiagnosisGraph:
             raise RuntimeError("finalize requires a validated_decision from validation_gate")
         context.update({"reflection": s.get("reflection"), "best_experiment": best, "allowed_evidence_ids": [item["experiment_id"] for item in experiments], "allowed_knowledge_evidence_ids": [item["evidence_id"] for item in s.get("knowledge_evidence", [])], "validated_decision": validated})
         if validated == "inconclusive":
-            final = {"decision":"inconclusive","fault_family":None,"root_cause":"The available budget ended before either a fault repair or a scientifically supported no-fault conclusion was validated.","confidence":0.0,"evidence_experiment_ids":[item["experiment_id"] for item in experiments],"recommended_repair":{},"remaining_uncertainty":["Additional diagnostic experiments or explicit normal-range scientific evidence are required."]}
+            stop_reason = s.get("stop_reason", "no_affordable_novel_action")
+            explanations = {
+                "max_steps_reached": "The maximum diagnostic step limit was reached before either a fault repair or a scientifically supported no-fault conclusion was validated.",
+                "budget_exhausted": "The available diagnostic budget was exhausted before either a fault repair or a scientifically supported no-fault conclusion was validated.",
+                "no_affordable_novel_action": "No affordable novel diagnostic action remained before either a fault repair or a scientifically supported no-fault conclusion was validated.",
+                "provider_failure": "The model provider failed before either a fault repair or a scientifically supported no-fault conclusion was validated.",
+            }
+            final = {"decision":"inconclusive","fault_family":None,"root_cause":explanations[stop_reason],"confidence":0.0,"evidence_experiment_ids":[item["experiment_id"] for item in experiments],"recommended_repair":{},"remaining_uncertainty":["Additional diagnostic experiments or explicit normal-range scientific evidence are required."], "stop_reason": stop_reason}
             self.log("finalize", final=final, validated_decision=validated)
             final["evidence_summary"] = {"experimental_evidence_ids": [item["evidence_id"] for item in s.get("experimental_evidence", s.get("evidence", []))], "knowledge_evidence_ids": [item["evidence_id"] for item in s.get("knowledge_evidence", [])], "final_inference": final["root_cause"]}
             return {"final_diagnosis": final}

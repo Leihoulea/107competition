@@ -44,8 +44,10 @@ class ScientificKnowledgeTool:
                     "source_id": hit.source_id,
                     "title": hit.title,
                     "authority": hit.authority,
+                    "version": hit.version,
                     "section": hit.section,
                     "page": hit.page,
+                    "chunk_id": hit.chunk_id,
                     "excerpt": hit.text,
                     "retrieval_score": hit.score,
                 }

@@ -21,7 +21,9 @@ to a broader explanation without supporting evidence. Prefer a materially differ
 over a near-duplicate when prior results have low diagnostic value.
 Do not assume that every anomaly implies a fault. A scientifically valid conclusion may be no_fault.
 Never claim an experiment, metric, document, or evidence item that is not present in the provided state.
-Only use evidence produced by executed experiments. Do not expose hidden reasoning.
+Use only evidence explicitly present in the provided state: executed experimental evidence and
+retrieved documentary knowledge evidence. Do not invent experiments, documents, claims, or sources.
+Do not expose hidden reasoning.
 Return only concise structured scientific state updates or requested actions, matching the supplied schema."""
 
 PLANNER_TOOL_CATALOG = planner_tool_catalog()
@@ -110,7 +112,18 @@ class OpenAICompatibleAgent:
 
     def generate_hypotheses(self, context: dict[str, Any]) -> list[dict[str, Any]]:
         schema={"hypotheses":[{"hypothesis_id":"H001","category":"short label","description":"concise explanation","scope_kind":"specific_candidate|fault_family|no_fault|knowledge_claim","testable_scope":["named measurable condition"],"status":"active","confidence":0.5,"evidence_for":[],"evidence_against":[]}]}
-        return self._hypotheses(self._request_json("generate competing hypotheses",context,schema))
+        value = self._request_json("generate competing hypotheses", context, schema)
+        try:
+            return self._hypotheses(value)
+        except AgentAPIError as exc:
+            # One correction is a provider-robustness boundary, not a
+            # case-specific search adjustment.  It applies to every cohort.
+            correction = {**context, "hypothesis_correction": "Return 2 to 5 competing hypotheses in the required hypotheses array."}
+            value = self._request_json("Correct the hypothesis response once: return 2 to 5 competing hypotheses.", correction, schema)
+            try:
+                return self._hypotheses(value)
+            except AgentAPIError as retry_exc:
+                raise AgentAPIError(f"hypothesis schema/cardinality remained invalid after one correction: {retry_exc}") from retry_exc
 
     def update_hypotheses(self, context: dict[str, Any]) -> list[dict[str, Any]]:
         schema={"hypotheses":[{"hypothesis_id":"existing ID","category":"short label","description":"concise explanation","scope_kind":"preserve existing value","testable_scope":["preserve existing scope"],"status":"supported|weakened|rejected|validated|active","confidence":0.5,"evidence_for":["E001"],"evidence_against":[]}]}
@@ -119,6 +132,38 @@ class OpenAICompatibleAgent:
         if allowed: updates=[item for item in updates if item["hypothesis_id"] in allowed]
         by_id={item["hypothesis_id"]:item for item in updates}
         return [by_id.get(item["hypothesis_id"],item) for item in existing] + [item for item in updates if item["hypothesis_id"] not in {old["hypothesis_id"] for old in existing}]
+
+    def update_hypotheses_from_knowledge(self, context: dict[str, Any]) -> dict[str, Any]:
+        """Interpret retrieved excerpts against only the query's target hypotheses."""
+        schema = {
+            "hypotheses": [{"hypothesis_id": "existing ID", "status": "supported|weakened|rejected|validated|active", "confidence": 0.5, "evidence_for": ["K001"], "evidence_against": []}],
+            "evidence_interpretations": [{"evidence_id": "K001", "claim": "concise, source-grounded interpretation", "supports_hypotheses": ["H001"], "contradicts_hypotheses": []}],
+        }
+        value = self._request_json(
+            "Update only the query-targeted hypotheses using the supplied documentary excerpts. "
+            "An excerpt may support or contradict a hypothesis, but it cannot recommend or validate a repair. "
+            "Preserve all untargeted hypotheses exactly and cite K evidence IDs for every change.",
+            context,
+            schema,
+        )
+        existing = context.get("hypotheses", [])
+        allowed = set(context.get("knowledge_target_hypothesis_ids", []))
+        evidence_ids = set(context.get("knowledge_evidence_ids", []))
+        updates = [item for item in self._hypotheses(value, existing, minimum=1) if item["hypothesis_id"] in allowed]
+        by_id = {item["hypothesis_id"]: item for item in updates}
+        interpretations = []
+        for item in value.get("evidence_interpretations", []):
+            if not isinstance(item, dict) or item.get("evidence_id") not in evidence_ids:
+                continue
+            claim = str(item.get("claim", "")).strip()
+            if not claim:
+                continue
+            interpretations.append({
+                "evidence_id": item["evidence_id"], "claim": claim,
+                "supports_hypotheses": [str(x) for x in item.get("supports_hypotheses", []) if str(x) in allowed],
+                "contradicts_hypotheses": [str(x) for x in item.get("contradicts_hypotheses", []) if str(x) in allowed],
+            })
+        return {"hypotheses": [by_id.get(item["hypothesis_id"], item) for item in existing], "evidence_interpretations": interpretations}
 
     def plan_experiment(self, context: dict[str, Any]) -> dict[str, Any]:
         schema={"candidates":[{"objective":"distinguish named hypotheses","target_hypotheses":["H001"],"diagnostic_rationale":"why the action is useful","predicted_observation":"expected measurable outcome","experiment":{"tool":"one supported tool name","arguments":{}}}]}
@@ -143,7 +188,7 @@ class OpenAICompatibleAgent:
             return candidates, rejected
 
         planner_context={**context, "tool_catalog": planner_tool_catalog(bool(context.get("knowledge_enabled", False)))}
-        value=self._request_json("propose two or three ranked, cost-aware experiment candidates. Each must use the supplied neutral tool catalog, cover named hypotheses, and state a measurable scope. Avoid candidates equivalent or near-equivalent to executed experiments.",planner_context,schema)
+        value=self._request_json("propose two or three ranked, cost-aware diagnostic action candidates. An action may be a compute experiment or, when present in the supplied catalog, a scientific knowledge query. Each must use the supplied neutral tool catalog, cover named hypotheses, and state a measurable scope. Avoid actions equivalent or near-equivalent to prior actions.",planner_context,schema)
         candidates, rejected=parse(value)
         if not candidates:
             correction={**planner_context, "planner_correction": {"rejected_candidates": rejected}}
@@ -305,6 +350,10 @@ class ManualAgent:
         if (evidence.get("delta") or 0) > 0:
             updated[0]={**updated[0],"status":"supported","confidence":.7,"evidence_for":updated[0]["evidence_for"]+[evidence["evidence_id"]]}
         return updated
+    def update_hypotheses_from_knowledge(self, context: dict[str, Any]) -> dict[str, Any]:
+        # The deterministic demonstration policy does not infer claims from
+        # text.  API-mode planners can perform the bounded, cited update.
+        return {"hypotheses": context["hypotheses"], "evidence_interpretations": []}
     def plan_experiment(self, context: dict[str, Any]) -> dict[str, Any]:
         # This adapter is used by the graph, whose planner deliberately never
         # accepts final decisions.  Keep the demonstration policy in the same

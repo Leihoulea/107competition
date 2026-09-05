@@ -67,3 +67,12 @@ def test_finalizer_request_forbids_overclaiming_evidence_scope():
     }
     agent.final_diagnosis({"validated_decision": "no_fault"})
     assert "Claims must not exceed the scope" in calls[0]
+
+
+def test_inconclusive_final_uses_the_actual_stop_reason():
+    current = finalizer_state("inconclusive")
+    current["stop_reason"] = "max_steps_reached"
+    with TemporaryDirectory(dir=Path.cwd()) as directory:
+        final = DiagnosisGraph(object(), object(), Path(directory)).finalize(current)["final_diagnosis"]
+    assert final["stop_reason"] == "max_steps_reached"
+    assert "step limit" in final["root_cause"]

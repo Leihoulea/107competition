@@ -66,3 +66,4 @@ class DiagnosisGraphState(TypedDict, total=False):
     knowledge_queries: list[dict[str, Any]]
     knowledge_evidence: list[dict[str, Any]]
     knowledge_enabled: bool
+    rag_ablation: dict[str, Any]

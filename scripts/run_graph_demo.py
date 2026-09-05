@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -34,6 +36,20 @@ if args.knowledge and args.rag_cohort == "B":
     raise SystemExit("--knowledge conflicts with B no-RAG cohort")
 knowledge_enabled = args.knowledge or args.rag_cohort == "C"
 cohort = rag_ablation_cohort("C" if knowledge_enabled else "B")
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def git_revision() -> str | None:
+    result = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=False)
+    return result.stdout.strip() if result.returncode == 0 else None
+
+
+def public_case_manifest(case_dir: Path) -> dict[str, str]:
+    paths = [case_dir / "task.json", case_dir / "initial_result.json"] + sorted((case_dir / "public").rglob("*"))
+    return {str(path.relative_to(case_dir)).replace("\\", "/"): sha256(path) for path in paths if path.is_file()}
 
 
 case = args.case_dir.resolve() if args.case_dir else ROOT / "cases" / args.case
@@ -68,6 +84,13 @@ try:
         "rag_ablation": cohort.to_dict(),
     }
     knowledge_tool = ScientificKnowledgeTool(ROOT / "knowledge") if knowledge_enabled else None
+    (run / "run_metadata.json").write_text(json.dumps({
+        "run_id": run.name, "git_commit": git_revision(), "case_id": task["case_id"],
+        "public_case_sha256": public_case_manifest(case), "rag_ablation": cohort.to_dict(),
+        "knowledge_enabled": knowledge_enabled, "knowledge_manifest_sha256": sha256(ROOT / "knowledge" / "manifest.json") if knowledge_enabled else None,
+        "provider": settings.model_provider, "model": settings.model_name, "temperature": 0,
+        "budget": task["budget"], "max_steps": args.max_steps,
+    }, indent=2), encoding="utf-8")
     result = DiagnosisGraph(agent, ExperimentTools(executor, case, run), run, knowledge_tool=knowledge_tool).run(state)
     (run / "state.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
     (run / "final.json").write_text(json.dumps(result["final_diagnosis"], indent=2), encoding="utf-8")

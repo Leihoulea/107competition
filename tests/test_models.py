@@ -34,6 +34,19 @@ def test_structured_output_retries_once_then_accepts_legal_output_wrapper(monkey
     assert agent._request_json("test", {}, {}) == {"answer": 1}
 
 
+def test_hypothesis_cardinality_gets_one_bounded_correction():
+    agent = object.__new__(OpenAICompatibleAgent)
+    calls = []
+    responses = [
+        {"hypotheses": [{"hypothesis_id": "H001"}]},
+        {"hypotheses": [{"hypothesis_id": "H001"}, {"hypothesis_id": "H002"}]},
+    ]
+    agent._request_json = lambda *args: calls.append(args[0]) or responses.pop(0)
+    hypotheses = agent.generate_hypotheses({})
+    assert [item["hypothesis_id"] for item in hypotheses] == ["H001", "H002"]
+    assert len(calls) == 2 and "Correct the hypothesis response once" in calls[1]
+
+
 def test_reflection_decision_dialects_are_normalized():
     value, decision = OpenAICompatibleAgent._normalize_reflection(
         {"reflection": {"action": "needs more evidence", "summary": "not decisive"}}
