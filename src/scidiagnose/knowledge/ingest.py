@@ -11,7 +11,7 @@ from .models import KnowledgeChunk
 from .sources import load_source_manifest, source_path, verify_source_sha256
 
 
-def build_knowledge_corpus(knowledge_root: Path, max_chars: int = 1200) -> list[KnowledgeChunk]:
+def build_knowledge_corpus(knowledge_root: Path, max_chars: int = 4000) -> list[KnowledgeChunk]:
     """Read only manifest-listed .txt/.md sources and emit provenance-rich chunks."""
     chunks: list[KnowledgeChunk] = []
     for source in load_source_manifest(knowledge_root / "manifest.json"):
@@ -26,5 +26,5 @@ def build_knowledge_corpus(knowledge_root: Path, max_chars: int = 1200) -> list[
     return chunks
 
 
-def build_knowledge_index(knowledge_root: Path, max_chars: int = 1200) -> KnowledgeIndex:
+def build_knowledge_index(knowledge_root: Path, max_chars: int = 4000) -> KnowledgeIndex:
     return build_bm25_index(build_knowledge_corpus(knowledge_root, max_chars), knowledge_root / "index" / "bm25.json")

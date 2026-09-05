@@ -1,0 +1,426 @@
+[
+  {
+    "query_id": "A",
+    "query": "What is the native image orientation of MSG SEVIRI data?",
+    "expected_source_ids": [
+      "EUMETSAT_MSG_IMAGE_DATA",
+      "EUMETSAT_MSG_NATIVE_FORMAT",
+      "SATPY_SEVIRI_READER"
+    ],
+    "top_hits": [
+      {
+        "rank": 1,
+        "source_id": "SATPY_SEVIRI_READER",
+        "title": "Satpy Reading Documentation",
+        "section": "Load data",
+        "page": null,
+        "score": 15.88536812,
+        "authority": "project_documentation",
+        "version": "source snapshot; version not stated",
+        "chunk_id": "SATPY_SEVIRI_READER:0006",
+        "text_excerpt": "([0.6, 10.8], pad_data=False) For geostationary products, where the imagery is stored in the files in an unconventional orientation (e.g. MSG SEVIRI L1.5 data are stored with the southwest corner in the upper right), the keyword argument ``upper_right_corner`` can be passed into the load call to automatically flip the datasets to the wished orientation. Accepted argument values are ``'NE'``, ``'NW'``, ``'SE'``, ``'SW'``, and ``'native'``. By default, no flipping is applied (corresponding to ``upper_right_corner='native'``) and the data are delivered in the original format. To get the data in the common upright orientation, load the datasets using e.g.:: >>> scn.load(['VIS008'], upper_right_c"
+      },
+      {
+        "rank": 2,
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "section": "4.1 Data Formats",
+        "page": "33",
+        "score": 10.52107888,
+        "authority": "official",
+        "version": "v8 e-signed, 26 September 2017",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0056",
+        "text_excerpt": "Before the Structure of the Level 1.5 data is presented, it is important to note the following aspects: The native Level 1.5 data, as produced and distribut ed within the MSG Ground Segment, is distributed as MSG Ground Segment packets. The actual data content of the Ground Segment packets is either: 1. Level 1.5 Data Header, holding the ancillary data that is known at the start of the repeat cycle. 2. Level 1.5 Image Line, comprising groups of image lines, with each group holding the scanlines for the 12 spectral channels (3 for HRV, and one for each of the other 11 channels). This group is repeated (nominally) 3712 times. 3. Level 1.5 Data Trailer, holding the ancillary data that has been "
+      },
+      {
+        "rank": 3,
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "section": "7.2.4 Image Description Record",
+        "page": "98",
+        "score": 10.19818824,
+        "authority": "official",
+        "version": "v8 e-signed, 26 September 2017",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0142",
+        "text_excerpt": "EUM/MSG/ICD/105 v8 e-signed, 26 September 2017 MSG Level 1.5 Image Data Format Description Page 98 of 129 Level 1_5 ImageProduction: ImageProcDirection defines the direction of the production of the Level 1.5 image in real -time, this corresponding to the actual scanning direction by the Radiometer. PixelGenDirection defines the direction of the generation of the pixels, therefore indicating if the first pixel in a line in the most Eastern or Western one. The default is the most Eastern pixel. PlannedChanProcessing is an array whose elements indicate for each channel if it is planned to derive 1.5 data from the received data and what the representation of the data is. If a channel is not pro"
+      },
+      {
+        "rank": 4,
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "section": "1 INTRODUCTION",
+        "page": "8",
+        "score": 9.59394593,
+        "authority": "official",
+        "version": "v8 e-signed, 26 September 2017",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0012",
+        "text_excerpt": "ge of Level 1.5 image data and its ancillary information. The reader should be aware that this document describes t he ‘native format’ of the Level 1.5 data, as explained further in the section on applicable documents. Depending on the type of data service and data product, the user may or may not have access to all the data described."
+      },
+      {
+        "rank": 5,
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "section": "1.4 Reference Documents",
+        "page": "11",
+        "score": 9.16717695,
+        "authority": "official",
+        "version": "v8 e-signed, 26 September 2017",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0018",
+        "text_excerpt": "round processing has taken place. The Level 1.0 image data are acquired by the Spinning Enhanced Visible and IR Imager (SEVIRI) of the MSG satellites."
+      }
+    ],
+    "expected_source_in_top_3": true
+  },
+  {
+    "query_id": "B",
+    "query": "What are the SEVIRI image scan directions?",
+    "expected_source_ids": [
+      "EUMETSAT_MSG_IMAGE_DATA",
+      "EUMETSAT_MSG_NATIVE_FORMAT"
+    ],
+    "top_hits": [
+      {
+        "rank": 1,
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "section": "2.1.1 Image Acquisition Principle",
+        "page": "11",
+        "score": 12.87085821,
+        "authority": "official",
+        "version": "v8 e-signed, 26 September 2017",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0019",
+        "text_excerpt": "The SEVIRI instrument is designed to produce the image of the Earth full disk from a spinning geostationary satellite. The scanning of the Earth disk is obtained by using the satellite spi n (100 rpm +/- 1%) in the East-West direction and by stepping a flat scan mirror in the South -North direction after each East-West line, to set up the instrument for acquiring the scan of image data. Figure 1 shows the Earth imaging principle used by SEVIRI. Figure 1 – Earth imaging principle One complete revolution of the satellite lasts 0.6 seconds of which only about 30 milliseconds are available over the Earth disk to acquire one scan. After the 30ms spent imaging the Earth, the remaining 570ms are us"
+      },
+      {
+        "rank": 2,
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "section": "29 Object_Store_Server_SU",
+        "page": "107",
+        "score": 9.80332626,
+        "authority": "official",
+        "version": "v8 e-signed, 26 September 2017",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0155",
+        "text_excerpt": " and possible values are –0.192 to +0.192. RadFramesAlignment is an array of three elements giving the alignment of the SEVIRI axis to the spin axis. ScanningLawVariation is an array of two elements, the linear and quadratic coefficients of the Radiometer Scan Law. EqualisationParms is an array of 42 records, one per detector. ConstCoef is the constant coefficient used for equalisation LinearCoef is the linear coefficient used for equalisation QuadraticCoef is the quadratic coefficient used for equalisation BlackBodyDataForWarmStart is an array of 12 records, one for each channel GTotalForMethod1 is the overall SEVIRI instrument gain for Method1 calibration, G total. GTotalForMethod2 is the "
+      },
+      {
+        "rank": 3,
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "section": "6.1.6 Geometric Processing Record Summary",
+        "page": "65",
+        "score": 9.08023907,
+        "authority": "official",
+        "version": "v8 e-signed, 26 September 2017",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0095",
+        "text_excerpt": "imated relative locations of the detectors in the focal plane. The distances from the optical axis in both E-W and N -S directions are expressed for each of the detectors in terms of kilometres from SSP. Usage. Provides expert users the knowledge of what was the focal plane misregistration that was corrected for in the processing to the Level 1.5. As the pre -launch characterisation of the Focal Plane is of limited value once in operations, the dete ctor positions are regularly re - estimated (using horizons and landmarks measurements) by the automated processing. The information is therefore useful because it provides the most accurate knowledge available on the true misregistration in the "
+      },
+      {
+        "rank": 4,
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "section": "2.1.2 Focal Plane Arrangement",
+        "page": "12",
+        "score": 8.93245311,
+        "authority": "official",
+        "version": "v8 e-signed, 26 September 2017",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0021",
+        "text_excerpt": "age are acquired simultaneously. For the HRV channel there are 9 detectors and 9 lines are obtained per revolution. The SEVIRI focal plane arrangement is shown in Figure 2. Figure 2 – SEVIRI focal plane arrangement The East -West alignment of the detectors in each channel is obtained by delaying the acquisition of the detectors according to their position in the focal plane. The East -West alignment of the channels is obtained by re -addressing the image rows (done by on -ground processing). The South-North alignment is obtained by re -addressing the image rows (this is also done by on-ground processing). Note that for Level 1.0 (raw) data only, the ‘1’ next to each set of detectors in the d"
+      },
+      {
+        "rank": 5,
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "section": "7.5.5 TimelinessAndCompleteness Record",
+        "page": "129",
+        "score": 8.84056762,
+        "authority": "official",
+        "version": "v8 e-signed, 26 September 2017",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0182",
+        "text_excerpt": "EUM/MSG/ICD/105 v8 e-signed, 26 September 2017 MSG Level 1.5 Image Data Format Description Page 129 of 129 APPENDIX C LEVEL 1.0 CO-ORDINATE FRAME (10CF) The level 1.0 co-ordinate frame is defined in terms of detector samples and is orientated in the order of scan. It is referenced to a notional detector at the telescope focal point and is expressed in terms of 3 km pixels. There are considered to be three detectors on the focal plane with the same East-West position but displaced North -South with a single 3 km pixel spacing. The frame is defined at the beginning of each repeat cycle and assumes spin rate is constant at that applying at the start of the repeat cycle, and that there is no jit"
+      }
+    ],
+    "expected_source_in_top_3": true
+  },
+  {
+    "query_id": "C",
+    "query": "How are MSG image line and column coordinates defined?",
+    "expected_source_ids": [
+      "EUMETSAT_MSG_IMAGE_DATA",
+      "EUMETSAT_MSG_NATIVE_FORMAT"
+    ],
+    "top_hits": [
+      {
+        "rank": 1,
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "section": "7.2.4 Image Description Record",
+        "page": "97",
+        "score": 15.61754458,
+        "authority": "official",
+        "version": "v8 e-signed, 26 September 2017",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0141",
+        "text_excerpt": " -West corner, South -East corner, North - East corner. Operations default is the South-East corner. The origin has the coordinates (1,1). ReferenceGridHRV: This record gives details of the reference grid for the HRV channel. The individual fields in this record are the same as those in the ReferenceGridVIS_IR record defined above. PlannedCoverageVIS_IR: This record gives details of the planned Level 1.5 coverage with respect to the grid definition for the VIS and IR channels. The details of each field are given below. SouthernLinePlanned is the planned southern line number, taking a value in the range 1 to 37 12. NorthernLinePlanned is the planned northern line number, taking a value in the"
+      },
+      {
+        "rank": 2,
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "section": "7.5.1 Image Production Stats Record",
+        "page": "115",
+        "score": 12.13159162,
+        "authority": "official",
+        "version": "v8 e-signed, 26 September 2017",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0164",
+        "text_excerpt": "he component fields are the same as those for th record Actual L15CoverageVIS_IR, with the difference that the line and column bounds are given for each of the two areas constituting the scan, i.e. the Lower and the Upper areas."
+      },
+      {
+        "rank": 3,
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "section": "22.2.1 Dynamic Application Data",
+        "page": "258",
+        "score": 11.51336101,
+        "authority": "official",
+        "version": "not stated in extracted cover metadata",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0661",
+        "text_excerpt": "m uses the Scenes Actual EBBT that is derived from the level 1.5 data from every repeat cycle from the MSG channels. As defined in the following table, the image data shall be available in the form of equivalent black body brightness temperatures (EBBT). The scenes type information from the Scenes Analysis of the current repeat cycle shall also be available. It is expected that the latitude and longitude will be derived from the pixel line and column using the geostationary projection transformation. M and D shall be derived from the nominal repeat cycle start time in the Level 1.5 header."
+      },
+      {
+        "rank": 4,
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "section": "7.5.1 Image Production Stats Record",
+        "page": "114",
+        "score": 11.42781374,
+        "authority": "official",
+        "version": "v8 e-signed, 26 September 2017",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0163",
+        "text_excerpt": " 1.5 image. Possible values are within the limit of the planned coverage (info present in the Level 1.5 header). EasternColumnActual gives the column nu mber of the easternmost column in this Level 1.5 image. Possible values are within the limit of the planned coverage (info present in the Level 1.5 header). WesternColumnActual gives the column number of the western most column in this Level 1.5 image. Po ssible values are within the limit of the planned coverage (info present in the Level 1.5 header). Actual L15CoverageHRV:"
+      },
+      {
+        "rank": 5,
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "section": "7.5.5 TimelinessAndCompleteness Record",
+        "page": "129",
+        "score": 11.06581034,
+        "authority": "official",
+        "version": "v8 e-signed, 26 September 2017",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0182",
+        "text_excerpt": "ata Format Description Page 129 of 129 APPENDIX C LEVEL 1.0 CO-ORDINATE FRAME (10CF) The level 1.0 co-ordinate frame is defined in terms of detector samples and is orientated in the order of scan. It is referenced to a notional detector at the telescope focal point and is expressed in terms of 3 km pixels. There are considered to be three detectors on the focal plane with the same East-West position but displaced North -South with a single 3 km pixel spacing. The frame is defined at the beginning of each repeat cycle and assumes spin rate is constant at that applying at the start of the repeat cycle, and that there is no jitter. The North South datum is the first detector of th e first scan "
+      }
+    ],
+    "expected_source_in_top_3": true
+  },
+  {
+    "query_id": "D",
+    "query": "How does Satpy handle the native SEVIRI image orientation?",
+    "expected_source_ids": [
+      "SATPY_SEVIRI_READER"
+    ],
+    "top_hits": [
+      {
+        "rank": 1,
+        "source_id": "SATPY_SEVIRI_READER",
+        "title": "Satpy Reading Documentation",
+        "section": "Load data",
+        "page": null,
+        "score": 18.42743601,
+        "authority": "project_documentation",
+        "version": "source snapshot; version not stated",
+        "chunk_id": "SATPY_SEVIRI_READER:0006",
+        "text_excerpt": "([0.6, 10.8], pad_data=False) For geostationary products, where the imagery is stored in the files in an unconventional orientation (e.g. MSG SEVIRI L1.5 data are stored with the southwest corner in the upper right), the keyword argument ``upper_right_corner`` can be passed into the load call to automatically flip the datasets to the wished orientation. Accepted argument values are ``'NE'``, ``'NW'``, ``'SE'``, ``'SW'``, and ``'native'``. By default, no flipping is applied (corresponding to ``upper_right_corner='native'``) and the data are delivered in the original format. To get the data in the common upright orientation, load the datasets using e.g.:: >>> scn.load(['VIS008'], upper_right_c"
+      },
+      {
+        "rank": 2,
+        "source_id": "SATPY_SEVIRI_READER",
+        "title": "Satpy Reading Documentation",
+        "section": "Reading",
+        "page": null,
+        "score": 10.59512139,
+        "authority": "project_documentation",
+        "version": "source snapshot; version not stated",
+        "chunk_id": "SATPY_SEVIRI_READER:0001",
+        "text_excerpt": ".. todo:: How to read cloud products from NWCSAF software. (separate document?) Satpy supports reading and loading data from many input file formats and schemes through the concept of *readers*. Each reader supports a specific type of input data. The :class:`~satpy.scene.Scene` object provides a simple interface around all the complexity of these various formats through its ``load`` method. The following sections describe the different way data can be loaded, requested, or added to a Scene object."
+      },
+      {
+        "rank": 3,
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "section": "22.1.3 Algorithm Specification Version History",
+        "page": "257",
+        "score": 9.6171466,
+        "authority": "official",
+        "version": "not stated in extracted cover metadata",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0659",
+        "text_excerpt": "e the emissivity calculation. 1.7 17/06/11 J. Jackson The TOZ product is generated as part of the GII OE framework. The SEVIRI ozone channel and ozone forecast data are added into the OE framework of GII. The pixel emissivity maps are used and replace the previous LUT method. RTTOV upgrade to handle arbitrary number of profile levels is removed from the Future Enhancements list. The version of RTTOV used can already handle an arbitrary number of profiles. Addition of the “ATBD for the MSG GII/TOZ Product” to the reference list."
+      },
+      {
+        "rank": 4,
+        "source_id": "SATPY_SEVIRI_READER",
+        "title": "Satpy Reading Documentation",
+        "section": "Metadata",
+        "page": null,
+        "score": 9.51150602,
+        "authority": "project_documentation",
+        "version": "source snapshot; version not stated",
+        "chunk_id": "SATPY_SEVIRI_READER:0010",
+        "text_excerpt": "ng attributes are standardized across all readers: * ``name``, and other identifying metadata keys: See :doc:`dev_guide/satpy_internals`. * ``start_time``: Left boundary of the time interval covered by the dataset. For more information see the :ref:`time_metadata` section below. * ``end_time``: Right boundary of the time interval covered by the dataset. For more information see the :ref:`time_metadata` section below. * ``area``: :class:`~pyresample.geometry.AreaDefinition` or :class:`~pyresample.geometry.SwathDefinition` if data is geolocated. Areas are used for gridded projected data and Swaths when data must be described by individual longitude/latitude coordinates. See the Coordinates sec"
+      },
+      {
+        "rank": 5,
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "section": "4.1 Data Formats",
+        "page": "33",
+        "score": 8.46168478,
+        "authority": "official",
+        "version": "v8 e-signed, 26 September 2017",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0056",
+        "text_excerpt": "Before the Structure of the Level 1.5 data is presented, it is important to note the following aspects: The native Level 1.5 data, as produced and distribut ed within the MSG Ground Segment, is distributed as MSG Ground Segment packets. The actual data content of the Ground Segment packets is either: 1. Level 1.5 Data Header, holding the ancillary data that is known at the start of the repeat cycle. 2. Level 1.5 Image Line, comprising groups of image lines, with each group holding the scanlines for the 12 spectral channels (3 for HRV, and one for each of the other 11 channels). This group is repeated (nominally) 3712 times. 3. Level 1.5 Data Trailer, holding the ancillary data that has been "
+      }
+    ],
+    "expected_source_in_top_3": true
+  },
+  {
+    "query_id": "E",
+    "query": "What does upper_right_corner mean for the Satpy SEVIRI reader?",
+    "expected_source_ids": [
+      "SATPY_SEVIRI_READER"
+    ],
+    "top_hits": [
+      {
+        "rank": 1,
+        "source_id": "SATPY_SEVIRI_READER",
+        "title": "Satpy Reading Documentation",
+        "section": "Load data",
+        "page": null,
+        "score": 17.20986853,
+        "authority": "project_documentation",
+        "version": "source snapshot; version not stated",
+        "chunk_id": "SATPY_SEVIRI_READER:0006",
+        "text_excerpt": "orientation (e.g. MSG SEVIRI L1.5 data are stored with the southwest corner in the upper right), the keyword argument ``upper_right_corner`` can be passed into the load call to automatically flip the datasets to the wished orientation. Accepted argument values are ``'NE'``, ``'NW'``, ``'SE'``, ``'SW'``, and ``'native'``. By default, no flipping is applied (corresponding to ``upper_right_corner='native'``) and the data are delivered in the original format. To get the data in the common upright orientation, load the datasets using e.g.:: >>> scn.load(['VIS008'], upper_right_corner='NE') .. note:: If a dataset could not be loaded there is no exception raised. You must check the :meth:`scn.missi"
+      },
+      {
+        "rank": 2,
+        "source_id": "SATPY_SEVIRI_READER",
+        "title": "Satpy Reading Documentation",
+        "section": "Available Readers",
+        "page": null,
+        "score": 14.06318579,
+        "authority": "project_documentation",
+        "version": "source snapshot; version not stated",
+        "chunk_id": "SATPY_SEVIRI_READER:0002",
+        "text_excerpt": "For readers currently available in Satpy see :ref:`reader_table`. Additionally to get a list of available readers you can use the `available_readers` function. By default, it returns the names of available readers. To return additional reader information use `available_readers(as_dict=True)`:: >>> from satpy import available_readers >>> available_readers() .. _reader_table:"
+      },
+      {
+        "rank": 3,
+        "source_id": "SATPY_SEVIRI_READER",
+        "title": "Satpy Reading Documentation",
+        "section": "Load remote data",
+        "page": null,
+        "score": 13.92435021,
+        "authority": "project_documentation",
+        "version": "source snapshot; version not stated",
+        "chunk_id": "SATPY_SEVIRI_READER:0008",
+        "text_excerpt": "Starting with Satpy version 0.25.1 with supported readers it is possible to load data from remote file systems like ``s3fs`` or ``fsspec``. For example: .. code-block:: python >>> from satpy import Scene >>> from satpy.readers.core.remote import FSFile >>> import fsspec >>> filename = 'noaa-goes16/ABI-L1b-RadC/2019/001/17/*_G16_s20190011702186*' >>> the_files = fsspec.open_files(\"simplecache::s3://\" + filename, s3={'anon': True}) >>> fs_files = [FSFile(open_file) for open_file in the_files] >>> scn = Scene(filenames=fs_files, reader='abi_l1b') >>> scn.load(['true_color_raw']) Check the list of :ref:`reader_table` to see which reader supports remote files. For the usage of ``fsspec`` and adva"
+      },
+      {
+        "rank": 4,
+        "source_id": "SATPY_SEVIRI_READER",
+        "title": "Satpy Reading Documentation",
+        "section": "Available datasets",
+        "page": null,
+        "score": 13.61510693,
+        "authority": "project_documentation",
+        "version": "source snapshot; version not stated",
+        "chunk_id": "SATPY_SEVIRI_READER:0007",
+        "text_excerpt": "To find out what datasets are available from a reader from the files that were provided to the ``Scene`` use :meth:`~satpy.scene.Scene.available_dataset_ids`:: >>> scn.available_dataset_ids() Or :meth:`~satpy.scene.Scene.available_dataset_names` for just the string names of Datasets:: >>> scn.available_dataset_names()"
+      },
+      {
+        "rank": 5,
+        "source_id": "SATPY_SEVIRI_READER",
+        "title": "Satpy Reading Documentation",
+        "section": "Search for local/remote files",
+        "page": null,
+        "score": 13.60891454,
+        "authority": "project_documentation",
+        "version": "source snapshot; version not stated",
+        "chunk_id": "SATPY_SEVIRI_READER:0009",
+        "text_excerpt": "Satpy provides a utility :func:`~satpy.readers.core.grouping.find_files_and_readers` for searching for files in a base directory matching various search parameters. This function discovers files based on filename patterns. It returns a dictionary mapping reader name to a list of filenames supported. This dictionary can be passed directly to the :class:`~satpy.scene.Scene` initialization. :: >>> from satpy import find_files_and_readers, Scene >>> from datetime import datetime >>> my_files = find_files_and_readers(base_dir='/data/viirs_sdrs', ... reader='viirs_sdr', ... start_time=datetime(2017, 5, 1, 18, 1, 0), ... end_time=datetime(2017, 5, 1, 18, 30, 0)) >>> scn = Scene(filenames=my_files) "
+      }
+    ],
+    "expected_source_in_top_3": true
+  },
+  {
+    "query_id": "F",
+    "query": "What is the MSG Cloud Mask Product Generation and how are cloud classes defined?",
+    "expected_source_ids": [
+      "EUMETSAT_MSG_MET_PRODUCTS_ATBD"
+    ],
+    "top_hits": [
+      {
+        "rank": 1,
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "section": "20.4 Outputs",
+        "page": "253",
+        "score": 18.2596744,
+        "authority": "official",
+        "version": "not stated in extracted cover metadata",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0631",
+        "text_excerpt": "The following data shall be produced for the cloud mask product for every pixel in the form of a GRIB Edition 2 encoded product. Parameter Mnemonic Units Min Max Prec Acc To Cloud Mask cloud_mask - 0 3 1 1 CLM The parameter value is defined in code table 4.217 of GRIB Edition 2. A specific entry (7) was added to code table 4.2 (Product Discipline 3, Parameter Category 0) to specify cloud mask data. Parameter Value Meaning Cloud Mask 0 Clear sky over water"
+      },
+      {
+        "rank": 2,
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "section": "14.3.1 Overview",
+        "page": "204",
+        "score": 15.59978037,
+        "authority": "official",
+        "version": "not stated in extracted cover metadata",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0481",
+        "text_excerpt": "This algorithm is responsible for the generation of the precipitation index data set EUMETSAT have to provide to the Global Precipitation Climatology Project (GPCP). The distribution of water in the atmosphere, its transport and its diurnal and seasonal change play an important role in the Earth’s weather and climate. Precipitation is a meteorological parameter which is important in climatological studies, general circulation studies and for the validation of numerical weather prediction (NWP) models. Because there is rather limited information about the amount and distribution of precipitation in many regions, the use of satellite data can provide the required information. The precipitation"
+      },
+      {
+        "rank": 3,
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "section": "3.2.2 New Products",
+        "page": "34",
+        "score": 15.5141886,
+        "authority": "official",
+        "version": "not stated in extracted cover metadata",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0093",
+        "text_excerpt": "This section provides a top-level description of the new products which have been added during the course of the MPEF development is provided. Aerosol Properties Over Sea (AES) The AES intermediate product,, generated every repeat cycle, consists of the optical thickness for the three visible channels and the Angström coefficient, for every pixel over sea. The retrieval is based on pre-calculated look-up tables. A daily product is also derived by temporally and spatially averaging the intermediate products over processing segments. All Sky Radiances (ASR) The ASR product is (as with CSR) a subset of the information derived during the Scenes Analysis processing. The product provides brightnes"
+      },
+      {
+        "rank": 4,
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "section": "27.6 Future Enhancements",
+        "page": "290",
+        "score": 14.79366574,
+        "authority": "official",
+        "version": "not stated in extracted cover metadata",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0781",
+        "text_excerpt": "This process also derives optical depth values over small water bodies like rivers and lakes. For an optimal product, such non-ocean pixels should be removed from the product, which is difficult with the existing cloud mask. We should consider the production of such an “open ocean mask” for this product (not available in MPEF at the moment)."
+      },
+      {
+        "rank": 5,
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "section": "5.5.3 Test Results",
+        "page": "83",
+        "score": 14.74707545,
+        "authority": "official",
+        "version": "not stated in extracted cover metadata",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0191",
+        "text_excerpt": "erformed for several slots of the GOES-8 images. For one slot the results from each single threshold test and the final cloud mask are available. For the other slots the results are only available in the form of the final cloud mask."
+      }
+    ],
+    "expected_source_in_top_3": true
+  }
+]

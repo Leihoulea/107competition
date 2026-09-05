@@ -83,4 +83,6 @@ Alternatively, create a local `E:\107competition\.env` from `.env.example` and a
 
 SciDiagnose now includes a lightweight, local BM25 foundation for authoritative product manuals, algorithm documents, variable metadata, physical constraints, numerical-method documentation, and project scientific notes. Sources are manifest-declared with authority, publisher, version, retrieval date, SHA-256, domain, product, and usage note; MVP ingestion accepts only cleaned local `.txt`/`.md` sources, never LLM-generated content or raw PDFs.
 
+The first actual corpus contains three EUMETSAT MSG/SEVIRI documents (`official`) and Satpy reader documentation (`project_documentation`). Raw documents, page-marked normalized text, source inventory, chunks, index, and retrieval smoke-test artifacts remain under `knowledge/`. The corpus records product semantics only; historical repairs are experimental evidence and are intentionally excluded.
+
 Retrieval is deliberately separate from diagnosis: `retrieve_scientific_knowledge(...)` returns provenance-rich passages, and a caller must explicitly create `KnowledgeEvidence` before a claim can participate in a future diagnosis graph. The current frozen agent does not automatically receive corpus text or invoke retrieval. This keeps the foundation auditable while preserving a clean ablation boundary for later graph integration.

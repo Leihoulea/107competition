@@ -5,7 +5,7 @@ from dataclasses import asdict, dataclass
 from typing import Any, Literal
 
 
-Authority = Literal["official", "peer_reviewed", "project_note"]
+Authority = Literal["official", "peer_reviewed", "project_documentation", "project_note"]
 
 
 @dataclass(frozen=True)
@@ -24,6 +24,7 @@ class KnowledgeSource:
 
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> "KnowledgeSource":
+        value = {**value, "license_or_usage_note": value.get("license_or_usage_note", value.get("usage_note", ""))}
         required = (
             "source_id", "title", "authority", "publisher", "version", "retrieved_at",
             "sha256", "domain", "product", "license_or_usage_note", "path",
@@ -31,8 +32,8 @@ class KnowledgeSource:
         missing = [name for name in required if not str(value.get(name, "")).strip()]
         if missing:
             raise ValueError(f"knowledge source missing required fields: {', '.join(missing)}")
-        if value["authority"] not in {"official", "peer_reviewed", "project_note"}:
-            raise ValueError("knowledge source authority must be official, peer_reviewed, or project_note")
+        if value["authority"] not in {"official", "peer_reviewed", "project_documentation", "project_note"}:
+            raise ValueError("knowledge source authority must be official, peer_reviewed, project_documentation, or project_note")
         return cls(**{name: str(value[name]) for name in required})  # type: ignore[arg-type]
 
     def to_dict(self) -> dict[str, str]:

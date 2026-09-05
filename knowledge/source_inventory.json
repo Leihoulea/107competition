@@ -1,0 +1,76 @@
+[
+  {
+    "source_id": "EUMETSAT_MSG_NATIVE_FORMAT",
+    "original_filename": "pdf_fg15_msg_native_format_15_6b513c5bb3.pdf",
+    "resolved_path": "E:\\107competition\\pdf_fg15_msg_native_format_15_6b513c5bb3.pdf",
+    "ingested_raw_path": "C:\\Users\\Administrator\\.codex\\worktrees\\fb8b\\107competition\\knowledge\\sources\\raw\\eumetsat_fg15_msg_native_format.pdf",
+    "file_type": "pdf",
+    "size_bytes": 347567,
+    "sha256": "30afd3c2fa4bda3f32ca7081fb63a21ce1343fed4e9f6a7010116b9a43698e76",
+    "text_extractable": true,
+    "page_count": 15,
+    "pdf_metadata": {
+      "/CreationDate": "D:20080530094307+02'00'",
+      "/Author": "Wettre",
+      "/Creator": "PScript5.dll Version 5.2.2",
+      "/Producer": "Acrobat Distiller 7.0.5 (Windows)",
+      "/ModDate": "D:20120629150828+02'00'",
+      "/Title": "Microsoft Word - pdf_fg15_msg-native-format-15_updated.doc"
+    },
+    "first_page_title_candidate": "MSG Level 1.5 Native Format"
+  },
+  {
+    "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+    "original_filename": "pdf_ten_05105_msg_img_data_e7c8b315e6.pdf",
+    "resolved_path": "E:\\107competition\\pdf_ten_05105_msg_img_data_e7c8b315e6.pdf",
+    "ingested_raw_path": "C:\\Users\\Administrator\\.codex\\worktrees\\fb8b\\107competition\\knowledge\\sources\\raw\\eumetsat_ten_05105_msg_image_data.pdf",
+    "file_type": "pdf",
+    "size_bytes": 1980925,
+    "sha256": "b70c47c67b7961d1f9a9741cacb6313241f163a39dd4518b7f5e83296739f8c1",
+    "text_extractable": true,
+    "page_count": 129,
+    "pdf_metadata": {
+      "/Title": "<Document Title>",
+      "/Author": "MUELLERJ",
+      "/Creator": "Microsoft® Word 2013",
+      "/CreationDate": "D:20171006152118+02'00'",
+      "/ModDate": "D:20171006152118+02'00'",
+      "/Producer": "Microsoft® Word 2013"
+    },
+    "first_page_title_candidate": "© EUMETSAT"
+  },
+  {
+    "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+    "original_filename": "pdf_msg_met_prod_atbd_15e4917e25.pdf",
+    "resolved_path": "E:\\107competition\\pdf_msg_met_prod_atbd_15e4917e25.pdf",
+    "ingested_raw_path": "C:\\Users\\Administrator\\.codex\\worktrees\\fb8b\\107competition\\knowledge\\sources\\raw\\eumetsat_msg_met_products_atbd.pdf",
+    "file_type": "pdf",
+    "size_bytes": 2304120,
+    "sha256": "2707af6c4f55b8dfc1814e65dba0d7cc551a7536cf18928e52b3a553cb578296",
+    "text_extractable": true,
+    "page_count": 297,
+    "pdf_metadata": {
+      "/Author": "Meyer",
+      "/CreationDate": "D:20151105143233+01'00'",
+      "/Creator": "PScript5.dll Version 5.2.2",
+      "/Keywords": "Clear Sky Reflectance Map,  (CRM), Climate Data set, CDS, Cloud Mask, CLM, Cloud Product, OCA, Global instability, GII, OLR, Outgoing longwave radiation, ",
+      "/ModDate": "D:20151105175924+01'00'",
+      "/Producer": "Acrobat Distiller 10.1.16 (Windows)",
+      "/Subject": "Comprehensive algorithm specification document for all MSG products.",
+      "/Title": "MSG MPEF Algorithm Specification Document"
+    },
+    "first_page_title_candidate": "© EUMETSAT"
+  },
+  {
+    "source_id": "SATPY_SEVIRI_READER",
+    "original_filename": "reading.rst.txt",
+    "resolved_path": "E:\\107competition\\reading.rst.txt",
+    "ingested_raw_path": "C:\\Users\\Administrator\\.codex\\worktrees\\fb8b\\107competition\\knowledge\\sources\\raw\\satpy_seviri_reading.rst.txt",
+    "file_type": "rst",
+    "size_bytes": 15551,
+    "sha256": "a88b0b9125cc7b43abf3dd720b3deaed8d8261afd2c94527ecae206b5e9133b1",
+    "text_extractable": true,
+    "page_count": null,
+    "first_page_title_candidate": ".. todo::"
+  }
+]

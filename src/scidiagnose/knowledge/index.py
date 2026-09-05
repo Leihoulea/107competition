@@ -14,7 +14,7 @@ from .models import KnowledgeChunk, KnowledgeHit
 # Separators may occur within a scientific identifier (e.g. ``L2/3``), but
 # trailing sentence punctuation must never become part of a lexical token.
 _TOKEN = re.compile(r"[A-Za-z0-9_]+(?:[./+-][A-Za-z0-9_]+)*")
-_AUTHORITY_PRIORITY = {"official": 3, "peer_reviewed": 2, "project_note": 1}
+_AUTHORITY_PRIORITY = {"official": 4, "peer_reviewed": 3, "project_documentation": 2, "project_note": 1}
 
 
 def tokenize(text: str) -> list[str]:

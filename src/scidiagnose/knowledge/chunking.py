@@ -8,11 +8,12 @@ from .models import KnowledgeChunk, KnowledgeSource
 
 _HEADING = re.compile(r"^#{1,6}\s+(.+)$")
 _PAGE = re.compile(r"^\[page:\s*(.+?)\s*\]$", re.IGNORECASE)
+_NUMBERED_HEADING = re.compile(r"^\s*\d+(?:\.\d+){0,4}\s+[A-Z][A-Za-z0-9 ,:/()_+\-]{2,}$")
 
 
-def chunk_scientific_text(source: KnowledgeSource, text: str, max_chars: int = 1200) -> list[KnowledgeChunk]:
-    if max_chars < 200:
-        raise ValueError("max_chars must be at least 200")
+def chunk_scientific_text(source: KnowledgeSource, text: str, max_chars: int = 4000) -> list[KnowledgeChunk]:
+    if max_chars < 800:
+        raise ValueError("max_chars must be at least 800")
     section, page, buffer, chunks = "Document", None, [], []
 
     def flush() -> None:
@@ -21,10 +22,27 @@ def chunk_scientific_text(source: KnowledgeSource, text: str, max_chars: int = 1
         buffer = []
         if not paragraph:
             return
-        for offset in range(0, len(paragraph), max_chars):
-            body = paragraph[offset:offset + max_chars].strip()
-            if body:
-                chunks.append((section, page, body))
+        # The normalized preamble is manifest-backed document metadata, not
+        # scientific source content.  Do not create an unpaged PDF chunk from
+        # it: every indexed PDF passage must retain its source page.
+        if section == "Document metadata" and page is None:
+            return
+        paragraphs = [item.strip() for item in re.split(r"\n\s*\n", paragraph) if item.strip()]
+        group: list[str] = []
+        size = 0
+        for item in paragraphs:
+            if group and size + len(item) + 2 > max_chars:
+                chunks.append((section, page, "\n\n".join(group)))
+                group, size = [], 0
+            if len(item) > max_chars:
+                if group:
+                    chunks.append((section, page, "\n\n".join(group)))
+                    group, size = [], 0
+                chunks.extend((section, page, item[offset:offset + max_chars].strip()) for offset in range(0, len(item), max_chars))
+            else:
+                group.append(item); size += len(item) + 2
+        if group:
+            chunks.append((section, page, "\n\n".join(group)))
 
     for line in text.splitlines():
         heading = _HEADING.match(line)
@@ -33,6 +51,8 @@ def chunk_scientific_text(source: KnowledgeSource, text: str, max_chars: int = 1
             flush(); section = heading.group(1).strip(); continue
         if page_match:
             flush(); page = page_match.group(1).strip(); continue
+        if _NUMBERED_HEADING.match(line):
+            flush(); section = line.strip(); continue
         buffer.append(line)
     flush()
     return [

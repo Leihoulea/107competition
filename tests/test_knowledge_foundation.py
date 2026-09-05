@@ -4,6 +4,7 @@ import json
 import pytest
 
 from scidiagnose.knowledge.evidence import knowledge_evidence_from_hit
+from scidiagnose.knowledge.cleaning import clean_scientific_text
 from scidiagnose.knowledge.ingest import build_knowledge_index
 from scidiagnose.knowledge.retrieve import retrieve_scientific_knowledge
 
@@ -63,3 +64,9 @@ def test_ingestion_rejects_tampered_or_raw_pdf_sources(tmp_path):
     (tmp_path / "sources" / "manual.md").write_text("tampered", encoding="utf-8")
     with pytest.raises(ValueError, match="sha256 mismatch"):
         build_knowledge_index(tmp_path)
+
+
+def test_cleaning_does_not_drop_formula_or_inequality_text():
+    cleaned = clean_scientific_text("A physical relation is a < b and x > y. <em>Markup</em>")
+    assert "a < b and x > y" in cleaned
+    assert "Markup" in cleaned
