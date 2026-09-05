@@ -63,6 +63,18 @@ class OpenAICompatibleAgent:
                 with request.urlopen(req,timeout=self.timeout) as response: data=json.loads(response.read())
                 raw=data["choices"][0]["message"]["content"]
                 value=self._unwrap_structured_response(json.loads(raw))
+                expected = set(response_schema)
+                # The supplied response schema is intentionally lightweight,
+                # but it must still identify the response family.  Keep the
+                # documented provider dialects accepted by the method-level
+                # normalizers; reject unrelated JSON objects and retry them.
+                compatible = {
+                    "candidates": {"experiment", "tool"},
+                    "decision": {"action", "reflection"},
+                }
+                allowed = expected | set().union(*(compatible.get(key, set()) for key in expected))
+                if expected and not (set(value) & allowed):
+                    raise StructuredOutputError(f"response does not match expected schema keys: {sorted(expected)}")
                 return value
             except error.HTTPError as exc:
                 if exc.code in {429,500,502,503,504} and attempt < self.max_retries:
