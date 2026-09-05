@@ -1,0 +1,2 @@
+case_id,method,repeat,completed,error,elapsed_seconds,decision,confidence,fault_family,validated_repair_success,false_positive,budget_units_used,remote_jobs,compute_wall_seconds,compute_cpu_seconds,evidence_backed,diagnostic_efficiency,experiment_count,best_agreement_valid,initial_agreement,threshold,cited_evidence_count
+R01,deterministic_full_search,1,True,,70.373104,fault,1.0,spatial_transform,True,,4235.0,0,,,True,6.435766756958259e-05,847,0.8094529528799465,0.5368982307227642,0.75,1

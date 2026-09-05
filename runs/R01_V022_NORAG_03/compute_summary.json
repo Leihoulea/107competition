@@ -1,0 +1,686 @@
+{
+  "schema_version": "1",
+  "experiment_count": 8,
+  "terminal_observation_count": 8,
+  "status_counts": {
+    "COMPLETED": 8,
+    "FAILED": 0,
+    "RUNNING": 0
+  },
+  "budget_units_used": 26,
+  "total_cost": 26,
+  "total_wall_seconds": 2.433613,
+  "total_cpu_seconds": 3.455024,
+  "peak_memory_mb": 191.8125,
+  "site_profiles": [
+    {
+      "backend": "ssh_direct",
+      "profile_version": "1",
+      "site_id": "ssh-642478ca63710924"
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "EXP_001",
+      "status": "COMPLETED",
+      "compute_observation": {
+        "job_id": "R01_V022_NORAG_03_EXP_001",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788621119.6681504,
+        "remote_pid": 271161,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788621116.6103814
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788621117.1716943
+            }
+          ],
+          "submit_timestamp": 1788621116.6103814,
+          "finish_timestamp": 1788621117.1716943,
+          "wall_seconds": 0.260361,
+          "cpu_seconds": 0.573615,
+          "process_cpu_cumulative_seconds": 1.274157,
+          "pid": 271161,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.0381,
+          "user_cpu_seconds": 0.454016,
+          "system_cpu_seconds": 0.11982,
+          "peak_rss_kib": 160756,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.447673,
+            "wait": 0.561362,
+            "result_fetch": 0.547422
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5368254023635483,
+          "values": {
+            "dr": 1,
+            "dc": 0,
+            "agreement": 0.5368254023635483,
+            "agreement_all": 0.6730639154930886,
+            "agreement_valid": 0.5368254023635483,
+            "intersection": 2995416,
+            "union": 7402765,
+            "iou": 0.4046347547166498,
+            "precision": 0.550493960661045,
+            "recall": 0.6042974408985371,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "status": "COMPLETED",
+      "compute_observation": {
+        "job_id": "R01_V022_NORAG_03_EXP_002",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788621133.873428,
+        "remote_pid": 271618,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788621131.8058202
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788621132.3531177
+            }
+          ],
+          "submit_timestamp": 1788621131.8058202,
+          "finish_timestamp": 1788621132.3531177,
+          "wall_seconds": 0.231219,
+          "cpu_seconds": 0.578871,
+          "process_cpu_cumulative_seconds": 1.230406,
+          "pid": 271618,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.4102,
+          "user_cpu_seconds": 0.471405,
+          "system_cpu_seconds": 0.100633,
+          "peak_rss_kib": 160804,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.756819,
+            "wait": 0.547366,
+            "result_fetch": 0.313698
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5370673228295152,
+          "values": {
+            "dr": -1,
+            "dc": 0,
+            "agreement": 0.5370673228295152,
+            "agreement_all": 0.6731312646310196,
+            "agreement_valid": 0.5370673228295152,
+            "intersection": 2997404,
+            "union": 7402451,
+            "iou": 0.4049204783658818,
+            "precision": 0.5508593129172238,
+            "recall": 0.6044943552838532,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "status": "COMPLETED",
+      "compute_observation": {
+        "job_id": "R01_V022_NORAG_03_EXP_003",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788621184.8773634,
+        "remote_pid": 272146,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788621182.7872763
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788621183.139292
+            }
+          ],
+          "submit_timestamp": 1788621182.7872763,
+          "finish_timestamp": 1788621183.139292,
+          "wall_seconds": 0.19804,
+          "cpu_seconds": 0.503024,
+          "process_cpu_cumulative_seconds": 1.215575,
+          "pid": 272146,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.1758,
+          "user_cpu_seconds": 0.433584,
+          "system_cpu_seconds": 0.06965,
+          "peak_rss_kib": 160756,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.444495,
+            "wait": 0.352032,
+            "result_fetch": 0.440163
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 10,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5374514319968086,
+          "values": {
+            "agreement": 0.5374514319968086,
+            "agreement_all": 0.6732309819968787,
+            "agreement_valid": 0.5374514319968086,
+            "intersection": 2993357,
+            "union": 7394749,
+            "iou": 0.40479494300617913,
+            "precision": 0.5501155601100026,
+            "recall": 0.605111969761352,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "status": "COMPLETED",
+      "compute_observation": {
+        "job_id": "R01_V022_NORAG_03_EXP_004",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788621207.1285093,
+        "remote_pid": 272621,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788621204.9797091
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788621205.4134114
+            }
+          ],
+          "submit_timestamp": 1788621204.9797091,
+          "finish_timestamp": 1788621205.4134114,
+          "wall_seconds": 0.161258,
+          "cpu_seconds": 0.161066,
+          "process_cpu_cumulative_seconds": 1.276681,
+          "pid": 272621,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.125,
+          "user_cpu_seconds": 0.084899,
+          "system_cpu_seconds": 0.07654,
+          "peak_rss_kib": 133788,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.543315,
+            "wait": 0.433732,
+            "result_fetch": 0.420278
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 10,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5368982307227642,
+          "values": {
+            "agreement": 0.5368982307227642,
+            "agreement_all": 0.673395435818594,
+            "agreement_valid": 0.5368982307227642,
+            "intersection": 2997691,
+            "union": 7404347,
+            "iou": 0.4048555530960394,
+            "precision": 0.5509120574330806,
+            "recall": 0.6042861975110841,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "status": "COMPLETED",
+      "compute_observation": {
+        "job_id": "R01_V022_NORAG_03_EXP_005",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788621224.2196484,
+        "remote_pid": 273139,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788621220.3814242
+            },
+            {
+              "state": "RUNNING",
+              "observed_at": 1788621221.0027702
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788621222.6119583
+            }
+          ],
+          "submit_timestamp": 1788621220.3814242,
+          "start_timestamp": 1788621221.0027702,
+          "finish_timestamp": 1788621222.6119583,
+          "wall_seconds": 0.485552,
+          "cpu_seconds": 0.546591,
+          "process_cpu_cumulative_seconds": 1.536963,
+          "pid": 273139,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.2324,
+          "user_cpu_seconds": 0.466267,
+          "system_cpu_seconds": 0.080576,
+          "peak_rss_kib": 196416,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.56395,
+            "wait": 2.23061,
+            "result_fetch": 0.436729
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 0,
+          "primary_metric": null,
+          "primary_value": null,
+          "values": {}
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "status": "COMPLETED",
+      "compute_observation": {
+        "job_id": "R01_V022_NORAG_03_EXP_006",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788621243.0239196,
+        "remote_pid": 273664,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788621239.539686
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788621240.1509738
+            }
+          ],
+          "submit_timestamp": 1788621239.539686,
+          "finish_timestamp": 1788621240.1509738,
+          "wall_seconds": 0.184753,
+          "cpu_seconds": 0.184653,
+          "process_cpu_cumulative_seconds": 1.297574,
+          "pid": 273664,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.1655,
+          "user_cpu_seconds": 0.103423,
+          "system_cpu_seconds": 0.081512,
+          "peak_rss_kib": 160772,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.537974,
+            "wait": 0.611339,
+            "result_fetch": 0.940996
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 10,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5368982307227642,
+          "values": {
+            "agreement": 0.5368982307227642,
+            "agreement_all": 0.673395435818594,
+            "agreement_valid": 0.5368982307227642,
+            "intersection": 2997691,
+            "union": 7404347,
+            "iou": 0.4048555530960394,
+            "precision": 0.5509120574330806,
+            "recall": 0.6042861975110841,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      }
+    },
+    {
+      "experiment_id": "EXP_007",
+      "status": "COMPLETED",
+      "compute_observation": {
+        "job_id": "R01_V022_NORAG_03_EXP_007",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788621262.8413837,
+        "remote_pid": 274152,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788621258.6511605
+            },
+            {
+              "state": "RUNNING",
+              "observed_at": 1788621259.1510024
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788621260.545904
+            }
+          ],
+          "submit_timestamp": 1788621258.6511605,
+          "start_timestamp": 1788621259.1510024,
+          "finish_timestamp": 1788621260.545904,
+          "wall_seconds": 0.432558,
+          "cpu_seconds": 0.432478,
+          "process_cpu_cumulative_seconds": 1.534975,
+          "pid": 274152,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.1802,
+          "user_cpu_seconds": 0.353404,
+          "system_cpu_seconds": 0.079332,
+          "peak_rss_kib": 160912,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.504002,
+            "wait": 1.89475,
+            "result_fetch": 0.537509
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 10,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.4768752619403829,
+          "values": {
+            "agreement": 0.4768752619403829,
+            "agreement_all": 0.6334769921410524,
+            "agreement_valid": 0.4768752619403829,
+            "intersection": 2674531,
+            "union": 7652337,
+            "iou": 0.34950512503565906,
+            "precision": 0.4915221001359228,
+            "recall": 0.5474377060159523,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      }
+    },
+    {
+      "experiment_id": "EXP_008",
+      "status": "COMPLETED",
+      "compute_observation": {
+        "job_id": "R01_V022_NORAG_03_EXP_008",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788621279.8812017,
+        "remote_pid": 274714,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788621276.1275496
+            },
+            {
+              "state": "RUNNING",
+              "observed_at": 1788621276.8451657
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788621278.4751225
+            }
+          ],
+          "submit_timestamp": 1788621276.1275496,
+          "start_timestamp": 1788621276.8451657,
+          "finish_timestamp": 1788621278.4751225,
+          "wall_seconds": 0.479872,
+          "cpu_seconds": 0.479698,
+          "process_cpu_cumulative_seconds": 1.603251,
+          "pid": 274714,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.2075,
+          "user_cpu_seconds": 0.407688,
+          "system_cpu_seconds": 0.072275,
+          "peak_rss_kib": 160688,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.428458,
+            "wait": 2.347606,
+            "result_fetch": 0.341301
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 10,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5074614913482431,
+          "values": {
+            "agreement": 0.5074614913482431,
+            "agreement_all": 0.6550860501356273,
+            "agreement_valid": 0.5074614913482431,
+            "intersection": 2830224,
+            "union": 7516986,
+            "iou": 0.376510479067009,
+            "precision": 0.5201351729836341,
+            "recall": 0.5769037437885838,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      }
+    }
+  ],
+  "remote_jobs": [
+    {
+      "job_id": "R01_V022_NORAG_03_EXP_001",
+      "backend": "ssh_direct",
+      "remote_pid": 271161,
+      "status": "COMPLETED",
+      "lifecycle_state": "COMPLETED",
+      "lifecycle": [
+        {
+          "state": "SUBMITTED",
+          "observed_at": 1788621116.6103814
+        },
+        {
+          "state": "COMPLETED",
+          "observed_at": 1788621117.1716943
+        }
+      ]
+    },
+    {
+      "job_id": "R01_V022_NORAG_03_EXP_002",
+      "backend": "ssh_direct",
+      "remote_pid": 271618,
+      "status": "COMPLETED",
+      "lifecycle_state": "COMPLETED",
+      "lifecycle": [
+        {
+          "state": "SUBMITTED",
+          "observed_at": 1788621131.8058202
+        },
+        {
+          "state": "COMPLETED",
+          "observed_at": 1788621132.3531177
+        }
+      ]
+    },
+    {
+      "job_id": "R01_V022_NORAG_03_EXP_003",
+      "backend": "ssh_direct",
+      "remote_pid": 272146,
+      "status": "COMPLETED",
+      "lifecycle_state": "COMPLETED",
+      "lifecycle": [
+        {
+          "state": "SUBMITTED",
+          "observed_at": 1788621182.7872763
+        },
+        {
+          "state": "COMPLETED",
+          "observed_at": 1788621183.139292
+        }
+      ]
+    },
+    {
+      "job_id": "R01_V022_NORAG_03_EXP_004",
+      "backend": "ssh_direct",
+      "remote_pid": 272621,
+      "status": "COMPLETED",
+      "lifecycle_state": "COMPLETED",
+      "lifecycle": [
+        {
+          "state": "SUBMITTED",
+          "observed_at": 1788621204.9797091
+        },
+        {
+          "state": "COMPLETED",
+          "observed_at": 1788621205.4134114
+        }
+      ]
+    },
+    {
+      "job_id": "R01_V022_NORAG_03_EXP_005",
+      "backend": "ssh_direct",
+      "remote_pid": 273139,
+      "status": "COMPLETED",
+      "lifecycle_state": "COMPLETED",
+      "lifecycle": [
+        {
+          "state": "SUBMITTED",
+          "observed_at": 1788621220.3814242
+        },
+        {
+          "state": "RUNNING",
+          "observed_at": 1788621221.0027702
+        },
+        {
+          "state": "COMPLETED",
+          "observed_at": 1788621222.6119583
+        }
+      ]
+    },
+    {
+      "job_id": "R01_V022_NORAG_03_EXP_006",
+      "backend": "ssh_direct",
+      "remote_pid": 273664,
+      "status": "COMPLETED",
+      "lifecycle_state": "COMPLETED",
+      "lifecycle": [
+        {
+          "state": "SUBMITTED",
+          "observed_at": 1788621239.539686
+        },
+        {
+          "state": "COMPLETED",
+          "observed_at": 1788621240.1509738
+        }
+      ]
+    },
+    {
+      "job_id": "R01_V022_NORAG_03_EXP_007",
+      "backend": "ssh_direct",
+      "remote_pid": 274152,
+      "status": "COMPLETED",
+      "lifecycle_state": "COMPLETED",
+      "lifecycle": [
+        {
+          "state": "SUBMITTED",
+          "observed_at": 1788621258.6511605
+        },
+        {
+          "state": "RUNNING",
+          "observed_at": 1788621259.1510024
+        },
+        {
+          "state": "COMPLETED",
+          "observed_at": 1788621260.545904
+        }
+      ]
+    },
+    {
+      "job_id": "R01_V022_NORAG_03_EXP_008",
+      "backend": "ssh_direct",
+      "remote_pid": 274714,
+      "status": "COMPLETED",
+      "lifecycle_state": "COMPLETED",
+      "lifecycle": [
+        {
+          "state": "SUBMITTED",
+          "observed_at": 1788621276.1275496
+        },
+        {
+          "state": "RUNNING",
+          "observed_at": 1788621276.8451657
+        },
+        {
+          "state": "COMPLETED",
+          "observed_at": 1788621278.4751225
+        }
+      ]
+    }
+  ]
+}

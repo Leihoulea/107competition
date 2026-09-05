@@ -1,0 +1,8 @@
+{
+  "schema_version": "1",
+  "run_id": "R01_V022_NORAG_01",
+  "benchmark_commit": "c90b87d6166679b0f107693da5a9cbe7f6b50bc8",
+  "evaluation_status": "not_scored",
+  "reason": "The run ended after EXP_001 because the school-model transport connection was reset before a final diagnosis was produced.",
+  "exception_type": "AgentAPIError"
+}

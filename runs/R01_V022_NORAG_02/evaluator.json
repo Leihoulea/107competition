@@ -1,0 +1,8 @@
+{
+  "schema_version": "1",
+  "run_id": "R01_V022_NORAG_02",
+  "benchmark_commit": "c90b87d6166679b0f107693da5a9cbe7f6b50bc8",
+  "evaluation_status": "not_scored",
+  "reason": "The school model returned a hypothesis collection outside the frozen 2-to-5-item schema before any experiment was submitted.",
+  "exception_type": "AgentAPIError"
+}
