@@ -6,6 +6,19 @@ from pathlib import Path
 from typing import Any
 
 
+def ground_truth_path(case_dir: Path) -> Path:
+    """Resolve evaluator-only truth without exposing it to public APIs.
+
+    Historical-real cases keep evaluator material in ``evaluator_private``;
+    synthetic compatibility cases continue to use the older ``hidden`` name.
+    """
+    for name in ("evaluator_private", "hidden"):
+        path = case_dir / name / "ground_truth.json"
+        if path.is_file():
+            return path
+    raise FileNotFoundError(f"no evaluator ground truth for case: {case_dir}")
+
+
 def _agreement(metrics: dict[str, Any]) -> float:
     """Use the v0.2.1 valid-region metric, with legacy trace compatibility."""
     return float(metrics.get("agreement_valid", metrics.get("agreement", 0.0)))
@@ -28,7 +41,7 @@ def _same_pipeline(left: list[dict[str, Any]], right: list[dict[str, Any]]) -> b
 
 def evaluate(case_dir: Path, final: dict[str, Any], experiments: list[dict[str, Any]], threshold: float, budget_total: int, budget_remaining: int) -> dict[str, float]:
     """Score detection (20), family (20), validated repair (30), evidence (15), efficiency (15)."""
-    truth = json.loads((case_dir / "hidden" / "ground_truth.json").read_text())
+    truth = json.loads(ground_truth_path(case_dir).read_text())
     expected_decision = "fault" if truth["fault"] else "no_fault"
     detected = final.get("decision") == expected_decision
     family = detected and final.get("fault_family") == truth["fault_family"]

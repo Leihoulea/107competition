@@ -1,0 +1,16 @@
+{
+  "case_id": "R01",
+  "source_type": "historical_real_reconstructed",
+  "fault": true,
+  "fault_family": "spatial_orientation_navigation_mismatch",
+  "ground_truth_basis": "Stage 09G relative-orientation evidence plus Stage 09H independent GRIB and official-area navigation confirmation",
+  "public_array_validation": {
+    "operation": "rot180",
+    "meaning": "diagnostic transform for the packaged source-centred comparison array; it does not prescribe mutation of the Meteosat product values"
+  },
+  "production_remediation": {
+    "operation": "replace_navigation_with_verified_seviri_native_area",
+    "mask_transform": "identity",
+    "reason": "Stage 09H localized the error to navigation handling; the operational mask values were retained byte-for-byte"
+  }
+}

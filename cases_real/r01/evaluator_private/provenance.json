@@ -1,0 +1,25 @@
+{
+  "case_id": "R01",
+  "source_type": "historical_real_reconstructed",
+  "original_project": "Geo Ring Cloud",
+  "historical_case_time": "2024-03-10T12:00:00Z",
+  "historical_runs": [
+    "geo_ring_cloud_stage1_time_runs/stage_09g_orientation_root_cause_audit_202403",
+    "geo_ring_cloud_stage1_time_runs/stage_09h_meteosat_mask_navigation_root_cause_202403"
+  ],
+  "source_files": [
+    "stage_09g_20240310_1200_meteosat_native_transform_reprojection_metrics.csv",
+    "stage_09h_gate3b_navigation_replacement_metrics.csv",
+    "Meteosat-0deg_CLM_20240310_1200_native_cloud_v0.npz",
+    "DSCOVR_EPIC_L2_CLOUD_03_20240310115251_03.nc4"
+  ],
+  "processing_scripts": [
+    "stage_09g_run_20240310_meteosat_rotation_diagnostic.py",
+    "scripts/package_r01_historical.py",
+    "scripts/validate_r01_package.py"
+  ],
+  "preprocessing": "The retained 3712 by 3712 Meteosat native cloud mask and its historical latitude/longitude arrays are preserved in original pixel order. The locally recovered original EPIC L2 cloud mask is mapped with policy A and sampled by nearest neighbour at the retained native navigation using the Stage 09G 0.15 degree distance limit. The valid mask is EPIC/Meteosat availability intersected with its 180-degree counterpart, matching the Stage 09G common-valid candidate-comparison principle. No clean array was transformed to inject a fault and no intermediate display grid was created.",
+  "known_missing_evidence": "This package reconstructs the direct native-grid diagnostic from the recovered EPIC L2 file rather than replaying the historical 0.05-degree EPIC-view output. The deterministic effect is independently checked against the retained Stage 09G full-resolution metrics.",
+  "packaged_at_utc": "2026-09-05",
+  "packaging_base_commit": "fa26a0f"
+}

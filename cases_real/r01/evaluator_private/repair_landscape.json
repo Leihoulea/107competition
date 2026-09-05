@@ -1,0 +1,15 @@
+{
+  "case_id": "R01",
+  "metric": "agreement",
+  "identity": 0.5368982307227642,
+  "flip_x": 0.5374514319968086,
+  "flip_y": 0.5605946661476552,
+  "rot90": 0.4768752619403829,
+  "rot180": 0.7982679671660752,
+  "rot270": 0.5022161680218556,
+  "transpose": 0.5074614913482431,
+  "valid_pixels_each_candidate": 9515524,
+  "best_transform": "rot180",
+  "second_best_transform": "flip_y",
+  "separation": 0.23767330101842
+}

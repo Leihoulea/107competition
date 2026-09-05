@@ -1,0 +1,7 @@
+{
+  "case_id": "R01",
+  "title": "Meteosat and EPIC cloud-mask comparison quality anomaly",
+  "task": "A completed remote-sensing comparison may contain a scientific silent failure. Use only public experiments to determine whether a fault exists and validate any repair.",
+  "budget": 30,
+  "expected_quality_threshold": 0.75
+}

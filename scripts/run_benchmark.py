@@ -14,6 +14,7 @@ from scidiagnose.config import Settings
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--cases", nargs="+", default=["b01", "b02", "b03"])
+parser.add_argument("--case-dir", type=Path, action="append", help="public case directory; may be repeated")
 parser.add_argument("--methods", nargs="+", default=["deterministic_transform_sweep"])
 parser.add_argument("--repeats", type=int, default=1)
 parser.add_argument("--output-dir", type=Path, default=ROOT / "benchmark" / "results")
@@ -21,7 +22,8 @@ parser.add_argument("--run-dir", type=Path, help="completed SciDiagnose artifact
 parser.add_argument("--use-api-llm", action="store_true", help="use configured OpenAI-compatible credentials for LLM baselines")
 args = parser.parse_args()
 if args.repeats < 1: parser.error("--repeats must be at least one")
-cases = [PublicCase.load(ROOT / "cases" / name) for name in args.cases]
+case_directories = args.case_dir or [ROOT / "cases" / name for name in args.cases]
+cases = [PublicCase.load(directory) for directory in case_directories]
 def api_llm(context):
     agent = OpenAICompatibleAgent(Settings())
     mode = context["mode"]

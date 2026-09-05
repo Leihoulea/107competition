@@ -1,0 +1,46 @@
+{
+  "case_id": "R01",
+  "metric": "agreement",
+  "valid_pixels": {
+    "identity": 9515524,
+    "flip_x": 9515524,
+    "flip_y": 9515524,
+    "rot90": 9515524,
+    "rot180": 9515524,
+    "rot270": 9515524,
+    "transpose": 9515524
+  },
+  "initial_metric": 0.5368982307227642,
+  "recomputed_identity": 0.5368982307227642,
+  "best_transform": "rot180",
+  "best_agreement": 0.7982679671660752,
+  "second_best_transform": "flip_y",
+  "second_best_agreement": 0.5605946661476552,
+  "separation": 0.23767330101842,
+  "quality_threshold": 0.75,
+  "absolute_improvement": 0.26136973644331096,
+  "valid_retention_fraction": 1.0,
+  "historical_reference": {
+    "before": 0.5381503121692608,
+    "after": 0.7961290682839249,
+    "tolerance": 0.01
+  },
+  "historical_before_delta": -0.001252081446496578,
+  "historical_after_delta": 0.002138898882150242,
+  "checks": {
+    "initial_metric_reproducible": true,
+    "rot180_is_unique_best": true,
+    "rot180_exceeds_threshold": true,
+    "valid_support_retained": true,
+    "historical_before_close": true,
+    "historical_after_close": true
+  },
+  "sha256": {
+    "reference.npy": "1d0498087227a63908b2207208e31d4796a3f68b2844590d7ac4657baedf7951",
+    "target_faulty.npy": "798efef55c73a5635c264ad17bee1665ab8d8e84a47121b81ad94fbf7650c2a4",
+    "target_valid.npy": "d68a32fca5b06ac815707bd9beb34e98e6f239a856883d54dbfebc4602fdd498"
+  },
+  "case_public_sha256": "8eec34174a6911c5078771bcb0ec400aaa6cb26c9d88894989acaef78494cfa3",
+  "ground_truth_sha256": "9e42f733c16abf26a64753f64c902cfb6647aeb721a6a91ffff1f5dcf7a2be3e",
+  "runner_sha256": "0498e8d88ec4d54a35e10a990108772176caa05d3d740cde135bf02126f55083"
+}

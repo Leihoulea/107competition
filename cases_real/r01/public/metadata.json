@@ -1,0 +1,11 @@
+{
+  "case_id": "R01",
+  "domain": "remote_sensing",
+  "reference_product": "EPIC L2 Cloud Mask",
+  "target_product": "Meteosat operational Cloud Mask",
+  "observation_time": "2024-03-10T12:00:00Z",
+  "comparison_metric": "agreement",
+  "data_kind": "binary_cloud_mask",
+  "array_grid": "Meteosat native pixel grid",
+  "public_data_version": "r01-v2"
+}

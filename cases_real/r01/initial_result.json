@@ -1,0 +1,10 @@
+{
+  "process_status": "COMPLETED",
+  "exit_code": 0,
+  "agreement": 0.5368982307227642,
+  "agreement_all": 0.5368982307227642,
+  "agreement_valid": 0.5368982307227642,
+  "valid_pixels": 9515524,
+  "valid_fraction": 0.6905844163384364,
+  "comparison_metric": "agreement"
+}

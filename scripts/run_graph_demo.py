@@ -20,6 +20,7 @@ from scidiagnose.ssh_executor import SSHDirectExecutor
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--case", default="b02")
+parser.add_argument("--case-dir", type=Path, help="public case directory outside cases/ (for example cases_real/r01)")
 parser.add_argument("--host")
 parser.add_argument("--agent", choices=["manual", "api"], default="manual")
 parser.add_argument("--max-steps", type=int, default=8)
@@ -27,7 +28,7 @@ parser.add_argument("--run-id", help="Optional stable run directory name under r
 args = parser.parse_args()
 
 
-case = ROOT / "cases" / args.case
+case = args.case_dir.resolve() if args.case_dir else ROOT / "cases" / args.case
 task = json.loads((case / "task.json").read_text())
 initial = json.loads((case / "initial_result.json").read_text())
 run = ROOT / "runs" / (args.run_id or f"RUN_{task['case_id']}_GRAPH_{int(time.time())}")
