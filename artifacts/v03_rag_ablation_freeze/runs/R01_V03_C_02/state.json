@@ -1,0 +1,1954 @@
+{
+  "run_id": "R01_V03_C_02",
+  "case_id": "R01",
+  "task": {
+    "case_id": "R01",
+    "title": "Meteosat and EPIC cloud-mask comparison quality anomaly",
+    "task": "A completed remote-sensing comparison may contain a scientific silent failure. Use only public experiments to determine whether a fault exists and validate any repair.",
+    "budget": 30,
+    "expected_quality_threshold": 0.75
+  },
+  "initial_observation": {
+    "process_status": "COMPLETED",
+    "exit_code": 0,
+    "agreement": 0.5368982307227642,
+    "agreement_all": 0.5368982307227642,
+    "agreement_valid": 0.5368982307227642,
+    "valid_pixels": 9515524,
+    "valid_fraction": 0.6905844163384364,
+    "comparison_metric": "agreement"
+  },
+  "hypotheses": [
+    {
+      "hypothesis_id": "H001",
+      "category": "spatial_registration_error",
+      "description": "Meteosat and EPIC images are misaligned (e.g., geolocation offset or projection mismatch), causing low agreement despite correct cloud detection.",
+      "status": "active",
+      "confidence": 0.4,
+      "testable_scope": [
+        "spatial shift between images",
+        "agreement improvement after alignment"
+      ],
+      "evidence_for": [],
+      "evidence_against": [],
+      "scope_kind": "specific_candidate"
+    },
+    {
+      "hypothesis_id": "H002",
+      "category": "temporal_mismatch",
+      "description": "The compared images are from different times, so cloud patterns differ, reducing agreement.",
+      "status": "active",
+      "confidence": 0.3,
+      "testable_scope": [
+        "time difference between acquisitions",
+        "agreement sensitivity to time shift"
+      ],
+      "evidence_for": [],
+      "evidence_against": [],
+      "scope_kind": "specific_candidate"
+    },
+    {
+      "hypothesis_id": "H003",
+      "category": "unspecified",
+      "description": "Plausible explanation requiring evidence.",
+      "status": "active",
+      "confidence": 0.5,
+      "testable_scope": [
+        "agreement by cloud type",
+        "sensitivity to threshold changes"
+      ],
+      "evidence_for": [
+        "K006",
+        "K007",
+        "K008",
+        "K009",
+        "K010"
+      ],
+      "evidence_against": [],
+      "scope_kind": "fault_family"
+    },
+    {
+      "hypothesis_id": "H004",
+      "category": "resolution_mismatch",
+      "description": "Meteosat and EPIC have different spatial resolutions; resampling artifacts cause disagreement, especially in heterogeneous scenes.",
+      "status": "active",
+      "confidence": 0.3,
+      "testable_scope": [
+        "resolution difference",
+        "agreement in homogeneous vs heterogeneous regions"
+      ],
+      "evidence_for": [],
+      "evidence_against": [],
+      "scope_kind": "specific_candidate"
+    },
+    {
+      "hypothesis_id": "H005",
+      "category": "unspecified",
+      "description": "Plausible explanation requiring evidence.",
+      "status": "active",
+      "confidence": 0.2,
+      "testable_scope": [
+        "expected agreement for such comparison",
+        "no systematic error in processing"
+      ],
+      "evidence_for": [
+        "K006",
+        "K007",
+        "K008",
+        "K009",
+        "K010"
+      ],
+      "evidence_against": [],
+      "scope_kind": "no_fault"
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "EXP_001",
+      "tool": "shift_and_compare",
+      "arguments": {
+        "dr": 1,
+        "dc": 1
+      },
+      "backend": "ssh_direct",
+      "remote_host": "server-114",
+      "remote_pid": 308501,
+      "job_id": "R01_V03_C_02_EXP_001",
+      "status": "COMPLETED",
+      "cost": 4,
+      "result": {
+        "status": "success",
+        "experiment_id": "EXP_001",
+        "tool": "shift_and_compare",
+        "arguments": {
+          "dr": 1,
+          "dc": 1
+        },
+        "metrics": {
+          "dr": 1,
+          "dc": 1,
+          "agreement": 0.5369410029337323,
+          "agreement_all": 0.6730964288700209,
+          "agreement_valid": 0.5369410029337323,
+          "intersection": 2995906,
+          "union": 7402155,
+          "iou": 0.40473429697162516,
+          "precision": 0.5505840122734834,
+          "recall": 0.6044109259781183,
+          "valid_pixels": 9515524,
+          "valid_fraction": 0.6905844163384364
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5369410029337323,
+          "values": {
+            "dr": 1,
+            "dc": 1,
+            "agreement": 0.5369410029337323,
+            "agreement_all": 0.6730964288700209,
+            "agreement_valid": 0.5369410029337323,
+            "intersection": 2995906,
+            "union": 7402155,
+            "iou": 0.40473429697162516,
+            "precision": 0.5505840122734834,
+            "recall": 0.6044109259781183,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "compute_metrics": {
+          "wall_seconds": 0.203842,
+          "cpu_seconds": 0.203826,
+          "process_cpu_cumulative_seconds": 1.317368,
+          "pid": 308501,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.1108,
+          "user_cpu_seconds": 0.124622,
+          "system_cpu_seconds": 0.079472,
+          "peak_rss_kib": 160488,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)"
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "remote-7804a56a5c7636cc",
+          "os_family": "linux"
+        },
+        "elapsed_seconds": 0.204
+      },
+      "compute_observation": {
+        "job_id": "R01_V03_C_02_EXP_001",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788630236.3413444,
+        "remote_pid": 308501,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788630233.5557659
+            },
+            {
+              "state": "RUNNING",
+              "observed_at": 1788630233.866494
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788630235.1374712
+            }
+          ],
+          "submit_timestamp": 1788630233.5557659,
+          "start_timestamp": 1788630233.866494,
+          "finish_timestamp": 1788630235.1374712,
+          "wall_seconds": 0.203842,
+          "cpu_seconds": 0.203826,
+          "process_cpu_cumulative_seconds": 1.317368,
+          "pid": 308501,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.1108,
+          "user_cpu_seconds": 0.124622,
+          "system_cpu_seconds": 0.079472,
+          "peak_rss_kib": 160488,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.391684,
+            "wait": 1.581706,
+            "result_fetch": 0.337951
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5369410029337323,
+          "values": {
+            "dr": 1,
+            "dc": 1,
+            "agreement": 0.5369410029337323,
+            "agreement_all": 0.6730964288700209,
+            "agreement_valid": 0.5369410029337323,
+            "intersection": 2995906,
+            "union": 7402155,
+            "iou": 0.40473429697162516,
+            "precision": 0.5505840122734834,
+            "recall": 0.6044109259781183,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      },
+      "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_001\", \"tool\": \"shift_and_compare\", \"arguments\": {\"dr\": 1, \"dc\": 1}, \"metrics\": {\"dr\": 1, \"dc\": 1, \"agreement\": 0.5369410029337323, \"agreement_all\": 0.6730964288700209, \"agreement_valid\": 0.5369410029337323, \"intersection\": 2995906, \"union\": 7402155, \"iou\": 0.40473429697162516, \"precision\": 0.5505840122734834, \"recall\": 0.6044109259781183, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}, \"scientific_metrics\": {\"metric_count\": 12, \"primary_metric\": \"agreement_valid\", \"primary_value\": 0.5369410029337323, \"values\": {\"dr\": 1, \"dc\": 1, \"agreement\": 0.5369410029337323, \"agreement_all\": 0.6730964288700209, \"agreement_valid\": 0.5369410029337323, \"intersection\": 2995906, \"union\": 7402155, \"iou\": 0.40473429697162516, \"precision\": 0.5505840122734834, \"recall\": 0.6044109259781183, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}}, \"compute_metrics\": {\"wall_seconds\": 0.203842, \"cpu_seconds\": 0.203826, \"process_cpu_cumulative_seconds\": 1.317368, \"pid\": 308501, \"python_version\": \"3.12.3\", \"input_bytes\": 41337216, \"load_average_1m\": 0.1108, \"user_cpu_seconds\": 0.124622, \"system_cpu_seconds\": 0.079472, \"peak_rss_kib\": 160488, \"peak_rss_unit\": \"KiB (Linux ru_maxrss)\"}, \"site_profile\": {\"profile_version\": \"1\", \"site_id\": \"remote-7804a56a5c7636cc\", \"os_family\": \"linux\"}, \"elapsed_seconds\": 0.204}\n",
+      "stderr": "",
+      "plan_id": "PLAN001",
+      "coverage": {
+        "hypothesis_ids": [
+          "H001",
+          "H002",
+          "H003",
+          "H004",
+          "H005"
+        ],
+        "system_tested_scope": {
+          "kind": "candidate",
+          "signature": "shift(dr=1,dc=1)"
+        },
+        "novelty": {
+          "status": "novel"
+        }
+      },
+      "diagnostic_rationale": "A broad shift scan over a small range (dr, dc in [-5,5]) directly tests spatial misalignment (H001) and, if agreement peaks at a non-zero shift, indicates a registration error. If agreement is flat or decreases, it weakens H001. This is the highest-value first experiment because it is cheap and directly addresses the most common silent failure in image comparisons.",
+      "predicted_observation": "If H001 is true, agreement will increase by at least 0.05 at some non-zero shift. If H001 is false, agreement will be maximized at (0,0) or show no significant improvement."
+    },
+    {
+      "experiment_id": "EXP_002",
+      "tool": "shift_and_compare",
+      "arguments": {
+        "dr": 5,
+        "dc": 5
+      },
+      "backend": "ssh_direct",
+      "remote_host": "server-114",
+      "remote_pid": 309071,
+      "job_id": "R01_V03_C_02_EXP_002",
+      "status": "COMPLETED",
+      "cost": 4,
+      "result": {
+        "status": "success",
+        "experiment_id": "EXP_002",
+        "tool": "shift_and_compare",
+        "arguments": {
+          "dr": 5,
+          "dc": 5
+        },
+        "metrics": {
+          "dr": 5,
+          "dc": 5,
+          "agreement": 0.5364932083614102,
+          "agreement_all": 0.6720160848320452,
+          "agreement_valid": 0.5364932083614102,
+          "intersection": 2989609,
+          "union": 7400119,
+          "iou": 0.4039947195443749,
+          "precision": 0.549426757164249,
+          "recall": 0.6041562087493261,
+          "valid_pixels": 9515524,
+          "valid_fraction": 0.6905844163384364
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5364932083614102,
+          "values": {
+            "dr": 5,
+            "dc": 5,
+            "agreement": 0.5364932083614102,
+            "agreement_all": 0.6720160848320452,
+            "agreement_valid": 0.5364932083614102,
+            "intersection": 2989609,
+            "union": 7400119,
+            "iou": 0.4039947195443749,
+            "precision": 0.549426757164249,
+            "recall": 0.6041562087493261,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "compute_metrics": {
+          "wall_seconds": 0.205895,
+          "cpu_seconds": 0.205458,
+          "process_cpu_cumulative_seconds": 1.291383,
+          "pid": 309071,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.0557,
+          "user_cpu_seconds": 0.110663,
+          "system_cpu_seconds": 0.095058,
+          "peak_rss_kib": 160740,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)"
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "remote-7804a56a5c7636cc",
+          "os_family": "linux"
+        },
+        "elapsed_seconds": 0.206
+      },
+      "compute_observation": {
+        "job_id": "R01_V03_C_02_EXP_002",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788630280.0896282,
+        "remote_pid": 309071,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788630276.7388825
+            },
+            {
+              "state": "RUNNING",
+              "observed_at": 1788630277.0528595
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788630278.3631244
+            }
+          ],
+          "submit_timestamp": 1788630276.7388825,
+          "start_timestamp": 1788630277.0528595,
+          "finish_timestamp": 1788630278.3631244,
+          "wall_seconds": 0.205895,
+          "cpu_seconds": 0.205458,
+          "process_cpu_cumulative_seconds": 1.291383,
+          "pid": 309071,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.0557,
+          "user_cpu_seconds": 0.110663,
+          "system_cpu_seconds": 0.095058,
+          "peak_rss_kib": 160740,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.513825,
+            "wait": 1.62433,
+            "result_fetch": 0.468005
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5364932083614102,
+          "values": {
+            "dr": 5,
+            "dc": 5,
+            "agreement": 0.5364932083614102,
+            "agreement_all": 0.6720160848320452,
+            "agreement_valid": 0.5364932083614102,
+            "intersection": 2989609,
+            "union": 7400119,
+            "iou": 0.4039947195443749,
+            "precision": 0.549426757164249,
+            "recall": 0.6041562087493261,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      },
+      "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_002\", \"tool\": \"shift_and_compare\", \"arguments\": {\"dr\": 5, \"dc\": 5}, \"metrics\": {\"dr\": 5, \"dc\": 5, \"agreement\": 0.5364932083614102, \"agreement_all\": 0.6720160848320452, \"agreement_valid\": 0.5364932083614102, \"intersection\": 2989609, \"union\": 7400119, \"iou\": 0.4039947195443749, \"precision\": 0.549426757164249, \"recall\": 0.6041562087493261, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}, \"scientific_metrics\": {\"metric_count\": 12, \"primary_metric\": \"agreement_valid\", \"primary_value\": 0.5364932083614102, \"values\": {\"dr\": 5, \"dc\": 5, \"agreement\": 0.5364932083614102, \"agreement_all\": 0.6720160848320452, \"agreement_valid\": 0.5364932083614102, \"intersection\": 2989609, \"union\": 7400119, \"iou\": 0.4039947195443749, \"precision\": 0.549426757164249, \"recall\": 0.6041562087493261, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}}, \"compute_metrics\": {\"wall_seconds\": 0.205895, \"cpu_seconds\": 0.205458, \"process_cpu_cumulative_seconds\": 1.291383, \"pid\": 309071, \"python_version\": \"3.12.3\", \"input_bytes\": 41337216, \"load_average_1m\": 0.0557, \"user_cpu_seconds\": 0.110663, \"system_cpu_seconds\": 0.095058, \"peak_rss_kib\": 160740, \"peak_rss_unit\": \"KiB (Linux ru_maxrss)\"}, \"site_profile\": {\"profile_version\": \"1\", \"site_id\": \"remote-7804a56a5c7636cc\", \"os_family\": \"linux\"}, \"elapsed_seconds\": 0.206}\n",
+      "stderr": "",
+      "plan_id": "PLAN003",
+      "coverage": {
+        "hypothesis_ids": [
+          "H001",
+          "H002"
+        ],
+        "system_tested_scope": {
+          "kind": "candidate",
+          "signature": "shift(dr=5,dc=5)"
+        },
+        "novelty": {
+          "status": "novel"
+        }
+      },
+      "diagnostic_rationale": "The single shift (1,1) produced negligible improvement (delta 4.3e-5), but this does not rule out larger or anisotropic shifts. A systematic shift scan over the full range [-5,5]x[-5,5] will map the agreement surface. If agreement peaks at a non-zero shift, H001 is supported; if agreement is flat or peaks at (0,0), H001 is weakened. Additionally, if the best shift is large (e.g., >3 pixels), it may indicate a temporal mismatch (H002) rather than a pure geolocation error, since large apparent shifts can arise from cloud advection between acquisition times.",
+      "predicted_observation": "A 2D map of agreement_valid over dr,dc in [-5,5]. If H001 is true, max agreement will exceed 0.537 by at least 0.05 at some non-zero shift. If H001 is false, max agreement will be within 0.01 of baseline and occur at or near (0,0). If H002 is true, the agreement surface may show a broad plateau or a shift direction consistent with cloud motion."
+    },
+    {
+      "experiment_id": "EXP_003",
+      "tool": "evaluate_candidate",
+      "arguments": {
+        "pipeline": [
+          {
+            "type": "transform",
+            "operation": "identity"
+          }
+        ]
+      },
+      "backend": "ssh_direct",
+      "remote_host": "server-114",
+      "remote_pid": 309589,
+      "job_id": "R01_V03_C_02_EXP_003",
+      "status": "COMPLETED",
+      "cost": 4,
+      "result": {
+        "status": "success",
+        "experiment_id": "EXP_003",
+        "tool": "evaluate_candidate",
+        "arguments": {
+          "pipeline": [
+            {
+              "type": "transform",
+              "operation": "identity"
+            }
+          ]
+        },
+        "metrics": {
+          "pipeline": [
+            {
+              "type": "transform",
+              "operation": "identity"
+            }
+          ],
+          "agreement": 0.5368982307227642,
+          "agreement_all": 0.673395435818594,
+          "agreement_valid": 0.5368982307227642,
+          "intersection": 2997691,
+          "union": 7404347,
+          "iou": 0.4048555530960394,
+          "precision": 0.5509120574330806,
+          "recall": 0.6042861975110841,
+          "valid_pixels": 9515524,
+          "valid_fraction": 0.6905844163384364
+        },
+        "scientific_metrics": {
+          "metric_count": 10,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5368982307227642,
+          "values": {
+            "agreement": 0.5368982307227642,
+            "agreement_all": 0.673395435818594,
+            "agreement_valid": 0.5368982307227642,
+            "intersection": 2997691,
+            "union": 7404347,
+            "iou": 0.4048555530960394,
+            "precision": 0.5509120574330806,
+            "recall": 0.6042861975110841,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "compute_metrics": {
+          "wall_seconds": 0.175731,
+          "cpu_seconds": 0.175716,
+          "process_cpu_cumulative_seconds": 1.334799,
+          "pid": 309589,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.2656,
+          "user_cpu_seconds": 0.099987,
+          "system_cpu_seconds": 0.076025,
+          "peak_rss_kib": 160880,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)"
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "remote-7804a56a5c7636cc",
+          "os_family": "linux"
+        },
+        "elapsed_seconds": 0.176
+      },
+      "compute_observation": {
+        "job_id": "R01_V03_C_02_EXP_003",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788630322.6391568,
+        "remote_pid": 309589,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788630320.0301125
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788630320.5977898
+            }
+          ],
+          "submit_timestamp": 1788630320.0301125,
+          "finish_timestamp": 1788630320.5977898,
+          "wall_seconds": 0.175731,
+          "cpu_seconds": 0.175716,
+          "process_cpu_cumulative_seconds": 1.334799,
+          "pid": 309589,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.2656,
+          "user_cpu_seconds": 0.099987,
+          "system_cpu_seconds": 0.076025,
+          "peak_rss_kib": 160880,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.763236,
+            "wait": 0.567689,
+            "result_fetch": 0.551302
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 10,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5368982307227642,
+          "values": {
+            "agreement": 0.5368982307227642,
+            "agreement_all": 0.673395435818594,
+            "agreement_valid": 0.5368982307227642,
+            "intersection": 2997691,
+            "union": 7404347,
+            "iou": 0.4048555530960394,
+            "precision": 0.5509120574330806,
+            "recall": 0.6042861975110841,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      },
+      "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_003\", \"tool\": \"evaluate_candidate\", \"arguments\": {\"pipeline\": [{\"type\": \"transform\", \"operation\": \"identity\"}]}, \"metrics\": {\"pipeline\": [{\"type\": \"transform\", \"operation\": \"identity\"}], \"agreement\": 0.5368982307227642, \"agreement_all\": 0.673395435818594, \"agreement_valid\": 0.5368982307227642, \"intersection\": 2997691, \"union\": 7404347, \"iou\": 0.4048555530960394, \"precision\": 0.5509120574330806, \"recall\": 0.6042861975110841, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}, \"scientific_metrics\": {\"metric_count\": 10, \"primary_metric\": \"agreement_valid\", \"primary_value\": 0.5368982307227642, \"values\": {\"agreement\": 0.5368982307227642, \"agreement_all\": 0.673395435818594, \"agreement_valid\": 0.5368982307227642, \"intersection\": 2997691, \"union\": 7404347, \"iou\": 0.4048555530960394, \"precision\": 0.5509120574330806, \"recall\": 0.6042861975110841, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}}, \"compute_metrics\": {\"wall_seconds\": 0.175731, \"cpu_seconds\": 0.175716, \"process_cpu_cumulative_seconds\": 1.334799, \"pid\": 309589, \"python_version\": \"3.12.3\", \"input_bytes\": 41337216, \"load_average_1m\": 0.2656, \"user_cpu_seconds\": 0.099987, \"system_cpu_seconds\": 0.076025, \"peak_rss_kib\": 160880, \"peak_rss_unit\": \"KiB (Linux ru_maxrss)\"}, \"site_profile\": {\"profile_version\": \"1\", \"site_id\": \"remote-7804a56a5c7636cc\", \"os_family\": \"linux\"}, \"elapsed_seconds\": 0.176}\n",
+      "stderr": "",
+      "plan_id": "PLAN004",
+      "coverage": {
+        "hypothesis_ids": [
+          "H003",
+          "H004",
+          "H005"
+        ],
+        "system_tested_scope": {
+          "kind": "pipeline",
+          "signature": [
+            "transform(identity)"
+          ]
+        },
+        "novelty": {
+          "status": "novel"
+        }
+      },
+      "diagnostic_rationale": "The knowledge query (K001-K005) provided no baseline agreement values, so the low agreement of 0.537 could be either a valid result (H005) or due to systematic algorithm/resolution differences. A heterogeneity-stratified analysis is a materially different experiment from the shift scan: it directly tests whether disagreement is concentrated in heterogeneous regions (supporting H004) or is uniform across scene types (supporting H003 or H005). This is cost-effective and provides high diagnostic value because it separates resolution artifacts from algorithm differences.",
+      "predicted_observation": "Agreement_valid computed separately for homogeneous and heterogeneous regions (e.g., by local variance of the cloud mask). If H004 is true, agreement will be significantly lower in heterogeneous regions (e.g., >0.05 lower than in homogeneous regions). If H003 is true, agreement will be uniformly low across both region types. If H005 is true, agreement will be consistent with expected instrument differences and show no systematic heterogeneity effect."
+    },
+    {
+      "experiment_id": "EXP_004",
+      "tool": "shift_and_compare",
+      "arguments": {
+        "dr": -3,
+        "dc": 2
+      },
+      "backend": "ssh_direct",
+      "remote_host": "server-114",
+      "remote_pid": 310042,
+      "job_id": "R01_V03_C_02_EXP_004",
+      "status": "COMPLETED",
+      "cost": 4,
+      "result": {
+        "status": "success",
+        "experiment_id": "EXP_004",
+        "tool": "shift_and_compare",
+        "arguments": {
+          "dr": -3,
+          "dc": 2
+        },
+        "metrics": {
+          "dr": -3,
+          "dc": 2,
+          "agreement": 0.5370282288185075,
+          "agreement_all": 0.6728152752489596,
+          "agreement_valid": 0.5370282288185075,
+          "intersection": 2996101,
+          "union": 7401520,
+          "iou": 0.40479536635718066,
+          "precision": 0.5506198491396579,
+          "recall": 0.6045039270245508,
+          "valid_pixels": 9515524,
+          "valid_fraction": 0.6905844163384364
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5370282288185075,
+          "values": {
+            "dr": -3,
+            "dc": 2,
+            "agreement": 0.5370282288185075,
+            "agreement_all": 0.6728152752489596,
+            "agreement_valid": 0.5370282288185075,
+            "intersection": 2996101,
+            "union": 7401520,
+            "iou": 0.40479536635718066,
+            "precision": 0.5506198491396579,
+            "recall": 0.6045039270245508,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "compute_metrics": {
+          "wall_seconds": 0.21028,
+          "cpu_seconds": 0.210256,
+          "process_cpu_cumulative_seconds": 1.284071,
+          "pid": 310042,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.2061,
+          "user_cpu_seconds": 0.12187,
+          "system_cpu_seconds": 0.088664,
+          "peak_rss_kib": 160740,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)"
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "remote-7804a56a5c7636cc",
+          "os_family": "linux"
+        },
+        "elapsed_seconds": 0.211
+      },
+      "compute_observation": {
+        "job_id": "R01_V03_C_02_EXP_004",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788630339.1221743,
+        "remote_pid": 310042,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788630336.4602108
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788630337.1810362
+            }
+          ],
+          "submit_timestamp": 1788630336.4602108,
+          "finish_timestamp": 1788630337.1810362,
+          "wall_seconds": 0.21028,
+          "cpu_seconds": 0.210256,
+          "process_cpu_cumulative_seconds": 1.284071,
+          "pid": 310042,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.2061,
+          "user_cpu_seconds": 0.12187,
+          "system_cpu_seconds": 0.088664,
+          "peak_rss_kib": 160740,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.918161,
+            "wait": 0.720839,
+            "result_fetch": 0.346874
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5370282288185075,
+          "values": {
+            "dr": -3,
+            "dc": 2,
+            "agreement": 0.5370282288185075,
+            "agreement_all": 0.6728152752489596,
+            "agreement_valid": 0.5370282288185075,
+            "intersection": 2996101,
+            "union": 7401520,
+            "iou": 0.40479536635718066,
+            "precision": 0.5506198491396579,
+            "recall": 0.6045039270245508,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      },
+      "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_004\", \"tool\": \"shift_and_compare\", \"arguments\": {\"dr\": -3, \"dc\": 2}, \"metrics\": {\"dr\": -3, \"dc\": 2, \"agreement\": 0.5370282288185075, \"agreement_all\": 0.6728152752489596, \"agreement_valid\": 0.5370282288185075, \"intersection\": 2996101, \"union\": 7401520, \"iou\": 0.40479536635718066, \"precision\": 0.5506198491396579, \"recall\": 0.6045039270245508, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}, \"scientific_metrics\": {\"metric_count\": 12, \"primary_metric\": \"agreement_valid\", \"primary_value\": 0.5370282288185075, \"values\": {\"dr\": -3, \"dc\": 2, \"agreement\": 0.5370282288185075, \"agreement_all\": 0.6728152752489596, \"agreement_valid\": 0.5370282288185075, \"intersection\": 2996101, \"union\": 7401520, \"iou\": 0.40479536635718066, \"precision\": 0.5506198491396579, \"recall\": 0.6045039270245508, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}}, \"compute_metrics\": {\"wall_seconds\": 0.21028, \"cpu_seconds\": 0.210256, \"process_cpu_cumulative_seconds\": 1.284071, \"pid\": 310042, \"python_version\": \"3.12.3\", \"input_bytes\": 41337216, \"load_average_1m\": 0.2061, \"user_cpu_seconds\": 0.12187, \"system_cpu_seconds\": 0.088664, \"peak_rss_kib\": 160740, \"peak_rss_unit\": \"KiB (Linux ru_maxrss)\"}, \"site_profile\": {\"profile_version\": \"1\", \"site_id\": \"remote-7804a56a5c7636cc\", \"os_family\": \"linux\"}, \"elapsed_seconds\": 0.211}\n",
+      "stderr": "",
+      "plan_id": "PLAN005",
+      "coverage": {
+        "hypothesis_ids": [
+          "H002"
+        ],
+        "system_tested_scope": {
+          "kind": "candidate",
+          "signature": "shift(dr=-3,dc=2)"
+        },
+        "novelty": {
+          "status": "novel"
+        }
+      },
+      "diagnostic_rationale": "The prior shift tests (E001, E002) only sampled two points (1,1) and (5,5), both showing negligible change. However, a temporal mismatch could produce a shift direction consistent with cloud motion, which may not be diagonal. A systematic shift scan over the full range [-5,5]x[-5,5] will map the agreement surface. If agreement peaks at a non-zero shift (especially anisotropic, e.g., along one axis), H002 is supported; if flat or peaking at (0,0), H002 is weakened. This is a more comprehensive test than the two prior points and directly addresses the temporal hypothesis.",
+      "predicted_observation": "A 2D map of agreement_valid over dr,dc in [-5,5]. If H002 is true, max agreement will exceed baseline by at least 0.05 at some non-zero shift, possibly with a directional pattern. If H002 is false, max agreement will be within 0.01 of baseline and occur at or near (0,0)."
+    },
+    {
+      "experiment_id": "EXP_005",
+      "tool": "shift_and_compare",
+      "arguments": {
+        "dr": 0,
+        "dc": 0
+      },
+      "backend": "ssh_direct",
+      "remote_host": "server-114",
+      "remote_pid": 310531,
+      "job_id": "R01_V03_C_02_EXP_005",
+      "status": "COMPLETED",
+      "cost": 4,
+      "result": {
+        "status": "success",
+        "experiment_id": "EXP_005",
+        "tool": "shift_and_compare",
+        "arguments": {
+          "dr": 0,
+          "dc": 0
+        },
+        "metrics": {
+          "dr": 0,
+          "dc": 0,
+          "agreement": 0.5368982307227642,
+          "agreement_all": 0.673395435818594,
+          "agreement_valid": 0.5368982307227642,
+          "intersection": 2997691,
+          "union": 7404347,
+          "iou": 0.4048555530960394,
+          "precision": 0.5509120574330806,
+          "recall": 0.6042861975110841,
+          "valid_pixels": 9515524,
+          "valid_fraction": 0.6905844163384364
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5368982307227642,
+          "values": {
+            "dr": 0,
+            "dc": 0,
+            "agreement": 0.5368982307227642,
+            "agreement_all": 0.673395435818594,
+            "agreement_valid": 0.5368982307227642,
+            "intersection": 2997691,
+            "union": 7404347,
+            "iou": 0.4048555530960394,
+            "precision": 0.5509120574330806,
+            "recall": 0.6042861975110841,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "compute_metrics": {
+          "wall_seconds": 0.210474,
+          "cpu_seconds": 0.210449,
+          "process_cpu_cumulative_seconds": 1.344758,
+          "pid": 310531,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.2271,
+          "user_cpu_seconds": 0.105365,
+          "system_cpu_seconds": 0.105352,
+          "peak_rss_kib": 160820,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)"
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "remote-7804a56a5c7636cc",
+          "os_family": "linux"
+        },
+        "elapsed_seconds": 0.211
+      },
+      "compute_observation": {
+        "job_id": "R01_V03_C_02_EXP_005",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788630357.3024678,
+        "remote_pid": 310531,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788630353.213008
+            },
+            {
+              "state": "RUNNING",
+              "observed_at": 1788630353.5913775
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788630355.0473275
+            }
+          ],
+          "submit_timestamp": 1788630353.213008,
+          "start_timestamp": 1788630353.5913775,
+          "finish_timestamp": 1788630355.0473275,
+          "wall_seconds": 0.210474,
+          "cpu_seconds": 0.210449,
+          "process_cpu_cumulative_seconds": 1.344758,
+          "pid": 310531,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.2271,
+          "user_cpu_seconds": 0.105365,
+          "system_cpu_seconds": 0.105352,
+          "peak_rss_kib": 160820,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.778355,
+            "wait": 1.83434,
+            "result_fetch": 0.592533
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5368982307227642,
+          "values": {
+            "dr": 0,
+            "dc": 0,
+            "agreement": 0.5368982307227642,
+            "agreement_all": 0.673395435818594,
+            "agreement_valid": 0.5368982307227642,
+            "intersection": 2997691,
+            "union": 7404347,
+            "iou": 0.4048555530960394,
+            "precision": 0.5509120574330806,
+            "recall": 0.6042861975110841,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      },
+      "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_005\", \"tool\": \"shift_and_compare\", \"arguments\": {\"dr\": 0, \"dc\": 0}, \"metrics\": {\"dr\": 0, \"dc\": 0, \"agreement\": 0.5368982307227642, \"agreement_all\": 0.673395435818594, \"agreement_valid\": 0.5368982307227642, \"intersection\": 2997691, \"union\": 7404347, \"iou\": 0.4048555530960394, \"precision\": 0.5509120574330806, \"recall\": 0.6042861975110841, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}, \"scientific_metrics\": {\"metric_count\": 12, \"primary_metric\": \"agreement_valid\", \"primary_value\": 0.5368982307227642, \"values\": {\"dr\": 0, \"dc\": 0, \"agreement\": 0.5368982307227642, \"agreement_all\": 0.673395435818594, \"agreement_valid\": 0.5368982307227642, \"intersection\": 2997691, \"union\": 7404347, \"iou\": 0.4048555530960394, \"precision\": 0.5509120574330806, \"recall\": 0.6042861975110841, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}}, \"compute_metrics\": {\"wall_seconds\": 0.210474, \"cpu_seconds\": 0.210449, \"process_cpu_cumulative_seconds\": 1.344758, \"pid\": 310531, \"python_version\": \"3.12.3\", \"input_bytes\": 41337216, \"load_average_1m\": 0.2271, \"user_cpu_seconds\": 0.105365, \"system_cpu_seconds\": 0.105352, \"peak_rss_kib\": 160820, \"peak_rss_unit\": \"KiB (Linux ru_maxrss)\"}, \"site_profile\": {\"profile_version\": \"1\", \"site_id\": \"remote-7804a56a5c7636cc\", \"os_family\": \"linux\"}, \"elapsed_seconds\": 0.211}\n",
+      "stderr": "",
+      "plan_id": "PLAN006",
+      "coverage": {
+        "hypothesis_ids": [
+          "H001",
+          "H002"
+        ],
+        "system_tested_scope": {
+          "kind": "candidate",
+          "signature": "shift(dr=0,dc=0)"
+        },
+        "novelty": {
+          "status": "novel"
+        }
+      },
+      "diagnostic_rationale": "Prior shift tests sampled only three points and showed negligible agreement change, but a full 2D shift scan over the range [-5,5]x[-5,5] is needed to map the agreement surface. If agreement peaks at a non-zero shift, it supports H001 (spatial misalignment) or H002 (temporal mismatch, if the shift is directional and large). If the surface is flat or peaks at (0,0), it weakens both H001 and H002. This is a comprehensive, cost-effective test that directly addresses the most common silent failure modes.",
+      "predicted_observation": "A 2D map of agreement_valid over dr,dc in [-5,5]. If H001 or H002 is true, max agreement will exceed baseline by at least 0.05 at some non-zero shift. If false, max agreement will be within 0.01 of baseline and occur at or near (0,0)."
+    }
+  ],
+  "experiment_coverage": {
+    "tested_signatures": [
+      "shift_and_compare:{\"dc\":1,\"dr\":1}",
+      "shift_and_compare:{\"dc\":5,\"dr\":5}",
+      "evaluate_candidate:{\"pipeline\":[{\"operation\":\"identity\",\"type\":\"transform\"}]}",
+      "shift_and_compare:{\"dc\":2,\"dr\":-3}",
+      "shift_and_compare:{\"dc\":0,\"dr\":0}"
+    ],
+    "families": {
+      "shift_and_compare": {
+        "count": 4,
+        "best_delta": 0.00012999809574332222,
+        "low_information_count": 4,
+        "informative_count": 0
+      },
+      "evaluate_candidate": {
+        "count": 1,
+        "best_delta": 0.0,
+        "low_information_count": 1,
+        "informative_count": 0
+      }
+    }
+  },
+  "evidence": [
+    {
+      "evidence_id": "E001",
+      "experiment_id": "EXP_001",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.5369410029337323,
+      "delta": 4.2772210968045066e-05,
+      "threshold": 0.75,
+      "residual_gap": 0.21305899706626774,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H001",
+        "H002",
+        "H003",
+        "H004",
+        "H005"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "shift(dr=1,dc=1)"
+      },
+      "diagnostic_rationale": "A broad shift scan over a small range (dr, dc in [-5,5]) directly tests spatial misalignment (H001) and, if agreement peaks at a non-zero shift, indicates a registration error. If agreement is flat or decreases, it weakens H001. This is the highest-value first experiment because it is cheap and directly addresses the most common silent failure in image comparisons.",
+      "predicted_observation": "If H001 is true, agreement will increase by at least 0.05 at some non-zero shift. If H001 is false, agreement will be maximized at (0,0) or show no significant improvement."
+    },
+    {
+      "evidence_id": "E002",
+      "experiment_id": "EXP_002",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.5364932083614102,
+      "delta": -0.0004050223613539794,
+      "threshold": 0.75,
+      "residual_gap": 0.21350679163858977,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H001",
+        "H002"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "shift(dr=5,dc=5)"
+      },
+      "diagnostic_rationale": "The single shift (1,1) produced negligible improvement (delta 4.3e-5), but this does not rule out larger or anisotropic shifts. A systematic shift scan over the full range [-5,5]x[-5,5] will map the agreement surface. If agreement peaks at a non-zero shift, H001 is supported; if agreement is flat or peaks at (0,0), H001 is weakened. Additionally, if the best shift is large (e.g., >3 pixels), it may indicate a temporal mismatch (H002) rather than a pure geolocation error, since large apparent shifts can arise from cloud advection between acquisition times.",
+      "predicted_observation": "A 2D map of agreement_valid over dr,dc in [-5,5]. If H001 is true, max agreement will exceed 0.537 by at least 0.05 at some non-zero shift. If H001 is false, max agreement will be within 0.01 of baseline and occur at or near (0,0). If H002 is true, the agreement surface may show a broad plateau or a shift direction consistent with cloud motion."
+    },
+    {
+      "evidence_id": "E003",
+      "experiment_id": "EXP_003",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.5368982307227642,
+      "delta": 0.0,
+      "threshold": 0.75,
+      "residual_gap": 0.2131017692772358,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H003",
+        "H004",
+        "H005"
+      ],
+      "system_tested_scope": {
+        "kind": "pipeline",
+        "signature": [
+          "transform(identity)"
+        ]
+      },
+      "diagnostic_rationale": "The knowledge query (K001-K005) provided no baseline agreement values, so the low agreement of 0.537 could be either a valid result (H005) or due to systematic algorithm/resolution differences. A heterogeneity-stratified analysis is a materially different experiment from the shift scan: it directly tests whether disagreement is concentrated in heterogeneous regions (supporting H004) or is uniform across scene types (supporting H003 or H005). This is cost-effective and provides high diagnostic value because it separates resolution artifacts from algorithm differences.",
+      "predicted_observation": "Agreement_valid computed separately for homogeneous and heterogeneous regions (e.g., by local variance of the cloud mask). If H004 is true, agreement will be significantly lower in heterogeneous regions (e.g., >0.05 lower than in homogeneous regions). If H003 is true, agreement will be uniformly low across both region types. If H005 is true, agreement will be consistent with expected instrument differences and show no systematic heterogeneity effect."
+    },
+    {
+      "evidence_id": "E004",
+      "experiment_id": "EXP_004",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.5370282288185075,
+      "delta": 0.00012999809574332222,
+      "threshold": 0.75,
+      "residual_gap": 0.21297177118149246,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H002"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "shift(dr=-3,dc=2)"
+      },
+      "diagnostic_rationale": "The prior shift tests (E001, E002) only sampled two points (1,1) and (5,5), both showing negligible change. However, a temporal mismatch could produce a shift direction consistent with cloud motion, which may not be diagonal. A systematic shift scan over the full range [-5,5]x[-5,5] will map the agreement surface. If agreement peaks at a non-zero shift (especially anisotropic, e.g., along one axis), H002 is supported; if flat or peaking at (0,0), H002 is weakened. This is a more comprehensive test than the two prior points and directly addresses the temporal hypothesis.",
+      "predicted_observation": "A 2D map of agreement_valid over dr,dc in [-5,5]. If H002 is true, max agreement will exceed baseline by at least 0.05 at some non-zero shift, possibly with a directional pattern. If H002 is false, max agreement will be within 0.01 of baseline and occur at or near (0,0)."
+    },
+    {
+      "evidence_id": "E005",
+      "experiment_id": "EXP_005",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.5368982307227642,
+      "delta": 0.0,
+      "threshold": 0.75,
+      "residual_gap": 0.2131017692772358,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H001",
+        "H002"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "shift(dr=0,dc=0)"
+      },
+      "diagnostic_rationale": "Prior shift tests sampled only three points and showed negligible agreement change, but a full 2D shift scan over the range [-5,5]x[-5,5] is needed to map the agreement surface. If agreement peaks at a non-zero shift, it supports H001 (spatial misalignment) or H002 (temporal mismatch, if the shift is directional and large). If the surface is flat or peaks at (0,0), it weakens both H001 and H002. This is a comprehensive, cost-effective test that directly addresses the most common silent failure modes.",
+      "predicted_observation": "A 2D map of agreement_valid over dr,dc in [-5,5]. If H001 or H002 is true, max agreement will exceed baseline by at least 0.05 at some non-zero shift. If false, max agreement will be within 0.01 of baseline and occur at or near (0,0)."
+    }
+  ],
+  "experimental_evidence": [
+    {
+      "evidence_id": "E001",
+      "experiment_id": "EXP_001",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.5369410029337323,
+      "delta": 4.2772210968045066e-05,
+      "threshold": 0.75,
+      "residual_gap": 0.21305899706626774,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H001",
+        "H002",
+        "H003",
+        "H004",
+        "H005"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "shift(dr=1,dc=1)"
+      },
+      "diagnostic_rationale": "A broad shift scan over a small range (dr, dc in [-5,5]) directly tests spatial misalignment (H001) and, if agreement peaks at a non-zero shift, indicates a registration error. If agreement is flat or decreases, it weakens H001. This is the highest-value first experiment because it is cheap and directly addresses the most common silent failure in image comparisons.",
+      "predicted_observation": "If H001 is true, agreement will increase by at least 0.05 at some non-zero shift. If H001 is false, agreement will be maximized at (0,0) or show no significant improvement."
+    },
+    {
+      "evidence_id": "E002",
+      "experiment_id": "EXP_002",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.5364932083614102,
+      "delta": -0.0004050223613539794,
+      "threshold": 0.75,
+      "residual_gap": 0.21350679163858977,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H001",
+        "H002"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "shift(dr=5,dc=5)"
+      },
+      "diagnostic_rationale": "The single shift (1,1) produced negligible improvement (delta 4.3e-5), but this does not rule out larger or anisotropic shifts. A systematic shift scan over the full range [-5,5]x[-5,5] will map the agreement surface. If agreement peaks at a non-zero shift, H001 is supported; if agreement is flat or peaks at (0,0), H001 is weakened. Additionally, if the best shift is large (e.g., >3 pixels), it may indicate a temporal mismatch (H002) rather than a pure geolocation error, since large apparent shifts can arise from cloud advection between acquisition times.",
+      "predicted_observation": "A 2D map of agreement_valid over dr,dc in [-5,5]. If H001 is true, max agreement will exceed 0.537 by at least 0.05 at some non-zero shift. If H001 is false, max agreement will be within 0.01 of baseline and occur at or near (0,0). If H002 is true, the agreement surface may show a broad plateau or a shift direction consistent with cloud motion."
+    },
+    {
+      "evidence_id": "E003",
+      "experiment_id": "EXP_003",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.5368982307227642,
+      "delta": 0.0,
+      "threshold": 0.75,
+      "residual_gap": 0.2131017692772358,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H003",
+        "H004",
+        "H005"
+      ],
+      "system_tested_scope": {
+        "kind": "pipeline",
+        "signature": [
+          "transform(identity)"
+        ]
+      },
+      "diagnostic_rationale": "The knowledge query (K001-K005) provided no baseline agreement values, so the low agreement of 0.537 could be either a valid result (H005) or due to systematic algorithm/resolution differences. A heterogeneity-stratified analysis is a materially different experiment from the shift scan: it directly tests whether disagreement is concentrated in heterogeneous regions (supporting H004) or is uniform across scene types (supporting H003 or H005). This is cost-effective and provides high diagnostic value because it separates resolution artifacts from algorithm differences.",
+      "predicted_observation": "Agreement_valid computed separately for homogeneous and heterogeneous regions (e.g., by local variance of the cloud mask). If H004 is true, agreement will be significantly lower in heterogeneous regions (e.g., >0.05 lower than in homogeneous regions). If H003 is true, agreement will be uniformly low across both region types. If H005 is true, agreement will be consistent with expected instrument differences and show no systematic heterogeneity effect."
+    },
+    {
+      "evidence_id": "E004",
+      "experiment_id": "EXP_004",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.5370282288185075,
+      "delta": 0.00012999809574332222,
+      "threshold": 0.75,
+      "residual_gap": 0.21297177118149246,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H002"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "shift(dr=-3,dc=2)"
+      },
+      "diagnostic_rationale": "The prior shift tests (E001, E002) only sampled two points (1,1) and (5,5), both showing negligible change. However, a temporal mismatch could produce a shift direction consistent with cloud motion, which may not be diagonal. A systematic shift scan over the full range [-5,5]x[-5,5] will map the agreement surface. If agreement peaks at a non-zero shift (especially anisotropic, e.g., along one axis), H002 is supported; if flat or peaking at (0,0), H002 is weakened. This is a more comprehensive test than the two prior points and directly addresses the temporal hypothesis.",
+      "predicted_observation": "A 2D map of agreement_valid over dr,dc in [-5,5]. If H002 is true, max agreement will exceed baseline by at least 0.05 at some non-zero shift, possibly with a directional pattern. If H002 is false, max agreement will be within 0.01 of baseline and occur at or near (0,0)."
+    },
+    {
+      "evidence_id": "E005",
+      "experiment_id": "EXP_005",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.5368982307227642,
+      "delta": 0.0,
+      "threshold": 0.75,
+      "residual_gap": 0.2131017692772358,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H001",
+        "H002"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "shift(dr=0,dc=0)"
+      },
+      "diagnostic_rationale": "Prior shift tests sampled only three points and showed negligible agreement change, but a full 2D shift scan over the range [-5,5]x[-5,5] is needed to map the agreement surface. If agreement peaks at a non-zero shift, it supports H001 (spatial misalignment) or H002 (temporal mismatch, if the shift is directional and large). If the surface is flat or peaks at (0,0), it weakens both H001 and H002. This is a comprehensive, cost-effective test that directly addresses the most common silent failure modes.",
+      "predicted_observation": "A 2D map of agreement_valid over dr,dc in [-5,5]. If H001 or H002 is true, max agreement will exceed baseline by at least 0.05 at some non-zero shift. If false, max agreement will be within 0.01 of baseline and occur at or near (0,0)."
+    }
+  ],
+  "current_plan": {
+    "plan_id": "PLAN008",
+    "objective": "distinguish H003 (algorithm differences) from H005 (no fault) by retrieving scientific knowledge on expected agreement and known disagreement sources between Meteosat and EPIC cloud masks",
+    "diagnostic_rationale": "The prior knowledge query (Q001) returned no baseline agreement values, and Q002 confirmed algorithm complexity but not expected agreement. A targeted knowledge query on published agreement statistics or known disagreement sources (viewing geometry, spectral bands, resolution) is cheap (cost 1) and directly tests whether 0.537 is within the expected range. If typical agreement is around 0.5-0.6, H005 is supported; if typical agreement is much higher (e.g., >0.8), H003 is supported. This complements the heterogeneity experiment and is materially different from prior queries by focusing on quantitative agreement baselines.",
+    "predicted_observation": "Retrieved documents will report typical agreement values between Meteosat and EPIC cloud masks or discuss known sources of disagreement. If the expected agreement range includes 0.537, H005 is supported; if not, H003 is supported.",
+    "target_hypotheses": [
+      "H003",
+      "H005"
+    ],
+    "tested_scope": [],
+    "tool": "retrieve_scientific_knowledge",
+    "arguments": {
+      "query": "What is the typical agreement between Meteosat SEVIRI and EPIC cloud masks? What are known sources of disagreement such as viewing geometry, spectral bands, or resolution?",
+      "top_k": 5
+    },
+    "expected_evidence": "Measure evidence that distinguishes the target hypotheses.",
+    "model_tested_scope": [],
+    "system_tested_scope": {
+      "kind": "knowledge",
+      "signature": "What is the typical agreement between Meteosat SEVIRI and EPIC cloud masks? What are known sources of disagreement such as viewing geometry, spectral bands, or resolution?"
+    },
+    "coverage": {
+      "hypothesis_ids": [
+        "H003",
+        "H005"
+      ],
+      "system_tested_scope": {
+        "kind": "knowledge",
+        "signature": "What is the typical agreement between Meteosat SEVIRI and EPIC cloud masks? What are known sources of disagreement such as viewing geometry, spectral bands, or resolution?"
+      },
+      "novelty": {
+        "status": "novel"
+      }
+    },
+    "estimated_cost": 1
+  },
+  "budget_blocked": false,
+  "latest_result": {
+    "query_id": "Q003",
+    "plan_id": "PLAN008",
+    "target_hypotheses": [
+      "H003",
+      "H005"
+    ],
+    "diagnostic_rationale": "The prior knowledge query (Q001) returned no baseline agreement values, and Q002 confirmed algorithm complexity but not expected agreement. A targeted knowledge query on published agreement statistics or known disagreement sources (viewing geometry, spectral bands, resolution) is cheap (cost 1) and directly tests whether 0.537 is within the expected range. If typical agreement is around 0.5-0.6, H005 is supported; if typical agreement is much higher (e.g., >0.8), H003 is supported. This complements the heterogeneity experiment and is materially different from prior queries by focusing on quantitative agreement baselines.",
+    "predicted_observation": "Retrieved documents will report typical agreement values between Meteosat and EPIC cloud masks or discuss known sources of disagreement. If the expected agreement range includes 0.537, H005 is supported; if not, H003 is supported.",
+    "tool": "retrieve_scientific_knowledge",
+    "category": "knowledge_query",
+    "cost": 1,
+    "query": "What is the typical agreement between Meteosat SEVIRI and EPIC cloud masks? What are known sources of disagreement such as viewing geometry, spectral bands, or resolution?",
+    "top_k": 5,
+    "hits": [
+      {
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "authority": "official",
+        "version": "v7B e-signed",
+        "section": "3.3 Prototyping",
+        "page": "37",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0098",
+        "excerpt": "In order to support the specification of the algorithms, prototyping has been performed for a subset of\nthe baseline algorithms which are considered as critical for the development of the MPEF.\nFor the following algorithms, the specifications in this document are based on prototype software and\ntest data sets:\n\uf0b7 Radiative Transfer Model (RTM)\n\uf0b7 Scenes Analysis (SCE)\n\uf0b7 Cloud Analysis (CLA)\n\uf0b7 Atmospheric Motion Vectors (AMV)\n\uf0b7 Tropospheric Humidity (TH)\n\uf0b7 Global Instability Index (GII)\n\uf0b7 Sea Surface Temperature (SST)\nThe detailed descriptions of the prototype software and of the test data available for each of these\nalgorithms are included in the relevant algorithm specifications later in this document.\nThe use of simulated SEVIRI test data for prototyping is problematic as some of the spectral channels\nhave not been operated on board a geostationary satellite or are only available at a reduced horizontal\nresolution. The test data used during the prototyping came from the following satellites/instruments:\nMeteosat, GOES-8/VISSR, GOES-8/VAS and NOAA/AVHRR. Test data from the NIR 1.6 \uf06dm and\nthe IR 8.7 \uf06dm channel have not been explored yet.",
+        "retrieval_score": 18.91150564
+      },
+      {
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "authority": "official",
+        "version": "v8 e-signed",
+        "section": "3.1.10 Interchannel Registration",
+        "page": "31",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0052",
+        "excerpt": "The specified and expected registration errors for the same pixel positions in different spectral\nchannels are shown in the following figures. Here also, the figures might need to be updated\nonce the actual behaviour of the MSG S/C in orbit is better characterised. All channels are\nregistered to a common grid with the following accuracy:\n\nChannel Groups Residual\nMisregistration\nRequirement (km)\nResidual Misregistration\nBudget (km)*\nVNIR 0.6 0.45\nWarm\n\n(HRV +VNIR)\n0.6 0.45\nWindow\n\n(IR3.9/IR8.7/IR10.2/IR12.0)\n0.6 0.45\nCold\n\n(All except HRV and VNIR)\n0.75 0.45\nALL 1.5 0.45\n\n*This is comprised of two summed errors, arising from 1) error in the interpolation methods\nused (0.27km) and 2) an error in the SEVIRI focal plane model (0.18km)\n\nNote 1: Distances are at sub-satellite point (SSP).\n\nNote 2: The grid of HRV images is such that 3x3 pixels of the HRV image are registered\nto 1 pixel of the VIS/IR channels.\n\nNote 3: The phenomenon of misregistration is mainly due to the thermo -elastic variations\nwithin the SEVIRI (both between the cold & warm focal planes and to a lesser extent between\nchannels within a given focal plane). The misregistrations characterised on ground are of\nlimited value after the launch, due to its thermal and mechanical influences. Therefore, the onground processing is an auto-adaptive method that continuously re -estimates and corrects the\nfocal plane misregistration based on the newest observations taken from the image. It has a\ntypical integration time of one day, but shorter periods are considered following ecl ipse or\nmanoeuvre situations.",
+        "retrieval_score": 18.85307011
+      },
+      {
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "authority": "official",
+        "version": "v7B e-signed",
+        "section": "22.2.2 Static Application Data",
+        "page": "261",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0665",
+        "excerpt": "EUM/MSG/SPE/022\nv7B e-signed , 23 October 2015\nMSG Meteorological Products Extraction Facility Algorithm\nSpecification Document\n\nand carbon dioxide absorption bands. The GII is produced at a horizontal resolution of approximately\n9 km and the RII at 3 km (at the sub-satellite point). The GII and RII products are distributed via\nEUMETCast.\nThe spectral characteristics of the SEVIRI channels are as follows:\nChannel Band Frequency at\nCentre \uf028\uf06dm)\nSpectral Coverage\n(98-99% of Energy) \uf028\uf06dm)\nNoise Specification\nHRV High resolution visible (0.75) Broadband (peak 0.6 \u2013 0.9) 1.07 W/m 2 sr \uf06dm\nVIS0.6\nVIS0.8\nVisible 0.635\n0.81\n0.56 \u2013 0.71\n0.74 \u2013 0.88\n0.53 W/m 2 sr \uf06dm\n0.49 W/m 2 sr \uf06dm\nIR1.6 Near-Infrared 1.64 1.59 \u2013 1.78 0.25 W/m 2 sr \uf06dm\nIR3.9\nIR8.7\nIR10.8\nIR12.0\nAtmospheric Window 3.92\n8.70\n10.80\n12.00\n3.48 \u2013 4.36\n8.30 \u2013 9.10\n9.80 \u2013 11.80\n11.00 \u2013 13.00",
+        "retrieval_score": 18.59717851
+      },
+      {
+        "source_id": "SATPY_SEVIRI_READER",
+        "title": "Satpy Reading Documentation",
+        "authority": "project_documentation",
+        "version": "unknown",
+        "section": "Available datasets",
+        "page": null,
+        "chunk_id": "SATPY_SEVIRI_READER:0007",
+        "excerpt": "To find out what datasets are available from a reader from the files that were\nprovided to the ``Scene`` use\n:meth:`~satpy.scene.Scene.available_dataset_ids`::\n\n>>> scn.available_dataset_ids()\n\nOr :meth:`~satpy.scene.Scene.available_dataset_names` for just the string\nnames of Datasets::\n\n>>> scn.available_dataset_names()",
+        "retrieval_score": 17.57325286
+      },
+      {
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "authority": "official",
+        "version": "v7B e-signed",
+        "section": "15.4 Overview",
+        "page": "210",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0500",
+        "excerpt": "This algorithm is responsible for the generation of the three data sets (AC, B1 and B2) EUMETSAT\nhas to provide, in its combined role of Meteosat operator and as a Sector Processing Centre (SPC), to\nthe International Satellite Cloud Climatology Project (ISCCP) which is part of the World Climate\nResearch Programme (WCRP) of the World Meteorological Organization (WMO).\nThe objectives of the Meteosat Sector Processing Centre are as follows:\n\uf0b7 To obtain satellite orbital information and calibration data from Meteosat.\n\uf0b7 To acquire the full resolution satellite digital data (A-data) from Meteosat in real-time.\n\uf0b7 To provide samples of full IR resolution data (the AC-data) for geographical areas of about\n2000 km \u00d7 2000 km. About 60 samples of these data, with navigation and calibration data\nappended, are required each year for each satellite, for the purpose of periodically calculating\ninter-satellite normalisation parameters (BC-data). The inter-calibration calculations are\nperformed at the Satellite Calibration Centre (SCC). The times and the geographical areas of the\n60 samples are chosen to produce observations coincident with the overflight of polar orbiters.\nThe coordinates of these samples are supplied by the SCC to each SPC.\n\uf0b7 To provide samples of reduced resolution data (the B1-data) for the full FOV disc. These data\nsets, with navigation and calibration data appended, are to be produced for the synoptic hours\n(every three hours starting with 00:00 UTC) and are processed at the Global Processing Centre\n(GPC) and archived at the ISCCP Central Archive (ICA). The reduction of the resolution of the\ndata is achieved by first averaging (linear mean or RMS) the visible channel pixel counts to the\nresolution of the infrared channel pixel counts and then reducing the IR channel resolution by sub\nsampling the pixels to a nominal resolution of about 10 km spacing at the sub-satellite point.\n\uf0b7\nTo provide samples of further reduced resolution data (the B2-data) for the full FOV disc. These\ndata sets, with navigation and calibration data appended, are to be produced for the synoptic\nhours (every three hours starting with 00:00 UTC) and are processed at the Global Processing\nCentre and archived at the ISCCP Central Archive. The reduction of the resolution of the data is\nachieved by further sub sampling the pixels of the B1-data to a nominal resolution of about 30\nkm spacing at the sub-satellite point.",
+        "retrieval_score": 17.05018277
+      }
+    ]
+  },
+  "budget_total": 30,
+  "budget_remaining": 7,
+  "steps_used": 8,
+  "max_steps": 8,
+  "quality_threshold": 0.75,
+  "reflection": {
+    "decision": "continue",
+    "best_hypothesis_id": null,
+    "unresolved_questions": [
+      "Is the low agreement concentrated in heterogeneous regions, indicating a resolution mismatch?",
+      "What is the expected agreement range for Meteosat vs EPIC cloud masks?"
+    ],
+    "summary": "Shift experiments (E001, E002, E004, E005) show negligible agreement change (max delta 0.00013) across sampled shifts, weakening H001 and H002. Knowledge queries (K001-K015) provide no baseline agreement values, leaving H003/H005 unresolved. The heterogeneity-stratified experiment (EXP_003) was not actually executed; only an identity transform was run. Budget remains 7. Next, run a heterogeneity-stratified comparison to test H004 and distinguish resolution artifacts from algorithm differences."
+  },
+  "diagnosis_status": "max_steps_reached",
+  "validated_decision": "inconclusive",
+  "final_diagnosis": {
+    "decision": "inconclusive",
+    "fault_family": null,
+    "root_cause": "The maximum diagnostic step limit was reached before either a fault repair or a scientifically supported no-fault conclusion was validated.",
+    "confidence": 0.0,
+    "evidence_experiment_ids": [
+      "EXP_001",
+      "EXP_002",
+      "EXP_003",
+      "EXP_004",
+      "EXP_005"
+    ],
+    "recommended_repair": {},
+    "remaining_uncertainty": [
+      "Additional diagnostic experiments or explicit normal-range scientific evidence are required."
+    ],
+    "stop_reason": "max_steps_reached",
+    "evidence_summary": {
+      "experimental_evidence_ids": [
+        "E001",
+        "E002",
+        "E003",
+        "E004",
+        "E005"
+      ],
+      "knowledge_evidence_ids": [
+        "K001",
+        "K002",
+        "K003",
+        "K004",
+        "K005",
+        "K006",
+        "K007",
+        "K008",
+        "K009",
+        "K010",
+        "K011",
+        "K012",
+        "K013",
+        "K014",
+        "K015"
+      ],
+      "final_inference": "The maximum diagnostic step limit was reached before either a fault repair or a scientifically supported no-fault conclusion was validated."
+    }
+  },
+  "stop_reason": "max_steps_reached",
+  "latest_action_kind": "knowledge_query",
+  "knowledge_queries": [
+    {
+      "query_id": "Q001",
+      "plan_id": "PLAN002",
+      "target_hypotheses": [
+        "H003",
+        "H004",
+        "H005"
+      ],
+      "diagnostic_rationale": "A knowledge query on expected agreement between Meteosat and EPIC cloud masks will provide a scientific baseline. If published comparisons typically show agreement around 0.5-0.6, then H005 (no fault) becomes more plausible. If typical agreement is much higher (e.g., >0.8), then a fault is likely, motivating further algorithm or resolution experiments. This is cheap and complements the shift scan.",
+      "predicted_observation": "Retrieved documents will report typical agreement values or discuss known sources of disagreement (viewing geometry, spectral bands, resolution). If the expected agreement range includes 0.537, H005 is supported; if not, H003/H004 are supported.",
+      "tool": "retrieve_scientific_knowledge",
+      "category": "knowledge_query",
+      "cost": 1,
+      "query": "What is the typical agreement between Meteosat and EPIC cloud masks? What causes disagreement?",
+      "top_k": 5,
+      "hits": [
+        {
+          "source_id": "SATPY_SEVIRI_READER",
+          "title": "Satpy Reading Documentation",
+          "authority": "project_documentation",
+          "version": "unknown",
+          "section": "Available datasets",
+          "page": null,
+          "chunk_id": "SATPY_SEVIRI_READER:0007",
+          "excerpt": "To find out what datasets are available from a reader from the files that were\nprovided to the ``Scene`` use\n:meth:`~satpy.scene.Scene.available_dataset_ids`::\n\n>>> scn.available_dataset_ids()\n\nOr :meth:`~satpy.scene.Scene.available_dataset_names` for just the string\nnames of Datasets::\n\n>>> scn.available_dataset_names()",
+          "retrieval_score": 13.44705025
+        },
+        {
+          "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+          "title": "MSG MPEF Algorithm Specification Document",
+          "authority": "official",
+          "version": "v7B e-signed",
+          "section": "18.3.7 Cost Function",
+          "page": "229",
+          "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0578",
+          "excerpt": "The \u2018cost\u2019 or \u2018distance\u2019 function, J, which defines the OCA algorithm method is the sum of two\nparts: the measurement cost (Jm) and the prior cost (Ja).\n\nGiven a current estimate of the state x, Jm is the weighted squared difference of the observed\nmeasurements, ym, and the values y(x) (the estimated measurements). The weights are given by the\nexpected errors in the measurements. Formally, this is written:\n\nJm = (ym \u2013 y(x))T Sy\n-1(ym - y(x)) Equation 50\n\nSimilarly, J a is the weighted squared difference of the prior values of the state, xa, and x; the\nweights being the expected errors in the prior values.\n\nJa = (x - xa)T Sa\n-1 (x - xa)) Equation 51\n\nA high J value therefore indicates that the current state is in disagreement with either the\nmeasurements or the prior information or both. At the minimum value of J, the state has been found\nwhich gives best agreement with both the prior estimate and the measurements. This is the meaning of\nthe statistical \u2018optimality\u2019 of the OCA method.",
+          "retrieval_score": 12.78557143
+        },
+        {
+          "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+          "title": "MSG Level 1.5 Image Data Format Description",
+          "authority": "official",
+          "version": "v8 e-signed",
+          "section": "6.1.6 Geometric Processing Record Summary",
+          "page": "64",
+          "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0094",
+          "excerpt": "This component record of the header provides information for east-west and north-south focal\nplane layouts, the scanning law, the Earth and atmosphere models a nd the resampling\nfunctions.\n\nScanning law data consists of the angles corresponding to the steps of the radiometer which\nthe latter takes in the course of its excursion between the lower and upper thresholds of the\nscanning.\n\nThe Earth model corresponds to the Earth Model used for the Horizons and Landmark\nprocessing as well as for the derivation of the relation of a given observation in the Level 1.0\nimage to physical geographical coordinates.\n\nNote: This Earth Model is not the same than the one underlyi ng the Level 1.5 Projection (that\nonly defines the way the Level 1.5 data is projected on a surface, function of the geographical\ncoordinates).\n\nThe atmospheric model gives values indicating the apparent limits of the atmosphere.\n\nThe resampling function defines what resampling kernel was used for the processing to Level\n1.5.\n\nThe following table gives details of the likely usage of the data and its main characteristics.\nFor full details on the Data Content see Section 7.2.6 Geometric Processing Record.",
+          "retrieval_score": 11.58202984
+        },
+        {
+          "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+          "title": "MSG MPEF Algorithm Specification Document",
+          "authority": "official",
+          "version": "v7B e-signed",
+          "section": "8.3.2.6 Cloud Top Height, Cloud Top Temperature and Effective Cloud Amount",
+          "page": "104",
+          "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0247",
+          "excerpt": "EUM/MSG/SPE/022\nv7B e-signed , 23 October 2015\nMSG Meteorological Products Extraction Facility Algorithm\nSpecification Document\n\n\uf0b7 Calculate the difference between the calculated radiance (from the RTM) of channel IR10.8 and\nthe predicted clear sky radiance of that channel for all pressure levels between the tropopause and\nthe lowest possible cloud level. (RADDIF10.8, calculated (p))\n\uf0b7 Calculate the difference between the calculated radiance (from the RTM) of channel IR13.4 and\nthe predicted clear sky radiance of that channel for all pressure levels between the tropopause and\nthe lowest possible cloud level. (RADDIF13.4, calculated (p))\n\uf0b7 Calculate the difference between the calculated radiance (from the RTM) of channel WV6.2 and\nthe predicted clear sky radiance of that channel for all pressure levels between the tropopause and\nthe lowest possible cloud level. (RADDIF6.2, calculated (p))\n\uf0b7 Calculate the difference between the calculated radiance (from the RTM) of channel WV7.3 and\nthe predicted clear sky radiance of that channel for all pressure levels between the tropopause and\nthe lowest possible cloud level. (RADDIF7.3, calculated (p))\n\uf0b7 Calculate the following ratios for each pressure level between the tropopause and the lowest\npossible cloud level:\nRATIO1 (p) = rat_cor_13.4 * RADDIF13.4, calculated (p) / RADDIF10.8, calculated (p)\nRATIO2 (p) = rat_cor_6.2 * RADDIF6.2, calculated (p) / RADDIF10.8, calculated (p)\nRATIO3 (p) = rat_cor_7.3 * RADDIF7.3, calculated (p) / RADDIF10.8, calculated (p)\nwhere rat_cor_13.4, rat_cor_6.2, rat_cor_7.3 are correction factors given in a static data set.\nThese correction factors depend on the cloud phase.\n\uf0b7 For each of the three channel combinations find the level (LCLD,1 , LCLD,2 , LCLD,3 ) between the\ntropopause and the lowest possible cloud level with the best agreement (minimum difference)\nbetween the ratio with measured radiances (i.e. RATIO1, RATIO2, RATIO3) and the ratio with\ncalculated radiances (i.e. RATIO1 (p) , RATIO2 (p) , RATIO3 (p).\n\uf0b7 For each of the three channel combinations extract the pressure of that level, i.e. the cloud top\nheight in hPa (PCTH 1, 2, 3).\n\uf0b7 For each of the three channel combinations extract the temperature of that level, i.e. the cloud top\ntemperature in kelvin (TCTH 1, 2, 3).\n\uf0b7 For each of the three channel combinations the effective cloud amount (NEFF in units of %) is\nderived as follows:\n- Extract the difference between the calculated radiance and the clear sky radiance in channel\n10.8 at the derived cloud level (RADDIF10.8 , calculated, lcld).\n- Derive the effective cloud amount by building the following ratio:\nNEFF1, 2, 3 = 100 * RADDIF10.8 , measured / RADDIF10.8, calculated, LCLD, 1, 2, 3\nIf the effective cloud amount is larger than neff_max, it shall be reset to neff_max.\nIf the effective cloud amount is smaller than neff_min and if the semi_transp_flag is set to\nopaque, the semi_transp_flag shall be reset to semi-transparent/partly cloudy.\nThe final product output for the cloud top height, the cloud top temperature and the effective cloud\namount will be derived as follows:\n\uf0b7 If the cloud phase is set to ice phase or to mixed phase and if the EBBT measured in channel\nIR10.8 or channel IR12.0 is colder than the predicted EBBT by a threshold DiffBase, then the\ncloud top parameters shall be derived as follows:\nCloud top height, PCTH = a0 + a1 * PCTH1 + a2 * PCTH2 + a3 * PCTH3",
+          "retrieval_score": 11.34188248
+        },
+        {
+          "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+          "title": "MSG Level 1.5 Image Data Format Description",
+          "authority": "official",
+          "version": "v8 e-signed",
+          "section": "7.2.4 Image Description Record",
+          "page": "98",
+          "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0142",
+          "excerpt": "EUM/MSG/ICD/105\nv8 e-signed, 26 September 2017\nMSG Level 1.5 Image Data Format Description\n\nPage 98 of 129\n\nLevel 1_5 ImageProduction:\n\nImageProcDirection defines the direction of the production of the Level 1.5 image in real -time, this\ncorresponding to the actual scanning direction by the Radiometer.\n\nPixelGenDirection defines the direction of the generation of the pixels, therefore indicating if the first pixel in a\nline in the most Eastern or Western one. The default is the most Eastern pixel.\n\nPlannedChanProcessing is an array whose elements indicate for each channel if it is planned to derive 1.5 data\nfrom the received data and what the representation of the data is. If a channel is not processed, this is indicated\nby a 0, if it is processed, but in spectral radiance, then it is set to 1, in effective radiance to 2. Users are reminded\nthat information on r adiometric processing is also provided in the RPSummary record of the Radiametric\nProcessing record.",
+          "retrieval_score": 10.78520096
+        }
+      ]
+    },
+    {
+      "query_id": "Q002",
+      "plan_id": "PLAN007",
+      "target_hypotheses": [
+        "H003",
+        "H005"
+      ],
+      "diagnostic_rationale": "The shift experiments show no spatial misalignment, and the knowledge query (K001-K005) provided no baseline agreement values. To distinguish algorithm differences (H003) from no fault (H005), a knowledge query targeting the specific cloud mask algorithms used by Meteosat and EPIC is needed. If the algorithms are known to differ systematically (e.g., different spectral bands, thresholds, or cloud detection methods), H003 is supported; if the algorithms are expected to produce similar masks, H005 becomes more plausible. This is cheap and complements the heterogeneity experiment.",
+      "predicted_observation": "Retrieved documents will describe the cloud mask algorithms for Meteosat and EPIC, including spectral bands, thresholds, and known limitations. If the algorithms differ significantly, H003 is supported; if they are similar, H005 is supported.",
+      "tool": "retrieve_scientific_knowledge",
+      "category": "knowledge_query",
+      "cost": 1,
+      "query": "What are the cloud mask algorithms used by Meteosat SEVIRI and EPIC? How do their spectral bands and thresholds differ?",
+      "top_k": 5,
+      "hits": [
+        {
+          "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+          "title": "MSG MPEF Algorithm Specification Document",
+          "authority": "official",
+          "version": "v7B e-signed",
+          "section": "1.1 Purpose and Scope of the Specification",
+          "page": "17",
+          "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0051",
+          "excerpt": "This document is the Algorithm Specification Document (ASD) for the Meteosat Second Generation\n(MSG) Meteorological Products Extraction Facility (MPEF).\nThe purpose of this document is to describe the scientific algorithms which will be used to extract the\nMeteorological Products from the pre-processed Level 1.5 image data acquired by the Spinning\nEnhanced Visible and Infra Red Imager (SEVIRI) on board the MSG series of satellites.\nSEVIRI produces images in twelve spectral channels, in the Visible (VIS), Near InfraRed (NIR) and\nInfraRed (IR, along with water vapour (WV)) part of the spectrum covering the following channels:\nVIS 0.6\uf06dm, VIS 0.8\uf06dm, NIR 1.6\uf06dm, IR 3.9\uf06dm, WV 6.2\uf06dm, WV 7.3\uf06dm, IR 8.7\uf06dm, IR 9.7\uf06dm, IR\n10.8\uf06dm, IR 12.0\uf06dm, IR 13.4\uf06dm and High Resolution Visible (HRVIS) channel. The imaging yields a\nresolution of 3\u2009km (at satellite nadir) and 1\u2009km for the HRVIS channel. Further information on the\nSEVIRI instrument and the Level 1.5 image data can be found in [RD1]. This document should be\nunderstood by anyone with a basic university level understanding of Mathematics. A background in\neither Meteorology or Remote Sensing is also required in order to understand the more detailed\nscientific requirements.\nThis document provides detailed scientific requirements for the algorithms; however, the requirements\nwill need some interpretation by the contractor in order for the algorithms to be implemented.\nThis document describes the algorithms in sufficient detail to ensure that their implementation is\nscientifically correct, but does not attempt to impose an overall software design.",
+          "retrieval_score": 19.62368747
+        },
+        {
+          "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+          "title": "MSG MPEF Algorithm Specification Document",
+          "authority": "official",
+          "version": "v7B e-signed",
+          "section": "3.3 Prototyping",
+          "page": "37",
+          "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0098",
+          "excerpt": "In order to support the specification of the algorithms, prototyping has been performed for a subset of\nthe baseline algorithms which are considered as critical for the development of the MPEF.\nFor the following algorithms, the specifications in this document are based on prototype software and\ntest data sets:\n\uf0b7 Radiative Transfer Model (RTM)\n\uf0b7 Scenes Analysis (SCE)\n\uf0b7 Cloud Analysis (CLA)\n\uf0b7 Atmospheric Motion Vectors (AMV)\n\uf0b7 Tropospheric Humidity (TH)\n\uf0b7 Global Instability Index (GII)\n\uf0b7 Sea Surface Temperature (SST)\nThe detailed descriptions of the prototype software and of the test data available for each of these\nalgorithms are included in the relevant algorithm specifications later in this document.\nThe use of simulated SEVIRI test data for prototyping is problematic as some of the spectral channels\nhave not been operated on board a geostationary satellite or are only available at a reduced horizontal\nresolution. The test data used during the prototyping came from the following satellites/instruments:\nMeteosat, GOES-8/VISSR, GOES-8/VAS and NOAA/AVHRR. Test data from the NIR 1.6 \uf06dm and\nthe IR 8.7 \uf06dm channel have not been explored yet.",
+          "retrieval_score": 19.61748025
+        },
+        {
+          "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+          "title": "MSG MPEF Algorithm Specification Document",
+          "authority": "official",
+          "version": "v7B e-signed",
+          "section": "3.1 Overview",
+          "page": "30",
+          "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0087",
+          "excerpt": "There are two types of algorithms which are specified in this document \uf02d those which have been\nprototyped and those which have not.\nThe algorithms which have been prototyped are those for which there is a high scientific content.\nWhere the existing MOP or MTP algorithms have required significant modifications, or completely\nnew algorithms have been developed, prototyping has been used to ensure that these new or modified\nalgorithms are scientifically valid, can produce the expected results, and can meet the required\naccuracy criteria.\nThe remaining algorithms, which have not been prototyped, perform much simpler, non-scientific\ntasks like reformatting of data, and thus do not need the same level of investigation and testing as the\nformer category.\nThe current issue of the ASD covers the specifications of the following products to be generated by\nthe MPEF. These products form the baseline for the MSG MPEF development:\n\uf0b7 Atmospheric Motion Vectors (AMV)\n\uf0b7 Cloud Analysis (CLA)\n\uf0b7 Cloud Analysis Image (CLAI)\n\uf0b7 Cloud Top Height (CTH)\n\uf0b7 Clear Sky Radiances (CSR)\n\uf0b7 Climate Data Set (CDS)\n\uf0b7 High Resolution Precipitation Index (HPI)\n\uf0b7 ISCCP Data Set (IDS)\n\uf0b7 Tropospheric Humidity (TH)\n\uf0b7 Calibration Monitoring Data (CAL)\nFurthermore, specifications for other products are also included in the current issue of the ASD. These\nproducts will be used in the internal product generation process, but will not be distributed to the endusers. If the baseline changes it shall\nbe required to distribute these products as well:\n\uf0b7 Sea Surface Temperature (SST)\nThe following products are new and have been added to the ASD during the course of the MPEF\ndevelopment:\n\uf0b7 Aerosol Properties Over Sea (AES)\n\uf0b7 All Sky Radiances (ASR)\n\uf0b7 Cloud Mask (CLM)\n\uf0b7 Clear Sky Reflectance Map (CRM)\n\uf0b7 Divergence (DIV)",
+          "retrieval_score": 18.06973878
+        },
+        {
+          "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+          "title": "MSG MPEF Algorithm Specification Document",
+          "authority": "official",
+          "version": "v7B e-signed",
+          "section": "18.3.5 The Measurements (y)",
+          "page": "228",
+          "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0575",
+          "excerpt": "The measurement vector, ym, constitutes all the single pixel measurements from the sensor; thus 11\nfor SEVIRI. The values are \u201csolar angle uncorrected\u201d reflectance for wavelengths to 3 \u03bcm and\nbrightness temperatures thereafter. The measurements are weighted in the retrieval by their errors,\n(Sy). It is important to note that the definition of error here refers to the ability of the forward model\nto reproduce the measurements since this defines how close a fit is expected. Thus the error should in\nprinciple include:\n\uf0b7 instrument noise\n\uf0b7 channel co-registration effects\n\uf0b7 effects of deviations from the OCA cloud model\n\uf0b7 effects of errors in ancillary model parameters",
+          "retrieval_score": 17.22242602
+        },
+        {
+          "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+          "title": "MSG Level 1.5 Image Data Format Description",
+          "authority": "official",
+          "version": "v8 e-signed",
+          "section": "3.1.1 Spectral Bands",
+          "page": "19",
+          "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0032",
+          "excerpt": "The 12 SEVIRI images channel correspond to the following spectral bands. The following table\npresents the spectral characteristics, the dynamic range, the operating temperature of the\ndetectors, the number of detectors simultaneously acquiring image informatio n during each\nsatellite revolution and the sampling distance of the Level 1.0 image data:",
+          "retrieval_score": 15.25201448
+        }
+      ]
+    },
+    {
+      "query_id": "Q003",
+      "plan_id": "PLAN008",
+      "target_hypotheses": [
+        "H003",
+        "H005"
+      ],
+      "diagnostic_rationale": "The prior knowledge query (Q001) returned no baseline agreement values, and Q002 confirmed algorithm complexity but not expected agreement. A targeted knowledge query on published agreement statistics or known disagreement sources (viewing geometry, spectral bands, resolution) is cheap (cost 1) and directly tests whether 0.537 is within the expected range. If typical agreement is around 0.5-0.6, H005 is supported; if typical agreement is much higher (e.g., >0.8), H003 is supported. This complements the heterogeneity experiment and is materially different from prior queries by focusing on quantitative agreement baselines.",
+      "predicted_observation": "Retrieved documents will report typical agreement values between Meteosat and EPIC cloud masks or discuss known sources of disagreement. If the expected agreement range includes 0.537, H005 is supported; if not, H003 is supported.",
+      "tool": "retrieve_scientific_knowledge",
+      "category": "knowledge_query",
+      "cost": 1,
+      "query": "What is the typical agreement between Meteosat SEVIRI and EPIC cloud masks? What are known sources of disagreement such as viewing geometry, spectral bands, or resolution?",
+      "top_k": 5,
+      "hits": [
+        {
+          "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+          "title": "MSG MPEF Algorithm Specification Document",
+          "authority": "official",
+          "version": "v7B e-signed",
+          "section": "3.3 Prototyping",
+          "page": "37",
+          "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0098",
+          "excerpt": "In order to support the specification of the algorithms, prototyping has been performed for a subset of\nthe baseline algorithms which are considered as critical for the development of the MPEF.\nFor the following algorithms, the specifications in this document are based on prototype software and\ntest data sets:\n\uf0b7 Radiative Transfer Model (RTM)\n\uf0b7 Scenes Analysis (SCE)\n\uf0b7 Cloud Analysis (CLA)\n\uf0b7 Atmospheric Motion Vectors (AMV)\n\uf0b7 Tropospheric Humidity (TH)\n\uf0b7 Global Instability Index (GII)\n\uf0b7 Sea Surface Temperature (SST)\nThe detailed descriptions of the prototype software and of the test data available for each of these\nalgorithms are included in the relevant algorithm specifications later in this document.\nThe use of simulated SEVIRI test data for prototyping is problematic as some of the spectral channels\nhave not been operated on board a geostationary satellite or are only available at a reduced horizontal\nresolution. The test data used during the prototyping came from the following satellites/instruments:\nMeteosat, GOES-8/VISSR, GOES-8/VAS and NOAA/AVHRR. Test data from the NIR 1.6 \uf06dm and\nthe IR 8.7 \uf06dm channel have not been explored yet.",
+          "retrieval_score": 18.91150564
+        },
+        {
+          "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+          "title": "MSG Level 1.5 Image Data Format Description",
+          "authority": "official",
+          "version": "v8 e-signed",
+          "section": "3.1.10 Interchannel Registration",
+          "page": "31",
+          "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0052",
+          "excerpt": "The specified and expected registration errors for the same pixel positions in different spectral\nchannels are shown in the following figures. Here also, the figures might need to be updated\nonce the actual behaviour of the MSG S/C in orbit is better characterised. All channels are\nregistered to a common grid with the following accuracy:\n\nChannel Groups Residual\nMisregistration\nRequirement (km)\nResidual Misregistration\nBudget (km)*\nVNIR 0.6 0.45\nWarm\n\n(HRV +VNIR)\n0.6 0.45\nWindow\n\n(IR3.9/IR8.7/IR10.2/IR12.0)\n0.6 0.45\nCold\n\n(All except HRV and VNIR)\n0.75 0.45\nALL 1.5 0.45\n\n*This is comprised of two summed errors, arising from 1) error in the interpolation methods\nused (0.27km) and 2) an error in the SEVIRI focal plane model (0.18km)\n\nNote 1: Distances are at sub-satellite point (SSP).\n\nNote 2: The grid of HRV images is such that 3x3 pixels of the HRV image are registered\nto 1 pixel of the VIS/IR channels.\n\nNote 3: The phenomenon of misregistration is mainly due to the thermo -elastic variations\nwithin the SEVIRI (both between the cold & warm focal planes and to a lesser extent between\nchannels within a given focal plane). The misregistrations characterised on ground are of\nlimited value after the launch, due to its thermal and mechanical influences. Therefore, the onground processing is an auto-adaptive method that continuously re -estimates and corrects the\nfocal plane misregistration based on the newest observations taken from the image. It has a\ntypical integration time of one day, but shorter periods are considered following ecl ipse or\nmanoeuvre situations.",
+          "retrieval_score": 18.85307011
+        },
+        {
+          "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+          "title": "MSG MPEF Algorithm Specification Document",
+          "authority": "official",
+          "version": "v7B e-signed",
+          "section": "22.2.2 Static Application Data",
+          "page": "261",
+          "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0665",
+          "excerpt": "EUM/MSG/SPE/022\nv7B e-signed , 23 October 2015\nMSG Meteorological Products Extraction Facility Algorithm\nSpecification Document\n\nand carbon dioxide absorption bands. The GII is produced at a horizontal resolution of approximately\n9 km and the RII at 3 km (at the sub-satellite point). The GII and RII products are distributed via\nEUMETCast.\nThe spectral characteristics of the SEVIRI channels are as follows:\nChannel Band Frequency at\nCentre \uf028\uf06dm)\nSpectral Coverage\n(98-99% of Energy) \uf028\uf06dm)\nNoise Specification\nHRV High resolution visible (0.75) Broadband (peak 0.6 \u2013 0.9) 1.07 W/m 2 sr \uf06dm\nVIS0.6\nVIS0.8\nVisible 0.635\n0.81\n0.56 \u2013 0.71\n0.74 \u2013 0.88\n0.53 W/m 2 sr \uf06dm\n0.49 W/m 2 sr \uf06dm\nIR1.6 Near-Infrared 1.64 1.59 \u2013 1.78 0.25 W/m 2 sr \uf06dm\nIR3.9\nIR8.7\nIR10.8\nIR12.0\nAtmospheric Window 3.92\n8.70\n10.80\n12.00\n3.48 \u2013 4.36\n8.30 \u2013 9.10\n9.80 \u2013 11.80\n11.00 \u2013 13.00",
+          "retrieval_score": 18.59717851
+        },
+        {
+          "source_id": "SATPY_SEVIRI_READER",
+          "title": "Satpy Reading Documentation",
+          "authority": "project_documentation",
+          "version": "unknown",
+          "section": "Available datasets",
+          "page": null,
+          "chunk_id": "SATPY_SEVIRI_READER:0007",
+          "excerpt": "To find out what datasets are available from a reader from the files that were\nprovided to the ``Scene`` use\n:meth:`~satpy.scene.Scene.available_dataset_ids`::\n\n>>> scn.available_dataset_ids()\n\nOr :meth:`~satpy.scene.Scene.available_dataset_names` for just the string\nnames of Datasets::\n\n>>> scn.available_dataset_names()",
+          "retrieval_score": 17.57325286
+        },
+        {
+          "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+          "title": "MSG MPEF Algorithm Specification Document",
+          "authority": "official",
+          "version": "v7B e-signed",
+          "section": "15.4 Overview",
+          "page": "210",
+          "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0500",
+          "excerpt": "This algorithm is responsible for the generation of the three data sets (AC, B1 and B2) EUMETSAT\nhas to provide, in its combined role of Meteosat operator and as a Sector Processing Centre (SPC), to\nthe International Satellite Cloud Climatology Project (ISCCP) which is part of the World Climate\nResearch Programme (WCRP) of the World Meteorological Organization (WMO).\nThe objectives of the Meteosat Sector Processing Centre are as follows:\n\uf0b7 To obtain satellite orbital information and calibration data from Meteosat.\n\uf0b7 To acquire the full resolution satellite digital data (A-data) from Meteosat in real-time.\n\uf0b7 To provide samples of full IR resolution data (the AC-data) for geographical areas of about\n2000 km \u00d7 2000 km. About 60 samples of these data, with navigation and calibration data\nappended, are required each year for each satellite, for the purpose of periodically calculating\ninter-satellite normalisation parameters (BC-data). The inter-calibration calculations are\nperformed at the Satellite Calibration Centre (SCC). The times and the geographical areas of the\n60 samples are chosen to produce observations coincident with the overflight of polar orbiters.\nThe coordinates of these samples are supplied by the SCC to each SPC.\n\uf0b7 To provide samples of reduced resolution data (the B1-data) for the full FOV disc. These data\nsets, with navigation and calibration data appended, are to be produced for the synoptic hours\n(every three hours starting with 00:00 UTC) and are processed at the Global Processing Centre\n(GPC) and archived at the ISCCP Central Archive (ICA). The reduction of the resolution of the\ndata is achieved by first averaging (linear mean or RMS) the visible channel pixel counts to the\nresolution of the infrared channel pixel counts and then reducing the IR channel resolution by sub\nsampling the pixels to a nominal resolution of about 10 km spacing at the sub-satellite point.\n\uf0b7\nTo provide samples of further reduced resolution data (the B2-data) for the full FOV disc. These\ndata sets, with navigation and calibration data appended, are to be produced for the synoptic\nhours (every three hours starting with 00:00 UTC) and are processed at the Global Processing\nCentre and archived at the ISCCP Central Archive. The reduction of the resolution of the data is\nachieved by further sub sampling the pixels of the B1-data to a nominal resolution of about 30\nkm spacing at the sub-satellite point.",
+          "retrieval_score": 17.05018277
+        }
+      ]
+    }
+  ],
+  "knowledge_evidence": [
+    {
+      "evidence_id": "K001",
+      "kind": "knowledge",
+      "query_id": "Q001",
+      "source": {
+        "source_id": "SATPY_SEVIRI_READER",
+        "title": "Satpy Reading Documentation",
+        "authority": "project_documentation",
+        "version": "unknown",
+        "section": "Available datasets",
+        "page": null,
+        "chunk_id": "SATPY_SEVIRI_READER:0007"
+      },
+      "claim": "Satpy documentation describes dataset availability but provides no information on expected agreement or disagreement sources between Meteosat and EPIC cloud masks.",
+      "supports_hypotheses": [],
+      "contradicts_hypotheses": [],
+      "validated": false,
+      "excerpt": "To find out what datasets are available from a reader from the files that were\nprovided to the ``Scene`` use\n:meth:`~satpy.scene.Scene.available_dataset_ids`::\n\n>>> scn.available_dataset_ids()\n\nOr :meth:`~satpy.scene.Scene.available_dataset_names` for just the string\nnames of Datasets::\n\n>>> scn.available_dataset_names()",
+      "retrieval_score": 13.44705025,
+      "target_hypotheses": [
+        "H003",
+        "H004",
+        "H005"
+      ]
+    },
+    {
+      "evidence_id": "K002",
+      "kind": "knowledge",
+      "query_id": "Q001",
+      "source": {
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "authority": "official",
+        "version": "v7B e-signed",
+        "section": "18.3.7 Cost Function",
+        "page": "229",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0578"
+      },
+      "claim": "The MSG OCA algorithm uses a cost function combining measurement and prior terms; this describes internal optimization, not cross-instrument agreement, and does not address Meteosat-EPIC comparison.",
+      "supports_hypotheses": [],
+      "contradicts_hypotheses": [],
+      "validated": false,
+      "excerpt": "The \u2018cost\u2019 or \u2018distance\u2019 function, J, which defines the OCA algorithm method is the sum of two\nparts: the measurement cost (Jm) and the prior cost (Ja).\n\nGiven a current estimate of the state x, Jm is the weighted squared difference of the observed\nmeasurements, ym, and the values y(x) (the estimated measurements). The weights are given by the\nexpected errors in the measurements. Formally, this is written:\n\nJm = (ym \u2013 y(x))T Sy\n-1(ym - y(x)) Equation 50\n\nSimilarly, J a is the weighted squared difference of the prior values of the state, xa, and x; the\nweights being the expected errors in the prior values.\n\nJa = (x - xa)T Sa\n-1 (x - xa)) Equation 51\n\nA high J value therefore indicates that the current state is in disagreement with either the\nmeasurements or the prior information or both. At the minimum value of J, the state has been found\nwhich gives best agreement with both the prior estimate and the measurements. This is the meaning of\nthe statistical \u2018optimality\u2019 of the OCA method.",
+      "retrieval_score": 12.78557143,
+      "target_hypotheses": [
+        "H003",
+        "H004",
+        "H005"
+      ]
+    },
+    {
+      "evidence_id": "K003",
+      "kind": "knowledge",
+      "query_id": "Q001",
+      "source": {
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "authority": "official",
+        "version": "v8 e-signed",
+        "section": "6.1.6 Geometric Processing Record Summary",
+        "page": "64",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0094"
+      },
+      "claim": "MSG Level 1.5 geometric processing includes Earth model, resampling kernel, and scanning law details; this indicates potential sources of geometric/resampling differences but does not quantify expected agreement with EPIC.",
+      "supports_hypotheses": [],
+      "contradicts_hypotheses": [],
+      "validated": false,
+      "excerpt": "This component record of the header provides information for east-west and north-south focal\nplane layouts, the scanning law, the Earth and atmosphere models a nd the resampling\nfunctions.\n\nScanning law data consists of the angles corresponding to the steps of the radiometer which\nthe latter takes in the course of its excursion between the lower and upper thresholds of the\nscanning.\n\nThe Earth model corresponds to the Earth Model used for the Horizons and Landmark\nprocessing as well as for the derivation of the relation of a given observation in the Level 1.0\nimage to physical geographical coordinates.\n\nNote: This Earth Model is not the same than the one underlyi ng the Level 1.5 Projection (that\nonly defines the way the Level 1.5 data is projected on a surface, function of the geographical\ncoordinates).\n\nThe atmospheric model gives values indicating the apparent limits of the atmosphere.\n\nThe resampling function defines what resampling kernel was used for the processing to Level\n1.5.\n\nThe following table gives details of the likely usage of the data and its main characteristics.\nFor full details on the Data Content see Section 7.2.6 Geometric Processing Record.",
+      "retrieval_score": 11.58202984,
+      "target_hypotheses": [
+        "H003",
+        "H004",
+        "H005"
+      ]
+    },
+    {
+      "evidence_id": "K004",
+      "kind": "knowledge",
+      "query_id": "Q001",
+      "source": {
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "authority": "official",
+        "version": "v7B e-signed",
+        "section": "8.3.2.6 Cloud Top Height, Cloud Top Temperature and Effective Cloud Amount",
+        "page": "104",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0247"
+      },
+      "claim": "The MSG cloud-top algorithm uses multiple IR channels and radiative transfer; this documents algorithm complexity but provides no baseline agreement values for comparison with EPIC.",
+      "supports_hypotheses": [],
+      "contradicts_hypotheses": [],
+      "validated": false,
+      "excerpt": "EUM/MSG/SPE/022\nv7B e-signed , 23 October 2015\nMSG Meteorological Products Extraction Facility Algorithm\nSpecification Document\n\n\uf0b7 Calculate the difference between the calculated radiance (from the RTM) of channel IR10.8 and\nthe predicted clear sky radiance of that channel for all pressure levels between the tropopause and\nthe lowest possible cloud level. (RADDIF10.8, calculated (p))\n\uf0b7 Calculate the difference between the calculated radiance (from the RTM) of channel IR13.4 and\nthe predicted clear sky radiance of that channel for all pressure levels between the tropopause and\nthe lowest possible cloud level. (RADDIF13.4, calculated (p))\n\uf0b7 Calculate the difference between the calculated radiance (from the RTM) of channel WV6.2 and\nthe predicted clear sky radiance of that channel for all pressure levels between the tropopause and\nthe lowest possible cloud level. (RADDIF6.2, calculated (p))\n\uf0b7 Calculate the difference between the calculated radiance (from the RTM) of channel WV7.3 and\nthe predicted clear sky radiance of that channel for all pressure levels between the tropopause and\nthe lowest possible cloud level. (RADDIF7.3, calculated (p))\n\uf0b7 Calculate the following ratios for each pressure level between the tropopause and the lowest\npossible cloud level:\nRATIO1 (p) = rat_cor_13.4 * RADDIF13.4, calculated (p) / RADDIF10.8, calculated (p)\nRATIO2 (p) = rat_cor_6.2 * RADDIF6.2, calculated (p) / RADDIF10.8, calculated (p)\nRATIO3 (p) = rat_cor_7.3 * RADDIF7.3, calculated (p) / RADDIF10.8, calculated (p)\nwhere rat_cor_13.4, rat_cor_6.2, rat_cor_7.3 are correction factors given in a static data set.\nThese correction factors depend on the cloud phase.\n\uf0b7 For each of the three channel combinations find the level (LCLD,1 , LCLD,2 , LCLD,3 ) between the\ntropopause and the lowest possible cloud level with the best agreement (minimum difference)\nbetween the ratio with measured radiances (i.e. RATIO1, RATIO2, RATIO3) and the ratio with\ncalculated radiances (i.e. RATIO1 (p) , RATIO2 (p) , RATIO3 (p).\n\uf0b7 For each of the three channel combinations extract the pressure of that level, i.e. the cloud top\nheight in hPa (PCTH 1, 2, 3).\n\uf0b7 For each of the three channel combinations extract the temperature of that level, i.e. the cloud top\ntemperature in kelvin (TCTH 1, 2, 3).\n\uf0b7 For each of the three channel combinations the effective cloud amount (NEFF in units of %) is\nderived as follows:\n- Extract the difference between the calculated radiance and the clear sky radiance in channel\n10.8 at the derived cloud level (RADDIF10.8 , calculated, lcld).\n- Derive the effective cloud amount by building the following ratio:\nNEFF1, 2, 3 = 100 * RADDIF10.8 , measured / RADDIF10.8, calculated, LCLD, 1, 2, 3\nIf the effective cloud amount is larger than neff_max, it shall be reset to neff_max.\nIf the effective cloud amount is smaller than neff_min and if the semi_transp_flag is set to\nopaque, the semi_transp_flag shall be reset to semi-transparent/partly cloudy.\nThe final product output for the cloud top height, the cloud top temperature and the effective cloud\namount will be derived as follows:\n\uf0b7 If the cloud phase is set to ice phase or to mixed phase and if the EBBT measured in channel\nIR10.8 or channel IR12.0 is colder than the predicted EBBT by a threshold DiffBase, then the\ncloud top parameters shall be derived as follows:\nCloud top height, PCTH = a0 + a1 * PCTH1 + a2 * PCTH2 + a3 * PCTH3",
+      "retrieval_score": 11.34188248,
+      "target_hypotheses": [
+        "H003",
+        "H004",
+        "H005"
+      ]
+    },
+    {
+      "evidence_id": "K005",
+      "kind": "knowledge",
+      "query_id": "Q001",
+      "source": {
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "authority": "official",
+        "version": "v8 e-signed",
+        "section": "7.2.4 Image Description Record",
+        "page": "98",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0142"
+      },
+      "claim": "MSG Level 1.5 image production includes pixel generation direction and channel processing details; this describes data format but does not address expected agreement or disagreement with EPIC.",
+      "supports_hypotheses": [],
+      "contradicts_hypotheses": [],
+      "validated": false,
+      "excerpt": "EUM/MSG/ICD/105\nv8 e-signed, 26 September 2017\nMSG Level 1.5 Image Data Format Description\n\nPage 98 of 129\n\nLevel 1_5 ImageProduction:\n\nImageProcDirection defines the direction of the production of the Level 1.5 image in real -time, this\ncorresponding to the actual scanning direction by the Radiometer.\n\nPixelGenDirection defines the direction of the generation of the pixels, therefore indicating if the first pixel in a\nline in the most Eastern or Western one. The default is the most Eastern pixel.\n\nPlannedChanProcessing is an array whose elements indicate for each channel if it is planned to derive 1.5 data\nfrom the received data and what the representation of the data is. If a channel is not processed, this is indicated\nby a 0, if it is processed, but in spectral radiance, then it is set to 1, in effective radiance to 2. Users are reminded\nthat information on r adiometric processing is also provided in the RPSummary record of the Radiametric\nProcessing record.",
+      "retrieval_score": 10.78520096,
+      "target_hypotheses": [
+        "H003",
+        "H004",
+        "H005"
+      ]
+    },
+    {
+      "evidence_id": "K006",
+      "kind": "knowledge",
+      "query_id": "Q002",
+      "source": {
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "authority": "official",
+        "version": "v7B e-signed",
+        "section": "1.1 Purpose and Scope of the Specification",
+        "page": "17",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0051"
+      },
+      "claim": "SEVIRI has 12 spectral channels (VIS, NIR, IR, WV) at 3 km resolution; this documents instrument complexity and algorithm specification, supporting that cloud mask algorithm differences (H003) are plausible and that inherent instrument differences (H005) are expected.",
+      "supports_hypotheses": [],
+      "contradicts_hypotheses": [],
+      "validated": false,
+      "excerpt": "This document is the Algorithm Specification Document (ASD) for the Meteosat Second Generation\n(MSG) Meteorological Products Extraction Facility (MPEF).\nThe purpose of this document is to describe the scientific algorithms which will be used to extract the\nMeteorological Products from the pre-processed Level 1.5 image data acquired by the Spinning\nEnhanced Visible and Infra Red Imager (SEVIRI) on board the MSG series of satellites.\nSEVIRI produces images in twelve spectral channels, in the Visible (VIS), Near InfraRed (NIR) and\nInfraRed (IR, along with water vapour (WV)) part of the spectrum covering the following channels:\nVIS 0.6\uf06dm, VIS 0.8\uf06dm, NIR 1.6\uf06dm, IR 3.9\uf06dm, WV 6.2\uf06dm, WV 7.3\uf06dm, IR 8.7\uf06dm, IR 9.7\uf06dm, IR\n10.8\uf06dm, IR 12.0\uf06dm, IR 13.4\uf06dm and High Resolution Visible (HRVIS) channel. The imaging yields a\nresolution of 3\u2009km (at satellite nadir) and 1\u2009km for the HRVIS channel. Further information on the\nSEVIRI instrument and the Level 1.5 image data can be found in [RD1]. This document should be\nunderstood by anyone with a basic university level understanding of Mathematics. A background in\neither Meteorology or Remote Sensing is also required in order to understand the more detailed\nscientific requirements.\nThis document provides detailed scientific requirements for the algorithms; however, the requirements\nwill need some interpretation by the contractor in order for the algorithms to be implemented.\nThis document describes the algorithms in sufficient detail to ensure that their implementation is\nscientifically correct, but does not attempt to impose an overall software design.",
+      "retrieval_score": 19.62368747,
+      "target_hypotheses": [
+        "H003",
+        "H005"
+      ]
+    },
+    {
+      "evidence_id": "K007",
+      "kind": "knowledge",
+      "query_id": "Q002",
+      "source": {
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "authority": "official",
+        "version": "v7B e-signed",
+        "section": "3.3 Prototyping",
+        "page": "37",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0098"
+      },
+      "claim": "SEVIRI cloud algorithms were prototyped using data from other instruments (Meteosat, GOES, AVHRR), indicating algorithm development and potential differences from EPIC; supports H003 and H005.",
+      "supports_hypotheses": [],
+      "contradicts_hypotheses": [],
+      "validated": false,
+      "excerpt": "In order to support the specification of the algorithms, prototyping has been performed for a subset of\nthe baseline algorithms which are considered as critical for the development of the MPEF.\nFor the following algorithms, the specifications in this document are based on prototype software and\ntest data sets:\n\uf0b7 Radiative Transfer Model (RTM)\n\uf0b7 Scenes Analysis (SCE)\n\uf0b7 Cloud Analysis (CLA)\n\uf0b7 Atmospheric Motion Vectors (AMV)\n\uf0b7 Tropospheric Humidity (TH)\n\uf0b7 Global Instability Index (GII)\n\uf0b7 Sea Surface Temperature (SST)\nThe detailed descriptions of the prototype software and of the test data available for each of these\nalgorithms are included in the relevant algorithm specifications later in this document.\nThe use of simulated SEVIRI test data for prototyping is problematic as some of the spectral channels\nhave not been operated on board a geostationary satellite or are only available at a reduced horizontal\nresolution. The test data used during the prototyping came from the following satellites/instruments:\nMeteosat, GOES-8/VISSR, GOES-8/VAS and NOAA/AVHRR. Test data from the NIR 1.6 \uf06dm and\nthe IR 8.7 \uf06dm channel have not been explored yet.",
+      "retrieval_score": 19.61748025,
+      "target_hypotheses": [
+        "H003",
+        "H005"
+      ]
+    },
+    {
+      "evidence_id": "K008",
+      "kind": "knowledge",
+      "query_id": "Q002",
+      "source": {
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "authority": "official",
+        "version": "v7B e-signed",
+        "section": "3.1 Overview",
+        "page": "30",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0087"
+      },
+      "claim": "The MSG MPEF includes a dedicated Cloud Mask (CLM) product with its own algorithm, distinct from other products; this supports that algorithm differences (H003) are a plausible source of disagreement and that inherent differences (H005) are expected.",
+      "supports_hypotheses": [],
+      "contradicts_hypotheses": [],
+      "validated": false,
+      "excerpt": "There are two types of algorithms which are specified in this document \uf02d those which have been\nprototyped and those which have not.\nThe algorithms which have been prototyped are those for which there is a high scientific content.\nWhere the existing MOP or MTP algorithms have required significant modifications, or completely\nnew algorithms have been developed, prototyping has been used to ensure that these new or modified\nalgorithms are scientifically valid, can produce the expected results, and can meet the required\naccuracy criteria.\nThe remaining algorithms, which have not been prototyped, perform much simpler, non-scientific\ntasks like reformatting of data, and thus do not need the same level of investigation and testing as the\nformer category.\nThe current issue of the ASD covers the specifications of the following products to be generated by\nthe MPEF. These products form the baseline for the MSG MPEF development:\n\uf0b7 Atmospheric Motion Vectors (AMV)\n\uf0b7 Cloud Analysis (CLA)\n\uf0b7 Cloud Analysis Image (CLAI)\n\uf0b7 Cloud Top Height (CTH)\n\uf0b7 Clear Sky Radiances (CSR)\n\uf0b7 Climate Data Set (CDS)\n\uf0b7 High Resolution Precipitation Index (HPI)\n\uf0b7 ISCCP Data Set (IDS)\n\uf0b7 Tropospheric Humidity (TH)\n\uf0b7 Calibration Monitoring Data (CAL)\nFurthermore, specifications for other products are also included in the current issue of the ASD. These\nproducts will be used in the internal product generation process, but will not be distributed to the endusers. If the baseline changes it shall\nbe required to distribute these products as well:\n\uf0b7 Sea Surface Temperature (SST)\nThe following products are new and have been added to the ASD during the course of the MPEF\ndevelopment:\n\uf0b7 Aerosol Properties Over Sea (AES)\n\uf0b7 All Sky Radiances (ASR)\n\uf0b7 Cloud Mask (CLM)\n\uf0b7 Clear Sky Reflectance Map (CRM)\n\uf0b7 Divergence (DIV)",
+      "retrieval_score": 18.06973878,
+      "target_hypotheses": [
+        "H003",
+        "H005"
+      ]
+    },
+    {
+      "evidence_id": "K009",
+      "kind": "knowledge",
+      "query_id": "Q002",
+      "source": {
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "authority": "official",
+        "version": "v7B e-signed",
+        "section": "18.3.5 The Measurements (y)",
+        "page": "228",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0575"
+      },
+      "claim": "SEVIRI measurements include 11 channels with solar-angle-uncorrected reflectance and brightness temperatures, and error sources include instrument noise and co-registration; this supports algorithm complexity (H003) and inherent instrument differences (H005).",
+      "supports_hypotheses": [],
+      "contradicts_hypotheses": [],
+      "validated": false,
+      "excerpt": "The measurement vector, ym, constitutes all the single pixel measurements from the sensor; thus 11\nfor SEVIRI. The values are \u201csolar angle uncorrected\u201d reflectance for wavelengths to 3 \u03bcm and\nbrightness temperatures thereafter. The measurements are weighted in the retrieval by their errors,\n(Sy). It is important to note that the definition of error here refers to the ability of the forward model\nto reproduce the measurements since this defines how close a fit is expected. Thus the error should in\nprinciple include:\n\uf0b7 instrument noise\n\uf0b7 channel co-registration effects\n\uf0b7 effects of deviations from the OCA cloud model\n\uf0b7 effects of errors in ancillary model parameters",
+      "retrieval_score": 17.22242602,
+      "target_hypotheses": [
+        "H003",
+        "H005"
+      ]
+    },
+    {
+      "evidence_id": "K010",
+      "kind": "knowledge",
+      "query_id": "Q002",
+      "source": {
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "authority": "official",
+        "version": "v8 e-signed",
+        "section": "3.1.1 Spectral Bands",
+        "page": "19",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0032"
+      },
+      "claim": "SEVIRI has 12 spectral bands with specific characteristics; this documents spectral differences from EPIC, supporting algorithm differences (H003) and inherent instrument differences (H005).",
+      "supports_hypotheses": [],
+      "contradicts_hypotheses": [],
+      "validated": false,
+      "excerpt": "The 12 SEVIRI images channel correspond to the following spectral bands. The following table\npresents the spectral characteristics, the dynamic range, the operating temperature of the\ndetectors, the number of detectors simultaneously acquiring image informatio n during each\nsatellite revolution and the sampling distance of the Level 1.0 image data:",
+      "retrieval_score": 15.25201448,
+      "target_hypotheses": [
+        "H003",
+        "H005"
+      ]
+    },
+    {
+      "evidence_id": "K011",
+      "kind": "knowledge",
+      "query_id": "Q003",
+      "source": {
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "authority": "official",
+        "version": "v7B e-signed",
+        "section": "3.3 Prototyping",
+        "page": "37",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0098"
+      },
+      "claim": "Retrieved documentary material relevant to: What is the typical agreement between Meteosat SEVIRI and EPIC cloud masks? What are known sources of disagreement such as viewing geometry, spectral bands, or resolution?",
+      "supports_hypotheses": [],
+      "contradicts_hypotheses": [],
+      "validated": false,
+      "excerpt": "In order to support the specification of the algorithms, prototyping has been performed for a subset of\nthe baseline algorithms which are considered as critical for the development of the MPEF.\nFor the following algorithms, the specifications in this document are based on prototype software and\ntest data sets:\n\uf0b7 Radiative Transfer Model (RTM)\n\uf0b7 Scenes Analysis (SCE)\n\uf0b7 Cloud Analysis (CLA)\n\uf0b7 Atmospheric Motion Vectors (AMV)\n\uf0b7 Tropospheric Humidity (TH)\n\uf0b7 Global Instability Index (GII)\n\uf0b7 Sea Surface Temperature (SST)\nThe detailed descriptions of the prototype software and of the test data available for each of these\nalgorithms are included in the relevant algorithm specifications later in this document.\nThe use of simulated SEVIRI test data for prototyping is problematic as some of the spectral channels\nhave not been operated on board a geostationary satellite or are only available at a reduced horizontal\nresolution. The test data used during the prototyping came from the following satellites/instruments:\nMeteosat, GOES-8/VISSR, GOES-8/VAS and NOAA/AVHRR. Test data from the NIR 1.6 \uf06dm and\nthe IR 8.7 \uf06dm channel have not been explored yet.",
+      "retrieval_score": 18.91150564,
+      "target_hypotheses": [
+        "H003",
+        "H005"
+      ]
+    },
+    {
+      "evidence_id": "K012",
+      "kind": "knowledge",
+      "query_id": "Q003",
+      "source": {
+        "source_id": "EUMETSAT_MSG_IMAGE_DATA",
+        "title": "MSG Level 1.5 Image Data Format Description",
+        "authority": "official",
+        "version": "v8 e-signed",
+        "section": "3.1.10 Interchannel Registration",
+        "page": "31",
+        "chunk_id": "EUMETSAT_MSG_IMAGE_DATA:0052"
+      },
+      "claim": "Retrieved documentary material relevant to: What is the typical agreement between Meteosat SEVIRI and EPIC cloud masks? What are known sources of disagreement such as viewing geometry, spectral bands, or resolution?",
+      "supports_hypotheses": [],
+      "contradicts_hypotheses": [],
+      "validated": false,
+      "excerpt": "The specified and expected registration errors for the same pixel positions in different spectral\nchannels are shown in the following figures. Here also, the figures might need to be updated\nonce the actual behaviour of the MSG S/C in orbit is better characterised. All channels are\nregistered to a common grid with the following accuracy:\n\nChannel Groups Residual\nMisregistration\nRequirement (km)\nResidual Misregistration\nBudget (km)*\nVNIR 0.6 0.45\nWarm\n\n(HRV +VNIR)\n0.6 0.45\nWindow\n\n(IR3.9/IR8.7/IR10.2/IR12.0)\n0.6 0.45\nCold\n\n(All except HRV and VNIR)\n0.75 0.45\nALL 1.5 0.45\n\n*This is comprised of two summed errors, arising from 1) error in the interpolation methods\nused (0.27km) and 2) an error in the SEVIRI focal plane model (0.18km)\n\nNote 1: Distances are at sub-satellite point (SSP).\n\nNote 2: The grid of HRV images is such that 3x3 pixels of the HRV image are registered\nto 1 pixel of the VIS/IR channels.\n\nNote 3: The phenomenon of misregistration is mainly due to the thermo -elastic variations\nwithin the SEVIRI (both between the cold & warm focal planes and to a lesser extent between\nchannels within a given focal plane). The misregistrations characterised on ground are of\nlimited value after the launch, due to its thermal and mechanical influences. Therefore, the onground processing is an auto-adaptive method that continuously re -estimates and corrects the\nfocal plane misregistration based on the newest observations taken from the image. It has a\ntypical integration time of one day, but shorter periods are considered following ecl ipse or\nmanoeuvre situations.",
+      "retrieval_score": 18.85307011,
+      "target_hypotheses": [
+        "H003",
+        "H005"
+      ]
+    },
+    {
+      "evidence_id": "K013",
+      "kind": "knowledge",
+      "query_id": "Q003",
+      "source": {
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "authority": "official",
+        "version": "v7B e-signed",
+        "section": "22.2.2 Static Application Data",
+        "page": "261",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0665"
+      },
+      "claim": "Retrieved documentary material relevant to: What is the typical agreement between Meteosat SEVIRI and EPIC cloud masks? What are known sources of disagreement such as viewing geometry, spectral bands, or resolution?",
+      "supports_hypotheses": [],
+      "contradicts_hypotheses": [],
+      "validated": false,
+      "excerpt": "EUM/MSG/SPE/022\nv7B e-signed , 23 October 2015\nMSG Meteorological Products Extraction Facility Algorithm\nSpecification Document\n\nand carbon dioxide absorption bands. The GII is produced at a horizontal resolution of approximately\n9 km and the RII at 3 km (at the sub-satellite point). The GII and RII products are distributed via\nEUMETCast.\nThe spectral characteristics of the SEVIRI channels are as follows:\nChannel Band Frequency at\nCentre \uf028\uf06dm)\nSpectral Coverage\n(98-99% of Energy) \uf028\uf06dm)\nNoise Specification\nHRV High resolution visible (0.75) Broadband (peak 0.6 \u2013 0.9) 1.07 W/m 2 sr \uf06dm\nVIS0.6\nVIS0.8\nVisible 0.635\n0.81\n0.56 \u2013 0.71\n0.74 \u2013 0.88\n0.53 W/m 2 sr \uf06dm\n0.49 W/m 2 sr \uf06dm\nIR1.6 Near-Infrared 1.64 1.59 \u2013 1.78 0.25 W/m 2 sr \uf06dm\nIR3.9\nIR8.7\nIR10.8\nIR12.0\nAtmospheric Window 3.92\n8.70\n10.80\n12.00\n3.48 \u2013 4.36\n8.30 \u2013 9.10\n9.80 \u2013 11.80\n11.00 \u2013 13.00",
+      "retrieval_score": 18.59717851,
+      "target_hypotheses": [
+        "H003",
+        "H005"
+      ]
+    },
+    {
+      "evidence_id": "K014",
+      "kind": "knowledge",
+      "query_id": "Q003",
+      "source": {
+        "source_id": "SATPY_SEVIRI_READER",
+        "title": "Satpy Reading Documentation",
+        "authority": "project_documentation",
+        "version": "unknown",
+        "section": "Available datasets",
+        "page": null,
+        "chunk_id": "SATPY_SEVIRI_READER:0007"
+      },
+      "claim": "Retrieved documentary material relevant to: What is the typical agreement between Meteosat SEVIRI and EPIC cloud masks? What are known sources of disagreement such as viewing geometry, spectral bands, or resolution?",
+      "supports_hypotheses": [],
+      "contradicts_hypotheses": [],
+      "validated": false,
+      "excerpt": "To find out what datasets are available from a reader from the files that were\nprovided to the ``Scene`` use\n:meth:`~satpy.scene.Scene.available_dataset_ids`::\n\n>>> scn.available_dataset_ids()\n\nOr :meth:`~satpy.scene.Scene.available_dataset_names` for just the string\nnames of Datasets::\n\n>>> scn.available_dataset_names()",
+      "retrieval_score": 17.57325286,
+      "target_hypotheses": [
+        "H003",
+        "H005"
+      ]
+    },
+    {
+      "evidence_id": "K015",
+      "kind": "knowledge",
+      "query_id": "Q003",
+      "source": {
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "authority": "official",
+        "version": "v7B e-signed",
+        "section": "15.4 Overview",
+        "page": "210",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0500"
+      },
+      "claim": "Retrieved documentary material relevant to: What is the typical agreement between Meteosat SEVIRI and EPIC cloud masks? What are known sources of disagreement such as viewing geometry, spectral bands, or resolution?",
+      "supports_hypotheses": [],
+      "contradicts_hypotheses": [],
+      "validated": false,
+      "excerpt": "This algorithm is responsible for the generation of the three data sets (AC, B1 and B2) EUMETSAT\nhas to provide, in its combined role of Meteosat operator and as a Sector Processing Centre (SPC), to\nthe International Satellite Cloud Climatology Project (ISCCP) which is part of the World Climate\nResearch Programme (WCRP) of the World Meteorological Organization (WMO).\nThe objectives of the Meteosat Sector Processing Centre are as follows:\n\uf0b7 To obtain satellite orbital information and calibration data from Meteosat.\n\uf0b7 To acquire the full resolution satellite digital data (A-data) from Meteosat in real-time.\n\uf0b7 To provide samples of full IR resolution data (the AC-data) for geographical areas of about\n2000 km \u00d7 2000 km. About 60 samples of these data, with navigation and calibration data\nappended, are required each year for each satellite, for the purpose of periodically calculating\ninter-satellite normalisation parameters (BC-data). The inter-calibration calculations are\nperformed at the Satellite Calibration Centre (SCC). The times and the geographical areas of the\n60 samples are chosen to produce observations coincident with the overflight of polar orbiters.\nThe coordinates of these samples are supplied by the SCC to each SPC.\n\uf0b7 To provide samples of reduced resolution data (the B1-data) for the full FOV disc. These data\nsets, with navigation and calibration data appended, are to be produced for the synoptic hours\n(every three hours starting with 00:00 UTC) and are processed at the Global Processing Centre\n(GPC) and archived at the ISCCP Central Archive (ICA). The reduction of the resolution of the\ndata is achieved by first averaging (linear mean or RMS) the visible channel pixel counts to the\nresolution of the infrared channel pixel counts and then reducing the IR channel resolution by sub\nsampling the pixels to a nominal resolution of about 10 km spacing at the sub-satellite point.\n\uf0b7\nTo provide samples of further reduced resolution data (the B2-data) for the full FOV disc. These\ndata sets, with navigation and calibration data appended, are to be produced for the synoptic\nhours (every three hours starting with 00:00 UTC) and are processed at the Global Processing\nCentre and archived at the ISCCP Central Archive. The reduction of the resolution of the data is\nachieved by further sub sampling the pixels of the B1-data to a nominal resolution of about 30\nkm spacing at the sub-satellite point.",
+      "retrieval_score": 17.05018277,
+      "target_hypotheses": [
+        "H003",
+        "H005"
+      ]
+    }
+  ],
+  "knowledge_enabled": true,
+  "rag_ablation": {
+    "cohort": "C",
+    "knowledge_enabled": true,
+    "query_cost": 1,
+    "shared_contract": [
+      "same_planner_implementation",
+      "same_hypothesis_prompt",
+      "same_compute_tool_specs_and_order",
+      "same_budget_and_max_steps",
+      "same_validation_and_evidence_semantics",
+      "same_public_case_inputs"
+    ]
+  }
+}

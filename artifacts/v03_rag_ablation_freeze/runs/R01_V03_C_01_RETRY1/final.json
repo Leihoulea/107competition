@@ -1,0 +1,43 @@
+{
+  "decision": "inconclusive",
+  "fault_family": null,
+  "root_cause": "The maximum diagnostic step limit was reached before either a fault repair or a scientifically supported no-fault conclusion was validated.",
+  "confidence": 0.0,
+  "evidence_experiment_ids": [
+    "EXP_001",
+    "EXP_002",
+    "EXP_003",
+    "EXP_004",
+    "EXP_005"
+  ],
+  "recommended_repair": {},
+  "remaining_uncertainty": [
+    "Additional diagnostic experiments or explicit normal-range scientific evidence are required."
+  ],
+  "stop_reason": "max_steps_reached",
+  "evidence_summary": {
+    "experimental_evidence_ids": [
+      "E001",
+      "E002",
+      "E003",
+      "E004",
+      "E005"
+    ],
+    "knowledge_evidence_ids": [
+      "K001",
+      "K002",
+      "K003",
+      "K004",
+      "K005",
+      "K006",
+      "K007",
+      "K008",
+      "K009",
+      "K010",
+      "K011",
+      "K012",
+      "K013"
+    ],
+    "final_inference": "The maximum diagnostic step limit was reached before either a fault repair or a scientifically supported no-fault conclusion was validated."
+  }
+}

@@ -1,0 +1,2 @@
+{"node": "observe", "timestamp": 1788629879.267796, "initial": {"process_status": "COMPLETED", "exit_code": 0, "agreement": 0.5368982307227642, "agreement_all": 0.5368982307227642, "agreement_valid": 0.5368982307227642, "valid_pixels": 9515524, "valid_fraction": 0.6905844163384364, "comparison_metric": "agreement"}}
+{"node": "provider_failure", "timestamp": 1788629919.9996946, "stop_reason": "provider_failure", "error": "School LLM API transport failed: Remote end closed connection without response"}

@@ -1,0 +1,454 @@
+{
+  "schema_version": "1",
+  "experiment_count": 5,
+  "terminal_observation_count": 5,
+  "status_counts": {
+    "COMPLETED": 5,
+    "FAILED": 0,
+    "RUNNING": 0
+  },
+  "budget_units_used": 20,
+  "total_cost": 20,
+  "total_wall_seconds": 1.016154,
+  "total_cpu_seconds": 1.691281,
+  "peak_memory_mb": 157.039062,
+  "site_profiles": [
+    {
+      "backend": "ssh_direct",
+      "profile_version": "1",
+      "site_id": "ssh-642478ca63710924"
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "EXP_001",
+      "status": "COMPLETED",
+      "compute_observation": {
+        "job_id": "R01_V03_C_01_RETRY1_EXP_001",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788629965.3428085,
+        "remote_pid": 305478,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788629962.7447426
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788629963.3491538
+            }
+          ],
+          "submit_timestamp": 1788629962.7447426,
+          "finish_timestamp": 1788629963.3491538,
+          "wall_seconds": 0.200307,
+          "cpu_seconds": 0.60607,
+          "process_cpu_cumulative_seconds": 1.21042,
+          "pid": 305478,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.1104,
+          "user_cpu_seconds": 0.517891,
+          "system_cpu_seconds": 0.082386,
+          "peak_rss_kib": 160676,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.638249,
+            "wait": 0.60443,
+            "result_fetch": 0.535548
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5369410029337323,
+          "values": {
+            "dr": 1,
+            "dc": 1,
+            "agreement": 0.5369410029337323,
+            "agreement_all": 0.6730964288700209,
+            "agreement_valid": 0.5369410029337323,
+            "intersection": 2995906,
+            "union": 7402155,
+            "iou": 0.40473429697162516,
+            "precision": 0.5505840122734834,
+            "recall": 0.6044109259781183,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "status": "COMPLETED",
+      "compute_observation": {
+        "job_id": "R01_V03_C_01_RETRY1_EXP_002",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788630025.9858382,
+        "remote_pid": 306007,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788630024.1490786
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788630024.552665
+            }
+          ],
+          "submit_timestamp": 1788630024.1490786,
+          "finish_timestamp": 1788630024.552665,
+          "wall_seconds": 0.200843,
+          "cpu_seconds": 0.478403,
+          "process_cpu_cumulative_seconds": 1.246347,
+          "pid": 306007,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.0649,
+          "user_cpu_seconds": 0.383658,
+          "system_cpu_seconds": 0.088082,
+          "peak_rss_kib": 160808,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.449986,
+            "wait": 0.4036,
+            "result_fetch": 0.312271
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5367085406962349,
+          "values": {
+            "dr": 3,
+            "dc": 3,
+            "agreement": 0.5367085406962349,
+            "agreement_all": 0.6725638771737514,
+            "agreement_valid": 0.5367085406962349,
+            "intersection": 2992762,
+            "union": 7401223,
+            "iou": 0.40436046853337615,
+            "precision": 0.5500062117234702,
+            "recall": 0.6042735410317807,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "status": "COMPLETED",
+      "compute_observation": {
+        "job_id": "R01_V03_C_01_RETRY1_EXP_003",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788630044.413514,
+        "remote_pid": 306491,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788630040.1811402
+            },
+            {
+              "state": "RUNNING",
+              "observed_at": 1788630040.587801
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788630041.9644623
+            }
+          ],
+          "submit_timestamp": 1788630040.1811402,
+          "start_timestamp": 1788630040.587801,
+          "finish_timestamp": 1788630041.9644623,
+          "wall_seconds": 0.224694,
+          "cpu_seconds": 0.224508,
+          "process_cpu_cumulative_seconds": 1.378573,
+          "pid": 306491,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.2109,
+          "user_cpu_seconds": 0.13479,
+          "system_cpu_seconds": 0.090047,
+          "peak_rss_kib": 160772,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.526216,
+            "wait": 1.783347,
+            "result_fetch": 0.530289
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5364932083614102,
+          "values": {
+            "dr": 5,
+            "dc": 5,
+            "agreement": 0.5364932083614102,
+            "agreement_all": 0.6720160848320452,
+            "agreement_valid": 0.5364932083614102,
+            "intersection": 2989609,
+            "union": 7400119,
+            "iou": 0.4039947195443749,
+            "precision": 0.549426757164249,
+            "recall": 0.6041562087493261,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "status": "COMPLETED",
+      "compute_observation": {
+        "job_id": "R01_V03_C_01_RETRY1_EXP_004",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788630063.1520007,
+        "remote_pid": 307015,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788630060.9695754
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788630061.4940708
+            }
+          ],
+          "submit_timestamp": 1788630060.9695754,
+          "finish_timestamp": 1788630061.4940708,
+          "wall_seconds": 0.196366,
+          "cpu_seconds": 0.20034,
+          "process_cpu_cumulative_seconds": 1.277305,
+          "pid": 307015,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.2749,
+          "user_cpu_seconds": 0.116571,
+          "system_cpu_seconds": 0.084026,
+          "peak_rss_kib": 160412,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.275682,
+            "wait": 0.524515,
+            "result_fetch": 0.34243
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5369224017510754,
+          "values": {
+            "dr": -2,
+            "dc": 0,
+            "agreement": 0.5369224017510754,
+            "agreement_all": 0.672856062119129,
+            "agreement_valid": 0.5369224017510754,
+            "intersection": 2995629,
+            "union": 7402055,
+            "iou": 0.40470234279534534,
+            "precision": 0.5505331055456356,
+            "recall": 0.6044010120330242,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "status": "COMPLETED",
+      "compute_observation": {
+        "job_id": "R01_V03_C_01_RETRY1_EXP_005",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788630084.477466,
+        "remote_pid": 307533,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788630080.4591105
+            },
+            {
+              "state": "RUNNING",
+              "observed_at": 1788630080.7912366
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788630082.1608644
+            }
+          ],
+          "submit_timestamp": 1788630080.4591105,
+          "start_timestamp": 1788630080.7912366,
+          "finish_timestamp": 1788630082.1608644,
+          "wall_seconds": 0.193944,
+          "cpu_seconds": 0.193602,
+          "process_cpu_cumulative_seconds": 1.257095,
+          "pid": 307533,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.3564,
+          "user_cpu_seconds": 0.109587,
+          "system_cpu_seconds": 0.084243,
+          "peak_rss_kib": 160652,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.684285,
+            "wait": 1.701782,
+            "result_fetch": 0.369608
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5355469651487401,
+          "values": {
+            "dr": 5,
+            "dc": -5,
+            "agreement": 0.5355469651487401,
+            "agreement_all": 0.671376848617717,
+            "agreement_valid": 0.5355469651487401,
+            "intersection": 2983296,
+            "union": 7402810,
+            "iou": 0.4029950788957166,
+            "precision": 0.5482665615942003,
+            "recall": 0.6033220473622497,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      }
+    }
+  ],
+  "remote_jobs": [
+    {
+      "job_id": "R01_V03_C_01_RETRY1_EXP_001",
+      "backend": "ssh_direct",
+      "remote_pid": 305478,
+      "status": "COMPLETED",
+      "lifecycle_state": "COMPLETED",
+      "lifecycle": [
+        {
+          "state": "SUBMITTED",
+          "observed_at": 1788629962.7447426
+        },
+        {
+          "state": "COMPLETED",
+          "observed_at": 1788629963.3491538
+        }
+      ]
+    },
+    {
+      "job_id": "R01_V03_C_01_RETRY1_EXP_002",
+      "backend": "ssh_direct",
+      "remote_pid": 306007,
+      "status": "COMPLETED",
+      "lifecycle_state": "COMPLETED",
+      "lifecycle": [
+        {
+          "state": "SUBMITTED",
+          "observed_at": 1788630024.1490786
+        },
+        {
+          "state": "COMPLETED",
+          "observed_at": 1788630024.552665
+        }
+      ]
+    },
+    {
+      "job_id": "R01_V03_C_01_RETRY1_EXP_003",
+      "backend": "ssh_direct",
+      "remote_pid": 306491,
+      "status": "COMPLETED",
+      "lifecycle_state": "COMPLETED",
+      "lifecycle": [
+        {
+          "state": "SUBMITTED",
+          "observed_at": 1788630040.1811402
+        },
+        {
+          "state": "RUNNING",
+          "observed_at": 1788630040.587801
+        },
+        {
+          "state": "COMPLETED",
+          "observed_at": 1788630041.9644623
+        }
+      ]
+    },
+    {
+      "job_id": "R01_V03_C_01_RETRY1_EXP_004",
+      "backend": "ssh_direct",
+      "remote_pid": 307015,
+      "status": "COMPLETED",
+      "lifecycle_state": "COMPLETED",
+      "lifecycle": [
+        {
+          "state": "SUBMITTED",
+          "observed_at": 1788630060.9695754
+        },
+        {
+          "state": "COMPLETED",
+          "observed_at": 1788630061.4940708
+        }
+      ]
+    },
+    {
+      "job_id": "R01_V03_C_01_RETRY1_EXP_005",
+      "backend": "ssh_direct",
+      "remote_pid": 307533,
+      "status": "COMPLETED",
+      "lifecycle_state": "COMPLETED",
+      "lifecycle": [
+        {
+          "state": "SUBMITTED",
+          "observed_at": 1788630080.4591105
+        },
+        {
+          "state": "RUNNING",
+          "observed_at": 1788630080.7912366
+        },
+        {
+          "state": "COMPLETED",
+          "observed_at": 1788630082.1608644
+        }
+      ]
+    }
+  ]
+}

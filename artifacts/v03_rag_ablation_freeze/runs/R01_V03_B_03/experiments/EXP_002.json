@@ -1,0 +1,125 @@
+{
+  "experiment_id": "EXP_002",
+  "tool": "inspect",
+  "arguments": {},
+  "backend": "ssh_direct",
+  "remote_host": "server-114",
+  "remote_pid": 301405,
+  "job_id": "R01_V03_B_03_EXP_002",
+  "status": "COMPLETED",
+  "cost": 1,
+  "result": {
+    "status": "success",
+    "experiment_id": "EXP_002",
+    "tool": "inspect",
+    "arguments": {},
+    "metrics": {
+      "reference": {
+        "shape": [
+          3712,
+          3712
+        ],
+        "dtype": "uint8",
+        "min": 0.0,
+        "max": 1.0,
+        "mean": 0.3627271436766127,
+        "std": 0.48078702448882565,
+        "unique_count": 2,
+        "nan_fraction": 0.0
+      },
+      "target": {
+        "shape": [
+          3712,
+          3712
+        ],
+        "dtype": "uint8",
+        "min": 0.0,
+        "max": 1.0,
+        "mean": 0.4026484903342375,
+        "std": 0.4904311201033198,
+        "unique_count": 2,
+        "nan_fraction": 0.0
+      }
+    },
+    "scientific_metrics": {
+      "metric_count": 0,
+      "primary_metric": null,
+      "primary_value": null,
+      "values": {}
+    },
+    "compute_metrics": {
+      "wall_seconds": 0.482771,
+      "cpu_seconds": 0.786941,
+      "process_cpu_cumulative_seconds": 1.50974,
+      "pid": 301405,
+      "python_version": "3.12.3",
+      "input_bytes": 41337216,
+      "load_average_1m": 0.6562,
+      "user_cpu_seconds": 0.690049,
+      "system_cpu_seconds": 0.097337,
+      "peak_rss_kib": 196416,
+      "peak_rss_unit": "KiB (Linux ru_maxrss)"
+    },
+    "site_profile": {
+      "profile_version": "1",
+      "site_id": "remote-7804a56a5c7636cc",
+      "os_family": "linux"
+    },
+    "elapsed_seconds": 0.484
+  },
+  "compute_observation": {
+    "job_id": "R01_V03_B_03_EXP_002",
+    "backend": "ssh_direct",
+    "lifecycle_state": "COMPLETED",
+    "observed_at": 1788629681.405782,
+    "remote_pid": 301405,
+    "compute_metrics": {
+      "lifecycle": [
+        {
+          "state": "SUBMITTED",
+          "observed_at": 1788629678.3050752
+        },
+        {
+          "state": "RUNNING",
+          "observed_at": 1788629678.7433734
+        },
+        {
+          "state": "COMPLETED",
+          "observed_at": 1788629680.125069
+        }
+      ],
+      "submit_timestamp": 1788629678.3050752,
+      "start_timestamp": 1788629678.7433734,
+      "finish_timestamp": 1788629680.125069,
+      "wall_seconds": 0.482771,
+      "cpu_seconds": 0.786941,
+      "process_cpu_cumulative_seconds": 1.50974,
+      "pid": 301405,
+      "python_version": "3.12.3",
+      "input_bytes": 41337216,
+      "load_average_1m": 0.6562,
+      "user_cpu_seconds": 0.690049,
+      "system_cpu_seconds": 0.097337,
+      "peak_rss_kib": 196416,
+      "peak_rss_unit": "KiB (Linux ru_maxrss)",
+      "executor_durations_seconds": {
+        "upload": 0.57797,
+        "wait": 1.820007,
+        "result_fetch": 0.330534
+      }
+    },
+    "scientific_metrics": {
+      "metric_count": 0,
+      "primary_metric": null,
+      "primary_value": null,
+      "values": {}
+    },
+    "site_profile": {
+      "profile_version": "1",
+      "site_id": "ssh-642478ca63710924",
+      "backend": "ssh_direct"
+    }
+  },
+  "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_002\", \"tool\": \"inspect\", \"arguments\": {}, \"metrics\": {\"reference\": {\"shape\": [3712, 3712], \"dtype\": \"uint8\", \"min\": 0.0, \"max\": 1.0, \"mean\": 0.3627271436766127, \"std\": 0.48078702448882565, \"unique_count\": 2, \"nan_fraction\": 0.0}, \"target\": {\"shape\": [3712, 3712], \"dtype\": \"uint8\", \"min\": 0.0, \"max\": 1.0, \"mean\": 0.4026484903342375, \"std\": 0.4904311201033198, \"unique_count\": 2, \"nan_fraction\": 0.0}}, \"scientific_metrics\": {\"metric_count\": 0, \"primary_metric\": null, \"primary_value\": null, \"values\": {}}, \"compute_metrics\": {\"wall_seconds\": 0.482771, \"cpu_seconds\": 0.786941, \"process_cpu_cumulative_seconds\": 1.50974, \"pid\": 301405, \"python_version\": \"3.12.3\", \"input_bytes\": 41337216, \"load_average_1m\": 0.6562, \"user_cpu_seconds\": 0.690049, \"system_cpu_seconds\": 0.097337, \"peak_rss_kib\": 196416, \"peak_rss_unit\": \"KiB (Linux ru_maxrss)\"}, \"site_profile\": {\"profile_version\": \"1\", \"site_id\": \"remote-7804a56a5c7636cc\", \"os_family\": \"linux\"}, \"elapsed_seconds\": 0.484}\n",
+  "stderr": ""
+}

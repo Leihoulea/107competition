@@ -1,0 +1,12 @@
+{
+  "experiment_id": "EXP_004",
+  "tool": "evaluate_candidate",
+  "arguments": {
+    "pipeline": [
+      {
+        "type": "transform",
+        "operation": "rot90"
+      }
+    ]
+  }
+}

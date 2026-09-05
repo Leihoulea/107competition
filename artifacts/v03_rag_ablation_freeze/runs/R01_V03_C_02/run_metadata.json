@@ -1,0 +1,33 @@
+{
+  "run_id": "R01_V03_C_02",
+  "git_commit": "015fe10d35d256c344a1affa656ce55391c8905f",
+  "case_id": "R01",
+  "public_case_sha256": {
+    "task.json": "810e09140e1996f8b2bd9e55ea7c243270e1a44e0f7d9167077b6c476e9c1f4f",
+    "initial_result.json": "d9e0b62ba20f1a5dff1e6b1d1182a2471797405ce0f99552bdef2498005a4801",
+    "public/data/reference.npy": "1d0498087227a63908b2207208e31d4796a3f68b2844590d7ac4657baedf7951",
+    "public/data/target_faulty.npy": "798efef55c73a5635c264ad17bee1665ab8d8e84a47121b81ad94fbf7650c2a4",
+    "public/data/target_valid.npy": "d68a32fca5b06ac815707bd9beb34e98e6f239a856883d54dbfebc4602fdd498",
+    "public/metadata.json": "268dbb9aca972e81eff0fc98c0c64ce188be46b860c9ae6b56804645ade49aa8"
+  },
+  "rag_ablation": {
+    "cohort": "C",
+    "knowledge_enabled": true,
+    "query_cost": 1,
+    "shared_contract": [
+      "same_planner_implementation",
+      "same_hypothesis_prompt",
+      "same_compute_tool_specs_and_order",
+      "same_budget_and_max_steps",
+      "same_validation_and_evidence_semantics",
+      "same_public_case_inputs"
+    ]
+  },
+  "knowledge_enabled": true,
+  "knowledge_manifest_sha256": "04c27565b2e30a7c19495406c89626d1fb6ab580d313201b1945c897c3624bf5",
+  "provider": "manual",
+  "model": "deepseek-v4-flash",
+  "temperature": 0,
+  "budget": 30,
+  "max_steps": 8
+}

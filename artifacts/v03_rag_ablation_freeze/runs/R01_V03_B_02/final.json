@@ -1,0 +1,33 @@
+{
+  "decision": "inconclusive",
+  "fault_family": null,
+  "root_cause": "The available diagnostic budget was exhausted before either a fault repair or a scientifically supported no-fault conclusion was validated.",
+  "confidence": 0.0,
+  "evidence_experiment_ids": [
+    "EXP_001",
+    "EXP_002",
+    "EXP_003",
+    "EXP_004",
+    "EXP_005",
+    "EXP_006",
+    "EXP_007"
+  ],
+  "recommended_repair": {},
+  "remaining_uncertainty": [
+    "Additional diagnostic experiments or explicit normal-range scientific evidence are required."
+  ],
+  "stop_reason": "budget_exhausted",
+  "evidence_summary": {
+    "experimental_evidence_ids": [
+      "E001",
+      "E002",
+      "E003",
+      "E004",
+      "E005",
+      "E006",
+      "E007"
+    ],
+    "knowledge_evidence_ids": [],
+    "final_inference": "The available diagnostic budget was exhausted before either a fault repair or a scientifically supported no-fault conclusion was validated."
+  }
+}

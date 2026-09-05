@@ -1,0 +1,1466 @@
+{
+  "run_id": "R01_V03_C_03",
+  "case_id": "R01",
+  "task": {
+    "case_id": "R01",
+    "title": "Meteosat and EPIC cloud-mask comparison quality anomaly",
+    "task": "A completed remote-sensing comparison may contain a scientific silent failure. Use only public experiments to determine whether a fault exists and validate any repair.",
+    "budget": 30,
+    "expected_quality_threshold": 0.75
+  },
+  "initial_observation": {
+    "process_status": "COMPLETED",
+    "exit_code": 0,
+    "agreement": 0.5368982307227642,
+    "agreement_all": 0.5368982307227642,
+    "agreement_valid": 0.5368982307227642,
+    "valid_pixels": 9515524,
+    "valid_fraction": 0.6905844163384364,
+    "comparison_metric": "agreement"
+  },
+  "hypotheses": [
+    {
+      "hypothesis_id": "H001",
+      "category": "geolocation_shift",
+      "description": "A systematic geolocation misregistration (e.g., a few pixels) between Meteosat and EPIC grids reduces agreement; correcting the shift may raise agreement above threshold.",
+      "status": "active",
+      "confidence": 0.4,
+      "testable_scope": [
+        "agreement improvement after applying sub-pixel or integer pixel shifts"
+      ],
+      "evidence_for": [],
+      "evidence_against": [],
+      "scope_kind": "specific_candidate"
+    },
+    {
+      "hypothesis_id": "H002",
+      "category": "cloud_mask_threshold",
+      "description": "Differences in cloud detection thresholds or sensitivity between the two instruments cause systematic disagreement; adjusting the threshold may improve agreement.",
+      "status": "active",
+      "confidence": 0.3,
+      "testable_scope": [
+        "agreement sensitivity to threshold variation"
+      ],
+      "evidence_for": [],
+      "evidence_against": [],
+      "scope_kind": "specific_candidate"
+    },
+    {
+      "hypothesis_id": "H003",
+      "category": "temporal_mismatch",
+      "description": "Temporal mismatch between the two observations (e.g., different acquisition times) leads to cloud movement and disagreement; time-shifting may improve agreement.",
+      "status": "active",
+      "confidence": 0.2,
+      "testable_scope": [
+        "agreement improvement after temporal shift"
+      ],
+      "evidence_for": [],
+      "evidence_against": [],
+      "scope_kind": "specific_candidate"
+    },
+    {
+      "hypothesis_id": "H004",
+      "category": "unspecified",
+      "description": "Plausible explanation requiring evidence.",
+      "status": "weakened",
+      "confidence": 0.1,
+      "testable_scope": [
+        "agreement remains below threshold after all plausible corrections"
+      ],
+      "evidence_for": [],
+      "evidence_against": [
+        "K001",
+        "K002",
+        "K003",
+        "E005"
+      ],
+      "scope_kind": "no_fault"
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "EXP_001",
+      "tool": "shift_and_compare",
+      "arguments": {
+        "dr": 1,
+        "dc": 0
+      },
+      "backend": "ssh_direct",
+      "remote_host": "server-114",
+      "remote_pid": 311397,
+      "job_id": "R01_V03_C_03_EXP_001",
+      "status": "COMPLETED",
+      "cost": 4,
+      "result": {
+        "status": "success",
+        "experiment_id": "EXP_001",
+        "tool": "shift_and_compare",
+        "arguments": {
+          "dr": 1,
+          "dc": 0
+        },
+        "metrics": {
+          "dr": 1,
+          "dc": 0,
+          "agreement": 0.5368254023635483,
+          "agreement_all": 0.6730639154930886,
+          "agreement_valid": 0.5368254023635483,
+          "intersection": 2995416,
+          "union": 7402765,
+          "iou": 0.4046347547166498,
+          "precision": 0.550493960661045,
+          "recall": 0.6042974408985371,
+          "valid_pixels": 9515524,
+          "valid_fraction": 0.6905844163384364
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5368254023635483,
+          "values": {
+            "dr": 1,
+            "dc": 0,
+            "agreement": 0.5368254023635483,
+            "agreement_all": 0.6730639154930886,
+            "agreement_valid": 0.5368254023635483,
+            "intersection": 2995416,
+            "union": 7402765,
+            "iou": 0.4046347547166498,
+            "precision": 0.550493960661045,
+            "recall": 0.6042974408985371,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "compute_metrics": {
+          "wall_seconds": 0.21715,
+          "cpu_seconds": 0.217035,
+          "process_cpu_cumulative_seconds": 1.436169,
+          "pid": 311397,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.0278,
+          "user_cpu_seconds": 0.072236,
+          "system_cpu_seconds": 0.145063,
+          "peak_rss_kib": 160808,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)"
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "remote-7804a56a5c7636cc",
+          "os_family": "linux"
+        },
+        "elapsed_seconds": 0.218
+      },
+      "compute_observation": {
+        "job_id": "R01_V03_C_03_EXP_001",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788630476.552861,
+        "remote_pid": 311397,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788630474.3508935
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788630475.061979
+            }
+          ],
+          "submit_timestamp": 1788630474.3508935,
+          "finish_timestamp": 1788630475.061979,
+          "wall_seconds": 0.21715,
+          "cpu_seconds": 0.217035,
+          "process_cpu_cumulative_seconds": 1.436169,
+          "pid": 311397,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.0278,
+          "user_cpu_seconds": 0.072236,
+          "system_cpu_seconds": 0.145063,
+          "peak_rss_kib": 160808,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.698923,
+            "wait": 0.711125,
+            "result_fetch": 0.383847
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5368254023635483,
+          "values": {
+            "dr": 1,
+            "dc": 0,
+            "agreement": 0.5368254023635483,
+            "agreement_all": 0.6730639154930886,
+            "agreement_valid": 0.5368254023635483,
+            "intersection": 2995416,
+            "union": 7402765,
+            "iou": 0.4046347547166498,
+            "precision": 0.550493960661045,
+            "recall": 0.6042974408985371,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      },
+      "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_001\", \"tool\": \"shift_and_compare\", \"arguments\": {\"dr\": 1, \"dc\": 0}, \"metrics\": {\"dr\": 1, \"dc\": 0, \"agreement\": 0.5368254023635483, \"agreement_all\": 0.6730639154930886, \"agreement_valid\": 0.5368254023635483, \"intersection\": 2995416, \"union\": 7402765, \"iou\": 0.4046347547166498, \"precision\": 0.550493960661045, \"recall\": 0.6042974408985371, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}, \"scientific_metrics\": {\"metric_count\": 12, \"primary_metric\": \"agreement_valid\", \"primary_value\": 0.5368254023635483, \"values\": {\"dr\": 1, \"dc\": 0, \"agreement\": 0.5368254023635483, \"agreement_all\": 0.6730639154930886, \"agreement_valid\": 0.5368254023635483, \"intersection\": 2995416, \"union\": 7402765, \"iou\": 0.4046347547166498, \"precision\": 0.550493960661045, \"recall\": 0.6042974408985371, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}}, \"compute_metrics\": {\"wall_seconds\": 0.21715, \"cpu_seconds\": 0.217035, \"process_cpu_cumulative_seconds\": 1.436169, \"pid\": 311397, \"python_version\": \"3.12.3\", \"input_bytes\": 41337216, \"load_average_1m\": 0.0278, \"user_cpu_seconds\": 0.072236, \"system_cpu_seconds\": 0.145063, \"peak_rss_kib\": 160808, \"peak_rss_unit\": \"KiB (Linux ru_maxrss)\"}, \"site_profile\": {\"profile_version\": \"1\", \"site_id\": \"remote-7804a56a5c7636cc\", \"os_family\": \"linux\"}, \"elapsed_seconds\": 0.218}\n",
+      "stderr": "",
+      "plan_id": "PLAN001",
+      "coverage": {
+        "hypothesis_ids": [
+          "H001"
+        ],
+        "system_tested_scope": {
+          "kind": "candidate",
+          "signature": "shift(dr=1,dc=0)"
+        },
+        "novelty": {
+          "status": "novel"
+        }
+      },
+      "diagnostic_rationale": "Directly test the geolocation-shift hypothesis by measuring agreement after applying a small integer pixel shift. A significant improvement would support H001; no improvement would weaken it.",
+      "predicted_observation": "agreement value after shift; if >0.537 by a meaningful margin, H001 is supported; if similar or lower, H001 is weakened."
+    },
+    {
+      "experiment_id": "EXP_002",
+      "tool": "shift_and_compare",
+      "arguments": {
+        "dr": -1,
+        "dc": 0
+      },
+      "backend": "ssh_direct",
+      "remote_host": "server-114",
+      "remote_pid": 311882,
+      "job_id": "R01_V03_C_03_EXP_002",
+      "status": "COMPLETED",
+      "cost": 4,
+      "result": {
+        "status": "success",
+        "experiment_id": "EXP_002",
+        "tool": "shift_and_compare",
+        "arguments": {
+          "dr": -1,
+          "dc": 0
+        },
+        "metrics": {
+          "dr": -1,
+          "dc": 0,
+          "agreement": 0.5370673228295152,
+          "agreement_all": 0.6731312646310196,
+          "agreement_valid": 0.5370673228295152,
+          "intersection": 2997404,
+          "union": 7402451,
+          "iou": 0.4049204783658818,
+          "precision": 0.5508593129172238,
+          "recall": 0.6044943552838532,
+          "valid_pixels": 9515524,
+          "valid_fraction": 0.6905844163384364
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5370673228295152,
+          "values": {
+            "dr": -1,
+            "dc": 0,
+            "agreement": 0.5370673228295152,
+            "agreement_all": 0.6731312646310196,
+            "agreement_valid": 0.5370673228295152,
+            "intersection": 2997404,
+            "union": 7402451,
+            "iou": 0.4049204783658818,
+            "precision": 0.5508593129172238,
+            "recall": 0.6044943552838532,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "compute_metrics": {
+          "wall_seconds": 0.228653,
+          "cpu_seconds": 0.313091,
+          "process_cpu_cumulative_seconds": 1.254862,
+          "pid": 311882,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.2617,
+          "user_cpu_seconds": 0.216938,
+          "system_cpu_seconds": 0.096411,
+          "peak_rss_kib": 160776,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)"
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "remote-7804a56a5c7636cc",
+          "os_family": "linux"
+        },
+        "elapsed_seconds": 0.229
+      },
+      "compute_observation": {
+        "job_id": "R01_V03_C_03_EXP_002",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788630491.4521263,
+        "remote_pid": 311882,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788630489.301231
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788630489.9394598
+            }
+          ],
+          "submit_timestamp": 1788630489.301231,
+          "finish_timestamp": 1788630489.9394598,
+          "wall_seconds": 0.228653,
+          "cpu_seconds": 0.313091,
+          "process_cpu_cumulative_seconds": 1.254862,
+          "pid": 311882,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.2617,
+          "user_cpu_seconds": 0.216938,
+          "system_cpu_seconds": 0.096411,
+          "peak_rss_kib": 160776,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.611049,
+            "wait": 0.63824,
+            "result_fetch": 0.300346
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5370673228295152,
+          "values": {
+            "dr": -1,
+            "dc": 0,
+            "agreement": 0.5370673228295152,
+            "agreement_all": 0.6731312646310196,
+            "agreement_valid": 0.5370673228295152,
+            "intersection": 2997404,
+            "union": 7402451,
+            "iou": 0.4049204783658818,
+            "precision": 0.5508593129172238,
+            "recall": 0.6044943552838532,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      },
+      "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_002\", \"tool\": \"shift_and_compare\", \"arguments\": {\"dr\": -1, \"dc\": 0}, \"metrics\": {\"dr\": -1, \"dc\": 0, \"agreement\": 0.5370673228295152, \"agreement_all\": 0.6731312646310196, \"agreement_valid\": 0.5370673228295152, \"intersection\": 2997404, \"union\": 7402451, \"iou\": 0.4049204783658818, \"precision\": 0.5508593129172238, \"recall\": 0.6044943552838532, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}, \"scientific_metrics\": {\"metric_count\": 12, \"primary_metric\": \"agreement_valid\", \"primary_value\": 0.5370673228295152, \"values\": {\"dr\": -1, \"dc\": 0, \"agreement\": 0.5370673228295152, \"agreement_all\": 0.6731312646310196, \"agreement_valid\": 0.5370673228295152, \"intersection\": 2997404, \"union\": 7402451, \"iou\": 0.4049204783658818, \"precision\": 0.5508593129172238, \"recall\": 0.6044943552838532, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}}, \"compute_metrics\": {\"wall_seconds\": 0.228653, \"cpu_seconds\": 0.313091, \"process_cpu_cumulative_seconds\": 1.254862, \"pid\": 311882, \"python_version\": \"3.12.3\", \"input_bytes\": 41337216, \"load_average_1m\": 0.2617, \"user_cpu_seconds\": 0.216938, \"system_cpu_seconds\": 0.096411, \"peak_rss_kib\": 160776, \"peak_rss_unit\": \"KiB (Linux ru_maxrss)\"}, \"site_profile\": {\"profile_version\": \"1\", \"site_id\": \"remote-7804a56a5c7636cc\", \"os_family\": \"linux\"}, \"elapsed_seconds\": 0.229}\n",
+      "stderr": "",
+      "plan_id": "PLAN002",
+      "coverage": {
+        "hypothesis_ids": [
+          "H001"
+        ],
+        "system_tested_scope": {
+          "kind": "candidate",
+          "signature": "shift(dr=-1,dc=0)"
+        },
+        "novelty": {
+          "status": "novel"
+        }
+      },
+      "diagnostic_rationale": "The prior experiment tested only one shift direction. A shift in another direction (e.g., dr=-1,dc=0 or dr=0,dc=1) may reveal a systematic misregistration that the first test missed. This directly probes H001 with a materially different shift vector.",
+      "predicted_observation": "agreement_valid after the shift; if it exceeds 0.537 by a meaningful margin (e.g., >0.55), H001 is supported; if similar or lower, H001 is further weakened."
+    },
+    {
+      "experiment_id": "EXP_003",
+      "tool": "shift_and_compare",
+      "arguments": {
+        "dr": 0,
+        "dc": 1
+      },
+      "backend": "ssh_direct",
+      "remote_host": "server-114",
+      "remote_pid": 312332,
+      "job_id": "R01_V03_C_03_EXP_003",
+      "status": "COMPLETED",
+      "cost": 4,
+      "result": {
+        "status": "success",
+        "experiment_id": "EXP_003",
+        "tool": "shift_and_compare",
+        "arguments": {
+          "dr": 0,
+          "dc": 1
+        },
+        "metrics": {
+          "dr": 0,
+          "dc": 1,
+          "agreement": 0.5371168208918394,
+          "agreement_all": 0.6733179262503716,
+          "agreement_valid": 0.5371168208918394,
+          "intersection": 2997633,
+          "union": 7402209,
+          "iou": 0.4049646531190892,
+          "precision": 0.5509013982626287,
+          "recall": 0.6045421232715098,
+          "valid_pixels": 9515524,
+          "valid_fraction": 0.6905844163384364
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5371168208918394,
+          "values": {
+            "dr": 0,
+            "dc": 1,
+            "agreement": 0.5371168208918394,
+            "agreement_all": 0.6733179262503716,
+            "agreement_valid": 0.5371168208918394,
+            "intersection": 2997633,
+            "union": 7402209,
+            "iou": 0.4049646531190892,
+            "precision": 0.5509013982626287,
+            "recall": 0.6045421232715098,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "compute_metrics": {
+          "wall_seconds": 0.199162,
+          "cpu_seconds": 0.199145,
+          "process_cpu_cumulative_seconds": 1.327076,
+          "pid": 312332,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.2031,
+          "user_cpu_seconds": 0.101319,
+          "system_cpu_seconds": 0.098173,
+          "peak_rss_kib": 160556,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)"
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "remote-7804a56a5c7636cc",
+          "os_family": "linux"
+        },
+        "elapsed_seconds": 0.2
+      },
+      "compute_observation": {
+        "job_id": "R01_V03_C_03_EXP_003",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788630508.5251243,
+        "remote_pid": 312332,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788630505.979616
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788630506.4293144
+            }
+          ],
+          "submit_timestamp": 1788630505.979616,
+          "finish_timestamp": 1788630506.4293144,
+          "wall_seconds": 0.199162,
+          "cpu_seconds": 0.199145,
+          "process_cpu_cumulative_seconds": 1.327076,
+          "pid": 312332,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.2031,
+          "user_cpu_seconds": 0.101319,
+          "system_cpu_seconds": 0.098173,
+          "peak_rss_kib": 160556,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.391389,
+            "wait": 0.449696,
+            "result_fetch": 0.492356
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 12,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5371168208918394,
+          "values": {
+            "dr": 0,
+            "dc": 1,
+            "agreement": 0.5371168208918394,
+            "agreement_all": 0.6733179262503716,
+            "agreement_valid": 0.5371168208918394,
+            "intersection": 2997633,
+            "union": 7402209,
+            "iou": 0.4049646531190892,
+            "precision": 0.5509013982626287,
+            "recall": 0.6045421232715098,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      },
+      "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_003\", \"tool\": \"shift_and_compare\", \"arguments\": {\"dr\": 0, \"dc\": 1}, \"metrics\": {\"dr\": 0, \"dc\": 1, \"agreement\": 0.5371168208918394, \"agreement_all\": 0.6733179262503716, \"agreement_valid\": 0.5371168208918394, \"intersection\": 2997633, \"union\": 7402209, \"iou\": 0.4049646531190892, \"precision\": 0.5509013982626287, \"recall\": 0.6045421232715098, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}, \"scientific_metrics\": {\"metric_count\": 12, \"primary_metric\": \"agreement_valid\", \"primary_value\": 0.5371168208918394, \"values\": {\"dr\": 0, \"dc\": 1, \"agreement\": 0.5371168208918394, \"agreement_all\": 0.6733179262503716, \"agreement_valid\": 0.5371168208918394, \"intersection\": 2997633, \"union\": 7402209, \"iou\": 0.4049646531190892, \"precision\": 0.5509013982626287, \"recall\": 0.6045421232715098, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}}, \"compute_metrics\": {\"wall_seconds\": 0.199162, \"cpu_seconds\": 0.199145, \"process_cpu_cumulative_seconds\": 1.327076, \"pid\": 312332, \"python_version\": \"3.12.3\", \"input_bytes\": 41337216, \"load_average_1m\": 0.2031, \"user_cpu_seconds\": 0.101319, \"system_cpu_seconds\": 0.098173, \"peak_rss_kib\": 160556, \"peak_rss_unit\": \"KiB (Linux ru_maxrss)\"}, \"site_profile\": {\"profile_version\": \"1\", \"site_id\": \"remote-7804a56a5c7636cc\", \"os_family\": \"linux\"}, \"elapsed_seconds\": 0.2}\n",
+      "stderr": "",
+      "plan_id": "PLAN003",
+      "coverage": {
+        "hypothesis_ids": [
+          "H001"
+        ],
+        "system_tested_scope": {
+          "kind": "candidate",
+          "signature": "shift(dr=0,dc=1)"
+        },
+        "novelty": {
+          "status": "novel"
+        }
+      },
+      "diagnostic_rationale": "The two prior shifts (dr=1,dc=0 and dr=-1,dc=0) produced negligible changes, weakening H001 for vertical shifts. Testing a horizontal shift (dr=0,dc=1) directly probes the remaining geolocation direction. A meaningful improvement would support H001; a negligible change would further weaken it.",
+      "predicted_observation": "agreement_valid after shift; if >0.55, H001 is supported; if within ~0.001 of 0.537, H001 is further weakened."
+    },
+    {
+      "experiment_id": "EXP_004",
+      "tool": "transform_and_compare",
+      "arguments": {
+        "operation": "identity"
+      },
+      "backend": "ssh_direct",
+      "remote_host": "server-114",
+      "remote_pid": 312834,
+      "job_id": "R01_V03_C_03_EXP_004",
+      "status": "COMPLETED",
+      "cost": 4,
+      "result": {
+        "status": "success",
+        "experiment_id": "EXP_004",
+        "tool": "transform_and_compare",
+        "arguments": {
+          "operation": "identity"
+        },
+        "metrics": {
+          "operation": "identity",
+          "agreement": 0.5368982307227642,
+          "agreement_all": 0.673395435818594,
+          "agreement_valid": 0.5368982307227642,
+          "intersection": 2997691,
+          "union": 7404347,
+          "iou": 0.4048555530960394,
+          "precision": 0.5509120574330806,
+          "recall": 0.6042861975110841,
+          "valid_pixels": 9515524,
+          "valid_fraction": 0.6905844163384364
+        },
+        "scientific_metrics": {
+          "metric_count": 10,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5368982307227642,
+          "values": {
+            "agreement": 0.5368982307227642,
+            "agreement_all": 0.673395435818594,
+            "agreement_valid": 0.5368982307227642,
+            "intersection": 2997691,
+            "union": 7404347,
+            "iou": 0.4048555530960394,
+            "precision": 0.5509120574330806,
+            "recall": 0.6042861975110841,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "compute_metrics": {
+          "wall_seconds": 0.175307,
+          "cpu_seconds": 0.175188,
+          "process_cpu_cumulative_seconds": 1.287165,
+          "pid": 312834,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.2075,
+          "user_cpu_seconds": 0.08815,
+          "system_cpu_seconds": 0.087127,
+          "peak_rss_kib": 160692,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)"
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "remote-7804a56a5c7636cc",
+          "os_family": "linux"
+        },
+        "elapsed_seconds": 0.176
+      },
+      "compute_observation": {
+        "job_id": "R01_V03_C_03_EXP_004",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788630530.241161,
+        "remote_pid": 312834,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788630527.980378
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788630528.5202465
+            }
+          ],
+          "submit_timestamp": 1788630527.980378,
+          "finish_timestamp": 1788630528.5202465,
+          "wall_seconds": 0.175307,
+          "cpu_seconds": 0.175188,
+          "process_cpu_cumulative_seconds": 1.287165,
+          "pid": 312834,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.2075,
+          "user_cpu_seconds": 0.08815,
+          "system_cpu_seconds": 0.087127,
+          "peak_rss_kib": 160692,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 1.132905,
+            "wait": 0.539923,
+            "result_fetch": 0.283594
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 10,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.5368982307227642,
+          "values": {
+            "agreement": 0.5368982307227642,
+            "agreement_all": 0.673395435818594,
+            "agreement_valid": 0.5368982307227642,
+            "intersection": 2997691,
+            "union": 7404347,
+            "iou": 0.4048555530960394,
+            "precision": 0.5509120574330806,
+            "recall": 0.6042861975110841,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      },
+      "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_004\", \"tool\": \"transform_and_compare\", \"arguments\": {\"operation\": \"identity\"}, \"metrics\": {\"operation\": \"identity\", \"agreement\": 0.5368982307227642, \"agreement_all\": 0.673395435818594, \"agreement_valid\": 0.5368982307227642, \"intersection\": 2997691, \"union\": 7404347, \"iou\": 0.4048555530960394, \"precision\": 0.5509120574330806, \"recall\": 0.6042861975110841, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}, \"scientific_metrics\": {\"metric_count\": 10, \"primary_metric\": \"agreement_valid\", \"primary_value\": 0.5368982307227642, \"values\": {\"agreement\": 0.5368982307227642, \"agreement_all\": 0.673395435818594, \"agreement_valid\": 0.5368982307227642, \"intersection\": 2997691, \"union\": 7404347, \"iou\": 0.4048555530960394, \"precision\": 0.5509120574330806, \"recall\": 0.6042861975110841, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}}, \"compute_metrics\": {\"wall_seconds\": 0.175307, \"cpu_seconds\": 0.175188, \"process_cpu_cumulative_seconds\": 1.287165, \"pid\": 312834, \"python_version\": \"3.12.3\", \"input_bytes\": 41337216, \"load_average_1m\": 0.2075, \"user_cpu_seconds\": 0.08815, \"system_cpu_seconds\": 0.087127, \"peak_rss_kib\": 160692, \"peak_rss_unit\": \"KiB (Linux ru_maxrss)\"}, \"site_profile\": {\"profile_version\": \"1\", \"site_id\": \"remote-7804a56a5c7636cc\", \"os_family\": \"linux\"}, \"elapsed_seconds\": 0.176}\n",
+      "stderr": "",
+      "plan_id": "PLAN004",
+      "coverage": {
+        "hypothesis_ids": [
+          "H002"
+        ],
+        "system_tested_scope": {
+          "kind": "candidate",
+          "signature": "transform(identity)"
+        },
+        "novelty": {
+          "status": "novel"
+        }
+      },
+      "diagnostic_rationale": "The three geolocation shifts produced negligible changes (max delta ~0.0002), weakening H001. The next most likely fault is a systematic cloud-mask threshold difference. Testing a threshold adjustment directly probes H002 and may reveal a larger sensitivity than the sub-pixel shifts.",
+      "predicted_observation": "agreement_valid after threshold adjustment; if it exceeds 0.537 by a meaningful margin (e.g., >0.55), H002 is supported; if within ~0.001 of 0.537, H002 is weakened."
+    },
+    {
+      "experiment_id": "EXP_005",
+      "tool": "transform_and_compare",
+      "arguments": {
+        "operation": "rot180"
+      },
+      "backend": "ssh_direct",
+      "remote_host": "server-114",
+      "remote_pid": 313336,
+      "job_id": "R01_V03_C_03_EXP_005",
+      "status": "COMPLETED",
+      "cost": 4,
+      "result": {
+        "status": "success",
+        "experiment_id": "EXP_005",
+        "tool": "transform_and_compare",
+        "arguments": {
+          "operation": "rot180"
+        },
+        "metrics": {
+          "operation": "rot180",
+          "agreement": 0.7982679671660752,
+          "agreement_all": 0.8547109270492717,
+          "agreement_valid": 0.7982679671660752,
+          "intersection": 4241226,
+          "union": 6160812,
+          "iou": 0.688419968017203,
+          "precision": 0.7794474286037737,
+          "recall": 0.8549628138207525,
+          "valid_pixels": 9515524,
+          "valid_fraction": 0.6905844163384364
+        },
+        "scientific_metrics": {
+          "metric_count": 10,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.7982679671660752,
+          "values": {
+            "agreement": 0.7982679671660752,
+            "agreement_all": 0.8547109270492717,
+            "agreement_valid": 0.7982679671660752,
+            "intersection": 4241226,
+            "union": 6160812,
+            "iou": 0.688419968017203,
+            "precision": 0.7794474286037737,
+            "recall": 0.8549628138207525,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "compute_metrics": {
+          "wall_seconds": 0.202541,
+          "cpu_seconds": 0.480419,
+          "process_cpu_cumulative_seconds": 1.207565,
+          "pid": 313336,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.0977,
+          "user_cpu_seconds": 0.402746,
+          "system_cpu_seconds": 0.069969,
+          "peak_rss_kib": 160688,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)"
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "remote-7804a56a5c7636cc",
+          "os_family": "linux"
+        },
+        "elapsed_seconds": 0.203
+      },
+      "compute_observation": {
+        "job_id": "R01_V03_C_03_EXP_005",
+        "backend": "ssh_direct",
+        "lifecycle_state": "COMPLETED",
+        "observed_at": 1788630592.4168465,
+        "remote_pid": 313336,
+        "compute_metrics": {
+          "lifecycle": [
+            {
+              "state": "SUBMITTED",
+              "observed_at": 1788630589.8920028
+            },
+            {
+              "state": "COMPLETED",
+              "observed_at": 1788630590.4500227
+            }
+          ],
+          "submit_timestamp": 1788630589.8920028,
+          "finish_timestamp": 1788630590.4500227,
+          "wall_seconds": 0.202541,
+          "cpu_seconds": 0.480419,
+          "process_cpu_cumulative_seconds": 1.207565,
+          "pid": 313336,
+          "python_version": "3.12.3",
+          "input_bytes": 41337216,
+          "load_average_1m": 0.0977,
+          "user_cpu_seconds": 0.402746,
+          "system_cpu_seconds": 0.069969,
+          "peak_rss_kib": 160688,
+          "peak_rss_unit": "KiB (Linux ru_maxrss)",
+          "executor_durations_seconds": {
+            "upload": 0.788937,
+            "wait": 0.55802,
+            "result_fetch": 0.643472
+          }
+        },
+        "scientific_metrics": {
+          "metric_count": 10,
+          "primary_metric": "agreement_valid",
+          "primary_value": 0.7982679671660752,
+          "values": {
+            "agreement": 0.7982679671660752,
+            "agreement_all": 0.8547109270492717,
+            "agreement_valid": 0.7982679671660752,
+            "intersection": 4241226,
+            "union": 6160812,
+            "iou": 0.688419968017203,
+            "precision": 0.7794474286037737,
+            "recall": 0.8549628138207525,
+            "valid_pixels": 9515524,
+            "valid_fraction": 0.6905844163384364
+          }
+        },
+        "site_profile": {
+          "profile_version": "1",
+          "site_id": "ssh-642478ca63710924",
+          "backend": "ssh_direct"
+        }
+      },
+      "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_005\", \"tool\": \"transform_and_compare\", \"arguments\": {\"operation\": \"rot180\"}, \"metrics\": {\"operation\": \"rot180\", \"agreement\": 0.7982679671660752, \"agreement_all\": 0.8547109270492717, \"agreement_valid\": 0.7982679671660752, \"intersection\": 4241226, \"union\": 6160812, \"iou\": 0.688419968017203, \"precision\": 0.7794474286037737, \"recall\": 0.8549628138207525, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}, \"scientific_metrics\": {\"metric_count\": 10, \"primary_metric\": \"agreement_valid\", \"primary_value\": 0.7982679671660752, \"values\": {\"agreement\": 0.7982679671660752, \"agreement_all\": 0.8547109270492717, \"agreement_valid\": 0.7982679671660752, \"intersection\": 4241226, \"union\": 6160812, \"iou\": 0.688419968017203, \"precision\": 0.7794474286037737, \"recall\": 0.8549628138207525, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}}, \"compute_metrics\": {\"wall_seconds\": 0.202541, \"cpu_seconds\": 0.480419, \"process_cpu_cumulative_seconds\": 1.207565, \"pid\": 313336, \"python_version\": \"3.12.3\", \"input_bytes\": 41337216, \"load_average_1m\": 0.0977, \"user_cpu_seconds\": 0.402746, \"system_cpu_seconds\": 0.069969, \"peak_rss_kib\": 160688, \"peak_rss_unit\": \"KiB (Linux ru_maxrss)\"}, \"site_profile\": {\"profile_version\": \"1\", \"site_id\": \"remote-7804a56a5c7636cc\", \"os_family\": \"linux\"}, \"elapsed_seconds\": 0.203}\n",
+      "stderr": "",
+      "plan_id": "PLAN006",
+      "coverage": {
+        "hypothesis_ids": [
+          "H002"
+        ],
+        "system_tested_scope": {
+          "kind": "candidate",
+          "signature": "transform(rot180)"
+        },
+        "novelty": {
+          "status": "novel"
+        }
+      },
+      "diagnostic_rationale": "The identity transform (E004) only confirmed the baseline; it did not test any actual threshold variation. The transform_and_compare tool supports operations like flip_x, flip_y, rot90, rot180, rot270, and transpose, which can reveal systematic orientation or axis-mapping errors between the two cloud masks. Such a misorientation would cause systematic disagreement that is not captured by small shifts. This directly probes H002 (systematic mask difference) with a materially different transformation family.",
+      "predicted_observation": "agreement_valid after applying rot180; if it exceeds 0.537 by a meaningful margin (e.g., >0.55), H002 is supported; if within ~0.001 of 0.537, H002 is weakened."
+    }
+  ],
+  "experiment_coverage": {
+    "tested_signatures": [
+      "shift_and_compare:{\"dc\":0,\"dr\":1}",
+      "shift_and_compare:{\"dc\":0,\"dr\":-1}",
+      "shift_and_compare:{\"dc\":1,\"dr\":0}",
+      "transform_and_compare:{\"operation\":\"identity\"}",
+      "transform_and_compare:{\"operation\":\"rot180\"}"
+    ],
+    "families": {
+      "shift_and_compare": {
+        "count": 3,
+        "best_delta": 0.00021859016907521678,
+        "low_information_count": 3,
+        "informative_count": 0
+      },
+      "transform_and_compare": {
+        "count": 2,
+        "best_delta": 0.26136973644331096,
+        "low_information_count": 1,
+        "informative_count": 1
+      }
+    }
+  },
+  "evidence": [
+    {
+      "evidence_id": "E001",
+      "experiment_id": "EXP_001",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.5368254023635483,
+      "delta": -7.282835921595954e-05,
+      "threshold": 0.75,
+      "residual_gap": 0.21317459763645175,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H001"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "shift(dr=1,dc=0)"
+      },
+      "diagnostic_rationale": "Directly test the geolocation-shift hypothesis by measuring agreement after applying a small integer pixel shift. A significant improvement would support H001; no improvement would weaken it.",
+      "predicted_observation": "agreement value after shift; if >0.537 by a meaningful margin, H001 is supported; if similar or lower, H001 is weakened."
+    },
+    {
+      "evidence_id": "E002",
+      "experiment_id": "EXP_002",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.5370673228295152,
+      "delta": 0.00016909210675097874,
+      "threshold": 0.75,
+      "residual_gap": 0.2129326771704848,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H001"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "shift(dr=-1,dc=0)"
+      },
+      "diagnostic_rationale": "The prior experiment tested only one shift direction. A shift in another direction (e.g., dr=-1,dc=0 or dr=0,dc=1) may reveal a systematic misregistration that the first test missed. This directly probes H001 with a materially different shift vector.",
+      "predicted_observation": "agreement_valid after the shift; if it exceeds 0.537 by a meaningful margin (e.g., >0.55), H001 is supported; if similar or lower, H001 is further weakened."
+    },
+    {
+      "evidence_id": "E003",
+      "experiment_id": "EXP_003",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.5371168208918394,
+      "delta": 0.00021859016907521678,
+      "threshold": 0.75,
+      "residual_gap": 0.21288317910816057,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H001"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "shift(dr=0,dc=1)"
+      },
+      "diagnostic_rationale": "The two prior shifts (dr=1,dc=0 and dr=-1,dc=0) produced negligible changes, weakening H001 for vertical shifts. Testing a horizontal shift (dr=0,dc=1) directly probes the remaining geolocation direction. A meaningful improvement would support H001; a negligible change would further weaken it.",
+      "predicted_observation": "agreement_valid after shift; if >0.55, H001 is supported; if within ~0.001 of 0.537, H001 is further weakened."
+    },
+    {
+      "evidence_id": "E004",
+      "experiment_id": "EXP_004",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.5368982307227642,
+      "delta": 0.0,
+      "threshold": 0.75,
+      "residual_gap": 0.2131017692772358,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H002"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "transform(identity)"
+      },
+      "diagnostic_rationale": "The three geolocation shifts produced negligible changes (max delta ~0.0002), weakening H001. The next most likely fault is a systematic cloud-mask threshold difference. Testing a threshold adjustment directly probes H002 and may reveal a larger sensitivity than the sub-pixel shifts.",
+      "predicted_observation": "agreement_valid after threshold adjustment; if it exceeds 0.537 by a meaningful margin (e.g., >0.55), H002 is supported; if within ~0.001 of 0.537, H002 is weakened."
+    },
+    {
+      "evidence_id": "E005",
+      "experiment_id": "EXP_005",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.7982679671660752,
+      "delta": 0.26136973644331096,
+      "threshold": 0.75,
+      "residual_gap": 0.0,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H002"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "transform(rot180)"
+      },
+      "diagnostic_rationale": "The identity transform (E004) only confirmed the baseline; it did not test any actual threshold variation. The transform_and_compare tool supports operations like flip_x, flip_y, rot90, rot180, rot270, and transpose, which can reveal systematic orientation or axis-mapping errors between the two cloud masks. Such a misorientation would cause systematic disagreement that is not captured by small shifts. This directly probes H002 (systematic mask difference) with a materially different transformation family.",
+      "predicted_observation": "agreement_valid after applying rot180; if it exceeds 0.537 by a meaningful margin (e.g., >0.55), H002 is supported; if within ~0.001 of 0.537, H002 is weakened."
+    }
+  ],
+  "experimental_evidence": [
+    {
+      "evidence_id": "E001",
+      "experiment_id": "EXP_001",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.5368254023635483,
+      "delta": -7.282835921595954e-05,
+      "threshold": 0.75,
+      "residual_gap": 0.21317459763645175,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H001"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "shift(dr=1,dc=0)"
+      },
+      "diagnostic_rationale": "Directly test the geolocation-shift hypothesis by measuring agreement after applying a small integer pixel shift. A significant improvement would support H001; no improvement would weaken it.",
+      "predicted_observation": "agreement value after shift; if >0.537 by a meaningful margin, H001 is supported; if similar or lower, H001 is weakened."
+    },
+    {
+      "evidence_id": "E002",
+      "experiment_id": "EXP_002",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.5370673228295152,
+      "delta": 0.00016909210675097874,
+      "threshold": 0.75,
+      "residual_gap": 0.2129326771704848,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H001"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "shift(dr=-1,dc=0)"
+      },
+      "diagnostic_rationale": "The prior experiment tested only one shift direction. A shift in another direction (e.g., dr=-1,dc=0 or dr=0,dc=1) may reveal a systematic misregistration that the first test missed. This directly probes H001 with a materially different shift vector.",
+      "predicted_observation": "agreement_valid after the shift; if it exceeds 0.537 by a meaningful margin (e.g., >0.55), H001 is supported; if similar or lower, H001 is further weakened."
+    },
+    {
+      "evidence_id": "E003",
+      "experiment_id": "EXP_003",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.5371168208918394,
+      "delta": 0.00021859016907521678,
+      "threshold": 0.75,
+      "residual_gap": 0.21288317910816057,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H001"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "shift(dr=0,dc=1)"
+      },
+      "diagnostic_rationale": "The two prior shifts (dr=1,dc=0 and dr=-1,dc=0) produced negligible changes, weakening H001 for vertical shifts. Testing a horizontal shift (dr=0,dc=1) directly probes the remaining geolocation direction. A meaningful improvement would support H001; a negligible change would further weaken it.",
+      "predicted_observation": "agreement_valid after shift; if >0.55, H001 is supported; if within ~0.001 of 0.537, H001 is further weakened."
+    },
+    {
+      "evidence_id": "E004",
+      "experiment_id": "EXP_004",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.5368982307227642,
+      "delta": 0.0,
+      "threshold": 0.75,
+      "residual_gap": 0.2131017692772358,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H002"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "transform(identity)"
+      },
+      "diagnostic_rationale": "The three geolocation shifts produced negligible changes (max delta ~0.0002), weakening H001. The next most likely fault is a systematic cloud-mask threshold difference. Testing a threshold adjustment directly probes H002 and may reveal a larger sensitivity than the sub-pixel shifts.",
+      "predicted_observation": "agreement_valid after threshold adjustment; if it exceeds 0.537 by a meaningful margin (e.g., >0.55), H002 is supported; if within ~0.001 of 0.537, H002 is weakened."
+    },
+    {
+      "evidence_id": "E005",
+      "experiment_id": "EXP_005",
+      "baseline_metric": 0.5368982307227642,
+      "observed_metric": 0.7982679671660752,
+      "delta": 0.26136973644331096,
+      "threshold": 0.75,
+      "residual_gap": 0.0,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364,
+      "interpretation": "Metric evidence pending hypothesis update.",
+      "supports": [],
+      "contradicts": [],
+      "tested_hypotheses": [
+        "H002"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "transform(rot180)"
+      },
+      "diagnostic_rationale": "The identity transform (E004) only confirmed the baseline; it did not test any actual threshold variation. The transform_and_compare tool supports operations like flip_x, flip_y, rot90, rot180, rot270, and transpose, which can reveal systematic orientation or axis-mapping errors between the two cloud masks. Such a misorientation would cause systematic disagreement that is not captured by small shifts. This directly probes H002 (systematic mask difference) with a materially different transformation family.",
+      "predicted_observation": "agreement_valid after applying rot180; if it exceeds 0.537 by a meaningful margin (e.g., >0.55), H002 is supported; if within ~0.001 of 0.537, H002 is weakened."
+    }
+  ],
+  "current_plan": {
+    "plan_id": "PLAN006",
+    "objective": "distinguish named hypotheses",
+    "diagnostic_rationale": "The identity transform (E004) only confirmed the baseline; it did not test any actual threshold variation. The transform_and_compare tool supports operations like flip_x, flip_y, rot90, rot180, rot270, and transpose, which can reveal systematic orientation or axis-mapping errors between the two cloud masks. Such a misorientation would cause systematic disagreement that is not captured by small shifts. This directly probes H002 (systematic mask difference) with a materially different transformation family.",
+    "predicted_observation": "agreement_valid after applying rot180; if it exceeds 0.537 by a meaningful margin (e.g., >0.55), H002 is supported; if within ~0.001 of 0.537, H002 is weakened.",
+    "target_hypotheses": [
+      "H002"
+    ],
+    "tested_scope": [],
+    "tool": "transform_and_compare",
+    "arguments": {
+      "operation": "rot180"
+    },
+    "expected_evidence": "Measure evidence that distinguishes the target hypotheses.",
+    "model_tested_scope": [],
+    "system_tested_scope": {
+      "kind": "candidate",
+      "signature": "transform(rot180)"
+    },
+    "coverage": {
+      "hypothesis_ids": [
+        "H002"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "transform(rot180)"
+      },
+      "novelty": {
+        "status": "novel"
+      }
+    },
+    "estimated_cost": 4
+  },
+  "budget_blocked": false,
+  "latest_result": {
+    "experiment_id": "EXP_005",
+    "tool": "transform_and_compare",
+    "arguments": {
+      "operation": "rot180"
+    },
+    "backend": "ssh_direct",
+    "remote_host": "server-114",
+    "remote_pid": 313336,
+    "job_id": "R01_V03_C_03_EXP_005",
+    "status": "COMPLETED",
+    "cost": 4,
+    "result": {
+      "status": "success",
+      "experiment_id": "EXP_005",
+      "tool": "transform_and_compare",
+      "arguments": {
+        "operation": "rot180"
+      },
+      "metrics": {
+        "operation": "rot180",
+        "agreement": 0.7982679671660752,
+        "agreement_all": 0.8547109270492717,
+        "agreement_valid": 0.7982679671660752,
+        "intersection": 4241226,
+        "union": 6160812,
+        "iou": 0.688419968017203,
+        "precision": 0.7794474286037737,
+        "recall": 0.8549628138207525,
+        "valid_pixels": 9515524,
+        "valid_fraction": 0.6905844163384364
+      },
+      "scientific_metrics": {
+        "metric_count": 10,
+        "primary_metric": "agreement_valid",
+        "primary_value": 0.7982679671660752,
+        "values": {
+          "agreement": 0.7982679671660752,
+          "agreement_all": 0.8547109270492717,
+          "agreement_valid": 0.7982679671660752,
+          "intersection": 4241226,
+          "union": 6160812,
+          "iou": 0.688419968017203,
+          "precision": 0.7794474286037737,
+          "recall": 0.8549628138207525,
+          "valid_pixels": 9515524,
+          "valid_fraction": 0.6905844163384364
+        }
+      },
+      "compute_metrics": {
+        "wall_seconds": 0.202541,
+        "cpu_seconds": 0.480419,
+        "process_cpu_cumulative_seconds": 1.207565,
+        "pid": 313336,
+        "python_version": "3.12.3",
+        "input_bytes": 41337216,
+        "load_average_1m": 0.0977,
+        "user_cpu_seconds": 0.402746,
+        "system_cpu_seconds": 0.069969,
+        "peak_rss_kib": 160688,
+        "peak_rss_unit": "KiB (Linux ru_maxrss)"
+      },
+      "site_profile": {
+        "profile_version": "1",
+        "site_id": "remote-7804a56a5c7636cc",
+        "os_family": "linux"
+      },
+      "elapsed_seconds": 0.203
+    },
+    "compute_observation": {
+      "job_id": "R01_V03_C_03_EXP_005",
+      "backend": "ssh_direct",
+      "lifecycle_state": "COMPLETED",
+      "observed_at": 1788630592.4168465,
+      "remote_pid": 313336,
+      "compute_metrics": {
+        "lifecycle": [
+          {
+            "state": "SUBMITTED",
+            "observed_at": 1788630589.8920028
+          },
+          {
+            "state": "COMPLETED",
+            "observed_at": 1788630590.4500227
+          }
+        ],
+        "submit_timestamp": 1788630589.8920028,
+        "finish_timestamp": 1788630590.4500227,
+        "wall_seconds": 0.202541,
+        "cpu_seconds": 0.480419,
+        "process_cpu_cumulative_seconds": 1.207565,
+        "pid": 313336,
+        "python_version": "3.12.3",
+        "input_bytes": 41337216,
+        "load_average_1m": 0.0977,
+        "user_cpu_seconds": 0.402746,
+        "system_cpu_seconds": 0.069969,
+        "peak_rss_kib": 160688,
+        "peak_rss_unit": "KiB (Linux ru_maxrss)",
+        "executor_durations_seconds": {
+          "upload": 0.788937,
+          "wait": 0.55802,
+          "result_fetch": 0.643472
+        }
+      },
+      "scientific_metrics": {
+        "metric_count": 10,
+        "primary_metric": "agreement_valid",
+        "primary_value": 0.7982679671660752,
+        "values": {
+          "agreement": 0.7982679671660752,
+          "agreement_all": 0.8547109270492717,
+          "agreement_valid": 0.7982679671660752,
+          "intersection": 4241226,
+          "union": 6160812,
+          "iou": 0.688419968017203,
+          "precision": 0.7794474286037737,
+          "recall": 0.8549628138207525,
+          "valid_pixels": 9515524,
+          "valid_fraction": 0.6905844163384364
+        }
+      },
+      "site_profile": {
+        "profile_version": "1",
+        "site_id": "ssh-642478ca63710924",
+        "backend": "ssh_direct"
+      }
+    },
+    "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_005\", \"tool\": \"transform_and_compare\", \"arguments\": {\"operation\": \"rot180\"}, \"metrics\": {\"operation\": \"rot180\", \"agreement\": 0.7982679671660752, \"agreement_all\": 0.8547109270492717, \"agreement_valid\": 0.7982679671660752, \"intersection\": 4241226, \"union\": 6160812, \"iou\": 0.688419968017203, \"precision\": 0.7794474286037737, \"recall\": 0.8549628138207525, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}, \"scientific_metrics\": {\"metric_count\": 10, \"primary_metric\": \"agreement_valid\", \"primary_value\": 0.7982679671660752, \"values\": {\"agreement\": 0.7982679671660752, \"agreement_all\": 0.8547109270492717, \"agreement_valid\": 0.7982679671660752, \"intersection\": 4241226, \"union\": 6160812, \"iou\": 0.688419968017203, \"precision\": 0.7794474286037737, \"recall\": 0.8549628138207525, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}}, \"compute_metrics\": {\"wall_seconds\": 0.202541, \"cpu_seconds\": 0.480419, \"process_cpu_cumulative_seconds\": 1.207565, \"pid\": 313336, \"python_version\": \"3.12.3\", \"input_bytes\": 41337216, \"load_average_1m\": 0.0977, \"user_cpu_seconds\": 0.402746, \"system_cpu_seconds\": 0.069969, \"peak_rss_kib\": 160688, \"peak_rss_unit\": \"KiB (Linux ru_maxrss)\"}, \"site_profile\": {\"profile_version\": \"1\", \"site_id\": \"remote-7804a56a5c7636cc\", \"os_family\": \"linux\"}, \"elapsed_seconds\": 0.203}\n",
+    "stderr": "",
+    "plan_id": "PLAN006",
+    "coverage": {
+      "hypothesis_ids": [
+        "H002"
+      ],
+      "system_tested_scope": {
+        "kind": "candidate",
+        "signature": "transform(rot180)"
+      },
+      "novelty": {
+        "status": "novel"
+      }
+    },
+    "diagnostic_rationale": "The identity transform (E004) only confirmed the baseline; it did not test any actual threshold variation. The transform_and_compare tool supports operations like flip_x, flip_y, rot90, rot180, rot270, and transpose, which can reveal systematic orientation or axis-mapping errors between the two cloud masks. Such a misorientation would cause systematic disagreement that is not captured by small shifts. This directly probes H002 (systematic mask difference) with a materially different transformation family.",
+    "predicted_observation": "agreement_valid after applying rot180; if it exceeds 0.537 by a meaningful margin (e.g., >0.55), H002 is supported; if within ~0.001 of 0.537, H002 is weakened."
+  },
+  "budget_total": 30,
+  "budget_remaining": 9,
+  "steps_used": 6,
+  "max_steps": 8,
+  "quality_threshold": 0.75,
+  "reflection": {
+    "decision": "propose_fault",
+    "best_hypothesis_id": "H002",
+    "unresolved_questions": [
+      "Which specific orientation error (e.g., flip_x, flip_y, rot90, rot270, transpose) best explains the disagreement, and does the corrected agreement exceed the threshold robustly?"
+    ],
+    "summary": "Geolocation shifts (E001-E003) produced negligible changes (max delta ~0.0002), weakening H001. The rot180 transform (E005) dramatically improved agreement from 0.537 to 0.798, exceeding the 0.75 threshold, indicating a systematic orientation/axis-mapping error between the cloud masks. This supports H002 (systematic mask difference) and identifies a fault. Knowledge evidence (K001-K003) does not support no-fault H004. Remaining budget is 9; further experiments could confirm the exact orientation correction."
+  },
+  "diagnosis_status": "accepted_fault",
+  "validated_decision": "fault",
+  "final_diagnosis": {
+    "decision": "fault",
+    "fault_family": "orientation_axis_mapping_error",
+    "root_cause": "A systematic orientation/axis-mapping error exists between the Meteosat and EPIC cloud masks. Applying a 180-degree rotation to one mask raises agreement from 0.537 to 0.798, exceeding the 0.75 quality threshold.",
+    "confidence": 0.9,
+    "evidence_experiment_ids": [
+      "EXP_001",
+      "EXP_002",
+      "EXP_003",
+      "EXP_004",
+      "EXP_005"
+    ],
+    "recommended_repair": {
+      "action": "Apply a 180-degree rotation to one of the cloud masks before comparison, or correct the underlying axis/orientation mapping in the comparison pipeline.",
+      "expected_metric": 0.7982679671660752,
+      "threshold": 0.75
+    },
+    "remaining_uncertainty": [
+      "The exact source of the orientation error (e.g., which mask is inverted, or whether a transpose or flip is also needed) is not fully isolated; only rot180 was tested.",
+      "Whether the 0.798 agreement is the maximum achievable or whether other transformations (rot90, rot270, flips) yield even higher agreement remains untested."
+    ],
+    "evidence_summary": {
+      "experimental_evidence_ids": [
+        "E001",
+        "E002",
+        "E003",
+        "E004",
+        "E005"
+      ],
+      "knowledge_evidence_ids": [
+        "K001",
+        "K002",
+        "K003"
+      ],
+      "final_inference": "A systematic orientation/axis-mapping error exists between the Meteosat and EPIC cloud masks. Applying a 180-degree rotation to one mask raises agreement from 0.537 to 0.798, exceeding the 0.75 quality threshold."
+    }
+  },
+  "stop_reason": null,
+  "latest_action_kind": "compute_experiment",
+  "knowledge_queries": [
+    {
+      "query_id": "Q001",
+      "plan_id": "PLAN005",
+      "target_hypotheses": [
+        "H004"
+      ],
+      "diagnostic_rationale": "Spatial shifts (H001) and threshold identity (H002) have not improved agreement. The observed agreement of 0.537 may be scientifically valid for this comparison, and the quality threshold may be inappropriate. A knowledge query can provide context on typical agreement values and whether 0.537 is plausible, supporting H004.",
+      "predicted_observation": "Retrieved documents indicating typical agreement ranges; if 0.537 is within expected range, H004 is supported; if not, H004 is weakened.",
+      "tool": "retrieve_scientific_knowledge",
+      "category": "knowledge_query",
+      "cost": 1,
+      "query": "typical agreement between Meteosat and EPIC cloud masks",
+      "top_k": 3,
+      "hits": [
+        {
+          "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+          "title": "MSG MPEF Algorithm Specification Document",
+          "authority": "official",
+          "version": "v7B e-signed",
+          "section": "8.3.2.6 Cloud Top Height, Cloud Top Temperature and Effective Cloud Amount",
+          "page": "104",
+          "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0247",
+          "excerpt": "EUM/MSG/SPE/022\nv7B e-signed , 23 October 2015\nMSG Meteorological Products Extraction Facility Algorithm\nSpecification Document\n\n\uf0b7 Calculate the difference between the calculated radiance (from the RTM) of channel IR10.8 and\nthe predicted clear sky radiance of that channel for all pressure levels between the tropopause and\nthe lowest possible cloud level. (RADDIF10.8, calculated (p))\n\uf0b7 Calculate the difference between the calculated radiance (from the RTM) of channel IR13.4 and\nthe predicted clear sky radiance of that channel for all pressure levels between the tropopause and\nthe lowest possible cloud level. (RADDIF13.4, calculated (p))\n\uf0b7 Calculate the difference between the calculated radiance (from the RTM) of channel WV6.2 and\nthe predicted clear sky radiance of that channel for all pressure levels between the tropopause and\nthe lowest possible cloud level. (RADDIF6.2, calculated (p))\n\uf0b7 Calculate the difference between the calculated radiance (from the RTM) of channel WV7.3 and\nthe predicted clear sky radiance of that channel for all pressure levels between the tropopause and\nthe lowest possible cloud level. (RADDIF7.3, calculated (p))\n\uf0b7 Calculate the following ratios for each pressure level between the tropopause and the lowest\npossible cloud level:\nRATIO1 (p) = rat_cor_13.4 * RADDIF13.4, calculated (p) / RADDIF10.8, calculated (p)\nRATIO2 (p) = rat_cor_6.2 * RADDIF6.2, calculated (p) / RADDIF10.8, calculated (p)\nRATIO3 (p) = rat_cor_7.3 * RADDIF7.3, calculated (p) / RADDIF10.8, calculated (p)\nwhere rat_cor_13.4, rat_cor_6.2, rat_cor_7.3 are correction factors given in a static data set.\nThese correction factors depend on the cloud phase.\n\uf0b7 For each of the three channel combinations find the level (LCLD,1 , LCLD,2 , LCLD,3 ) between the\ntropopause and the lowest possible cloud level with the best agreement (minimum difference)\nbetween the ratio with measured radiances (i.e. RATIO1, RATIO2, RATIO3) and the ratio with\ncalculated radiances (i.e. RATIO1 (p) , RATIO2 (p) , RATIO3 (p).\n\uf0b7 For each of the three channel combinations extract the pressure of that level, i.e. the cloud top\nheight in hPa (PCTH 1, 2, 3).\n\uf0b7 For each of the three channel combinations extract the temperature of that level, i.e. the cloud top\ntemperature in kelvin (TCTH 1, 2, 3).\n\uf0b7 For each of the three channel combinations the effective cloud amount (NEFF in units of %) is\nderived as follows:\n- Extract the difference between the calculated radiance and the clear sky radiance in channel\n10.8 at the derived cloud level (RADDIF10.8 , calculated, lcld).\n- Derive the effective cloud amount by building the following ratio:\nNEFF1, 2, 3 = 100 * RADDIF10.8 , measured / RADDIF10.8, calculated, LCLD, 1, 2, 3\nIf the effective cloud amount is larger than neff_max, it shall be reset to neff_max.\nIf the effective cloud amount is smaller than neff_min and if the semi_transp_flag is set to\nopaque, the semi_transp_flag shall be reset to semi-transparent/partly cloudy.\nThe final product output for the cloud top height, the cloud top temperature and the effective cloud\namount will be derived as follows:\n\uf0b7 If the cloud phase is set to ice phase or to mixed phase and if the EBBT measured in channel\nIR10.8 or channel IR12.0 is colder than the predicted EBBT by a threshold DiffBase, then the\ncloud top parameters shall be derived as follows:\nCloud top height, PCTH = a0 + a1 * PCTH1 + a2 * PCTH2 + a3 * PCTH3",
+          "retrieval_score": 9.49375577
+        },
+        {
+          "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+          "title": "MSG MPEF Algorithm Specification Document",
+          "authority": "official",
+          "version": "v7B e-signed",
+          "section": "1.6 Acronyms/Abbreviations and Terms used in this Document",
+          "page": "20",
+          "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0060",
+          "excerpt": "EUM/MSG/SPE/022\nv7B e-signed , 23 October 2015\nMSG Meteorological Products Extraction Facility Algorithm\nSpecification Document\n\nAcronym Meaning\nICAO International Civil Aviation Organization\nICSU International Council for Science\nIDS ISCCP Data Set Product\nIGBP International Geosphere-Biosphere Programme\nIR Infrared (channels of SEVIRI)\nISCCP International Satellite Cloud Climatology Project\nLEO Low Earth Orbit\nLSD Local Standard Deviation\nLST Land Surface Temperature (product of Land Surface Analysis SAF)\nLUT Look-Up Table\nM&C Monitoring and Control\nMODIS Moderate Resolution Imaging Spectroradiometer\nMOP Meteosat Operational Programme\nMPE Multi-sensor Precipitation Estimate Product\nMPEF Meteorological Products Extraction Facility\nMQC Manual Quality Control\nMSG Meteosat Second Generation\nMTP Meteosat Transition Programme\nNDVI Normalised Difference Vegetation Index Product\nNIR Near Infrared (NIR1.6 channel of SEVIRI)\nNOAA National Oceanic and Atmospheric Administration (also the series of LEO satellites\noperated by this organisation)\nNRT Near Real Time\nNTC Normalised Total Contribution\nNTCC Normalised Total Cumulative Contribution\nNWP Numerical Weather Prediction\nOCC Operational Calibration Coefficient\nOCA Optimal Cloud Analysis\nPB Processing Box\nPNG Portable Network Graphics (image format)\nPQM Product Quality Monitoring\nQI Quality Index\nRFF Recursive Filter Function\nRII Regional Instability Index Product\nRMS Root Mean Square\nRSM Radiance Sampling Method\nRSS Rapid Scanning Service\nRTM Radiative Transfer Model\nRTTOV Radiative Transfer model for TOVS",
+          "retrieval_score": 8.10921033
+        },
+        {
+          "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+          "title": "MSG MPEF Algorithm Specification Document",
+          "authority": "official",
+          "version": "v7B e-signed",
+          "section": "8.3.2.6 Cloud Top Height, Cloud Top Temperature and Effective Cloud Amount",
+          "page": "103",
+          "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0246",
+          "excerpt": "Estimation\nThis function shall derive the cloud top temperature (in kelvin), the cloud top height (in hPa) and the\neffective cloud amount (in %).\nThe cloud top height, the cloud top temperature and the effective cloud amount shall be determined\non a pixel basis for all pixels flagged as cloudy as follows:\n\uf0b7 Interpolate the data provided by the RTM (which already has been horizontally interpolated) in\nthe vertical to fixed vertical_int hPa pressure levels between the tropopause and the surface.\n\uf0b7 Extract the level with the smallest difference of measured and calculated radiances in channel\nIR10.8 between the tropopause and the surface (i.e. lowest possible cloud level). Extract: the\npressure of that level, i.e. the cloud top height in hPa (PCLH0), the temperature of that level, i.e.\nthe cloud top temperature in kelvin (TCTH0) and set the effective cloud amount of the level to\n100% (NEFF0). If the extracted level is equal to the surface and if the cloud is flagged as opaque\nin the cloud analysis, the cloud height shall be set to the pressure of the closest level above the\nsurface, the cloud top temperature shall be set to the predicted temperature of that level, the\neffective cloud amount shall be set to 100%, the cloud type shall be reset to fog/stratus and the\nfollowing steps shall be skipped.\n\uf0b7 Calculate the difference between the measured radiance of channel IR10.8 and the predicted clear\nsky radiance of that channel (RADDIF10.8, measured). If channel IR10.8 is not available channel\nIR12.0 shall be selected instead.\n\uf0b7 Calculate the difference between the measured radiance of channel IR13.4 and the predicted clear\nsky radiance of that channel. (RADDIF13.4, measured)\n\uf0b7 Calculate the difference between the measured radiance of channel WV6.2 and the predicted clear\nsky radiance of that channel. (RADDIF6.2, measured)\n\uf0b7 Calculate the difference between the measured radiance of channel WV7.3 and the predicted clear\nsky radiance of that channel. (RADDIF7.3, measured)\n\uf0b7 Calculate the following ratios:\nRATIO1 = rat_cor_13.4 * RADDIF13.4, measured / RADDIF10.8, measured\nRATIO2 = rat_cor_6.2 * RADDIF6.2, measured / RADDIF10.8, measured\nRATIO3 = rat_cor_7.3 * RADDIF7.3, measured / RADDIF10.8, measured\nwhere\nrat_cor_13.4, rat_cor_6.2, rat_cor_7.3 are correction factors given in a static data set. These\ncorrection factors depend on the cloud phase.",
+          "retrieval_score": 6.89673844
+        }
+      ]
+    }
+  ],
+  "knowledge_evidence": [
+    {
+      "evidence_id": "K001",
+      "kind": "knowledge",
+      "query_id": "Q001",
+      "source": {
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "authority": "official",
+        "version": "v7B e-signed",
+        "section": "8.3.2.6 Cloud Top Height, Cloud Top Temperature and Effective Cloud Amount",
+        "page": "104",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0247"
+      },
+      "claim": "The retrieved MSG MPEF Algorithm Specification Document describes the cloud top height, temperature, and effective cloud amount derivation algorithm, but contains no information about typical agreement values between Meteosat and EPIC cloud masks. Therefore, it does not support the no-fault hypothesis H004.",
+      "supports_hypotheses": [],
+      "contradicts_hypotheses": [
+        "H004"
+      ],
+      "validated": false,
+      "excerpt": "EUM/MSG/SPE/022\nv7B e-signed , 23 October 2015\nMSG Meteorological Products Extraction Facility Algorithm\nSpecification Document\n\n\uf0b7 Calculate the difference between the calculated radiance (from the RTM) of channel IR10.8 and\nthe predicted clear sky radiance of that channel for all pressure levels between the tropopause and\nthe lowest possible cloud level. (RADDIF10.8, calculated (p))\n\uf0b7 Calculate the difference between the calculated radiance (from the RTM) of channel IR13.4 and\nthe predicted clear sky radiance of that channel for all pressure levels between the tropopause and\nthe lowest possible cloud level. (RADDIF13.4, calculated (p))\n\uf0b7 Calculate the difference between the calculated radiance (from the RTM) of channel WV6.2 and\nthe predicted clear sky radiance of that channel for all pressure levels between the tropopause and\nthe lowest possible cloud level. (RADDIF6.2, calculated (p))\n\uf0b7 Calculate the difference between the calculated radiance (from the RTM) of channel WV7.3 and\nthe predicted clear sky radiance of that channel for all pressure levels between the tropopause and\nthe lowest possible cloud level. (RADDIF7.3, calculated (p))\n\uf0b7 Calculate the following ratios for each pressure level between the tropopause and the lowest\npossible cloud level:\nRATIO1 (p) = rat_cor_13.4 * RADDIF13.4, calculated (p) / RADDIF10.8, calculated (p)\nRATIO2 (p) = rat_cor_6.2 * RADDIF6.2, calculated (p) / RADDIF10.8, calculated (p)\nRATIO3 (p) = rat_cor_7.3 * RADDIF7.3, calculated (p) / RADDIF10.8, calculated (p)\nwhere rat_cor_13.4, rat_cor_6.2, rat_cor_7.3 are correction factors given in a static data set.\nThese correction factors depend on the cloud phase.\n\uf0b7 For each of the three channel combinations find the level (LCLD,1 , LCLD,2 , LCLD,3 ) between the\ntropopause and the lowest possible cloud level with the best agreement (minimum difference)\nbetween the ratio with measured radiances (i.e. RATIO1, RATIO2, RATIO3) and the ratio with\ncalculated radiances (i.e. RATIO1 (p) , RATIO2 (p) , RATIO3 (p).\n\uf0b7 For each of the three channel combinations extract the pressure of that level, i.e. the cloud top\nheight in hPa (PCTH 1, 2, 3).\n\uf0b7 For each of the three channel combinations extract the temperature of that level, i.e. the cloud top\ntemperature in kelvin (TCTH 1, 2, 3).\n\uf0b7 For each of the three channel combinations the effective cloud amount (NEFF in units of %) is\nderived as follows:\n- Extract the difference between the calculated radiance and the clear sky radiance in channel\n10.8 at the derived cloud level (RADDIF10.8 , calculated, lcld).\n- Derive the effective cloud amount by building the following ratio:\nNEFF1, 2, 3 = 100 * RADDIF10.8 , measured / RADDIF10.8, calculated, LCLD, 1, 2, 3\nIf the effective cloud amount is larger than neff_max, it shall be reset to neff_max.\nIf the effective cloud amount is smaller than neff_min and if the semi_transp_flag is set to\nopaque, the semi_transp_flag shall be reset to semi-transparent/partly cloudy.\nThe final product output for the cloud top height, the cloud top temperature and the effective cloud\namount will be derived as follows:\n\uf0b7 If the cloud phase is set to ice phase or to mixed phase and if the EBBT measured in channel\nIR10.8 or channel IR12.0 is colder than the predicted EBBT by a threshold DiffBase, then the\ncloud top parameters shall be derived as follows:\nCloud top height, PCTH = a0 + a1 * PCTH1 + a2 * PCTH2 + a3 * PCTH3",
+      "retrieval_score": 9.49375577,
+      "target_hypotheses": [
+        "H004"
+      ]
+    },
+    {
+      "evidence_id": "K002",
+      "kind": "knowledge",
+      "query_id": "Q001",
+      "source": {
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "authority": "official",
+        "version": "v7B e-signed",
+        "section": "1.6 Acronyms/Abbreviations and Terms used in this Document",
+        "page": "20",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0060"
+      },
+      "claim": "The retrieved acronym list from the MSG MPEF Algorithm Specification Document provides no information about typical agreement between Meteosat and EPIC cloud masks. It does not support the no-fault hypothesis H004.",
+      "supports_hypotheses": [],
+      "contradicts_hypotheses": [
+        "H004"
+      ],
+      "validated": false,
+      "excerpt": "EUM/MSG/SPE/022\nv7B e-signed , 23 October 2015\nMSG Meteorological Products Extraction Facility Algorithm\nSpecification Document\n\nAcronym Meaning\nICAO International Civil Aviation Organization\nICSU International Council for Science\nIDS ISCCP Data Set Product\nIGBP International Geosphere-Biosphere Programme\nIR Infrared (channels of SEVIRI)\nISCCP International Satellite Cloud Climatology Project\nLEO Low Earth Orbit\nLSD Local Standard Deviation\nLST Land Surface Temperature (product of Land Surface Analysis SAF)\nLUT Look-Up Table\nM&C Monitoring and Control\nMODIS Moderate Resolution Imaging Spectroradiometer\nMOP Meteosat Operational Programme\nMPE Multi-sensor Precipitation Estimate Product\nMPEF Meteorological Products Extraction Facility\nMQC Manual Quality Control\nMSG Meteosat Second Generation\nMTP Meteosat Transition Programme\nNDVI Normalised Difference Vegetation Index Product\nNIR Near Infrared (NIR1.6 channel of SEVIRI)\nNOAA National Oceanic and Atmospheric Administration (also the series of LEO satellites\noperated by this organisation)\nNRT Near Real Time\nNTC Normalised Total Contribution\nNTCC Normalised Total Cumulative Contribution\nNWP Numerical Weather Prediction\nOCC Operational Calibration Coefficient\nOCA Optimal Cloud Analysis\nPB Processing Box\nPNG Portable Network Graphics (image format)\nPQM Product Quality Monitoring\nQI Quality Index\nRFF Recursive Filter Function\nRII Regional Instability Index Product\nRMS Root Mean Square\nRSM Radiance Sampling Method\nRSS Rapid Scanning Service\nRTM Radiative Transfer Model\nRTTOV Radiative Transfer model for TOVS",
+      "retrieval_score": 8.10921033,
+      "target_hypotheses": [
+        "H004"
+      ]
+    },
+    {
+      "evidence_id": "K003",
+      "kind": "knowledge",
+      "query_id": "Q001",
+      "source": {
+        "source_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD",
+        "title": "MSG MPEF Algorithm Specification Document",
+        "authority": "official",
+        "version": "v7B e-signed",
+        "section": "8.3.2.6 Cloud Top Height, Cloud Top Temperature and Effective Cloud Amount",
+        "page": "103",
+        "chunk_id": "EUMETSAT_MSG_MET_PRODUCTS_ATBD:0246"
+      },
+      "claim": "The retrieved MSG MPEF Algorithm Specification Document section describes the cloud top height estimation algorithm but provides no information about typical agreement values between Meteosat and EPIC cloud masks. It does not support the no-fault hypothesis H004.",
+      "supports_hypotheses": [],
+      "contradicts_hypotheses": [
+        "H004"
+      ],
+      "validated": false,
+      "excerpt": "Estimation\nThis function shall derive the cloud top temperature (in kelvin), the cloud top height (in hPa) and the\neffective cloud amount (in %).\nThe cloud top height, the cloud top temperature and the effective cloud amount shall be determined\non a pixel basis for all pixels flagged as cloudy as follows:\n\uf0b7 Interpolate the data provided by the RTM (which already has been horizontally interpolated) in\nthe vertical to fixed vertical_int hPa pressure levels between the tropopause and the surface.\n\uf0b7 Extract the level with the smallest difference of measured and calculated radiances in channel\nIR10.8 between the tropopause and the surface (i.e. lowest possible cloud level). Extract: the\npressure of that level, i.e. the cloud top height in hPa (PCLH0), the temperature of that level, i.e.\nthe cloud top temperature in kelvin (TCTH0) and set the effective cloud amount of the level to\n100% (NEFF0). If the extracted level is equal to the surface and if the cloud is flagged as opaque\nin the cloud analysis, the cloud height shall be set to the pressure of the closest level above the\nsurface, the cloud top temperature shall be set to the predicted temperature of that level, the\neffective cloud amount shall be set to 100%, the cloud type shall be reset to fog/stratus and the\nfollowing steps shall be skipped.\n\uf0b7 Calculate the difference between the measured radiance of channel IR10.8 and the predicted clear\nsky radiance of that channel (RADDIF10.8, measured). If channel IR10.8 is not available channel\nIR12.0 shall be selected instead.\n\uf0b7 Calculate the difference between the measured radiance of channel IR13.4 and the predicted clear\nsky radiance of that channel. (RADDIF13.4, measured)\n\uf0b7 Calculate the difference between the measured radiance of channel WV6.2 and the predicted clear\nsky radiance of that channel. (RADDIF6.2, measured)\n\uf0b7 Calculate the difference between the measured radiance of channel WV7.3 and the predicted clear\nsky radiance of that channel. (RADDIF7.3, measured)\n\uf0b7 Calculate the following ratios:\nRATIO1 = rat_cor_13.4 * RADDIF13.4, measured / RADDIF10.8, measured\nRATIO2 = rat_cor_6.2 * RADDIF6.2, measured / RADDIF10.8, measured\nRATIO3 = rat_cor_7.3 * RADDIF7.3, measured / RADDIF10.8, measured\nwhere\nrat_cor_13.4, rat_cor_6.2, rat_cor_7.3 are correction factors given in a static data set. These\ncorrection factors depend on the cloud phase.",
+      "retrieval_score": 6.89673844,
+      "target_hypotheses": [
+        "H004"
+      ]
+    }
+  ],
+  "knowledge_enabled": true,
+  "rag_ablation": {
+    "cohort": "C",
+    "knowledge_enabled": true,
+    "query_cost": 1,
+    "shared_contract": [
+      "same_planner_implementation",
+      "same_hypothesis_prompt",
+      "same_compute_tool_specs_and_order",
+      "same_budget_and_max_steps",
+      "same_validation_and_evidence_semantics",
+      "same_public_case_inputs"
+    ]
+  }
+}

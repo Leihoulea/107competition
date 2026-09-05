@@ -1,0 +1,138 @@
+{
+  "experiment_id": "EXP_004",
+  "tool": "shift_and_compare",
+  "arguments": {
+    "dr": -3,
+    "dc": 2
+  },
+  "backend": "ssh_direct",
+  "remote_host": "server-114",
+  "remote_pid": 310042,
+  "job_id": "R01_V03_C_02_EXP_004",
+  "status": "COMPLETED",
+  "cost": 4,
+  "result": {
+    "status": "success",
+    "experiment_id": "EXP_004",
+    "tool": "shift_and_compare",
+    "arguments": {
+      "dr": -3,
+      "dc": 2
+    },
+    "metrics": {
+      "dr": -3,
+      "dc": 2,
+      "agreement": 0.5370282288185075,
+      "agreement_all": 0.6728152752489596,
+      "agreement_valid": 0.5370282288185075,
+      "intersection": 2996101,
+      "union": 7401520,
+      "iou": 0.40479536635718066,
+      "precision": 0.5506198491396579,
+      "recall": 0.6045039270245508,
+      "valid_pixels": 9515524,
+      "valid_fraction": 0.6905844163384364
+    },
+    "scientific_metrics": {
+      "metric_count": 12,
+      "primary_metric": "agreement_valid",
+      "primary_value": 0.5370282288185075,
+      "values": {
+        "dr": -3,
+        "dc": 2,
+        "agreement": 0.5370282288185075,
+        "agreement_all": 0.6728152752489596,
+        "agreement_valid": 0.5370282288185075,
+        "intersection": 2996101,
+        "union": 7401520,
+        "iou": 0.40479536635718066,
+        "precision": 0.5506198491396579,
+        "recall": 0.6045039270245508,
+        "valid_pixels": 9515524,
+        "valid_fraction": 0.6905844163384364
+      }
+    },
+    "compute_metrics": {
+      "wall_seconds": 0.21028,
+      "cpu_seconds": 0.210256,
+      "process_cpu_cumulative_seconds": 1.284071,
+      "pid": 310042,
+      "python_version": "3.12.3",
+      "input_bytes": 41337216,
+      "load_average_1m": 0.2061,
+      "user_cpu_seconds": 0.12187,
+      "system_cpu_seconds": 0.088664,
+      "peak_rss_kib": 160740,
+      "peak_rss_unit": "KiB (Linux ru_maxrss)"
+    },
+    "site_profile": {
+      "profile_version": "1",
+      "site_id": "remote-7804a56a5c7636cc",
+      "os_family": "linux"
+    },
+    "elapsed_seconds": 0.211
+  },
+  "compute_observation": {
+    "job_id": "R01_V03_C_02_EXP_004",
+    "backend": "ssh_direct",
+    "lifecycle_state": "COMPLETED",
+    "observed_at": 1788630339.1221743,
+    "remote_pid": 310042,
+    "compute_metrics": {
+      "lifecycle": [
+        {
+          "state": "SUBMITTED",
+          "observed_at": 1788630336.4602108
+        },
+        {
+          "state": "COMPLETED",
+          "observed_at": 1788630337.1810362
+        }
+      ],
+      "submit_timestamp": 1788630336.4602108,
+      "finish_timestamp": 1788630337.1810362,
+      "wall_seconds": 0.21028,
+      "cpu_seconds": 0.210256,
+      "process_cpu_cumulative_seconds": 1.284071,
+      "pid": 310042,
+      "python_version": "3.12.3",
+      "input_bytes": 41337216,
+      "load_average_1m": 0.2061,
+      "user_cpu_seconds": 0.12187,
+      "system_cpu_seconds": 0.088664,
+      "peak_rss_kib": 160740,
+      "peak_rss_unit": "KiB (Linux ru_maxrss)",
+      "executor_durations_seconds": {
+        "upload": 0.918161,
+        "wait": 0.720839,
+        "result_fetch": 0.346874
+      }
+    },
+    "scientific_metrics": {
+      "metric_count": 12,
+      "primary_metric": "agreement_valid",
+      "primary_value": 0.5370282288185075,
+      "values": {
+        "dr": -3,
+        "dc": 2,
+        "agreement": 0.5370282288185075,
+        "agreement_all": 0.6728152752489596,
+        "agreement_valid": 0.5370282288185075,
+        "intersection": 2996101,
+        "union": 7401520,
+        "iou": 0.40479536635718066,
+        "precision": 0.5506198491396579,
+        "recall": 0.6045039270245508,
+        "valid_pixels": 9515524,
+        "valid_fraction": 0.6905844163384364
+      }
+    },
+    "site_profile": {
+      "profile_version": "1",
+      "site_id": "ssh-642478ca63710924",
+      "backend": "ssh_direct"
+    }
+  },
+  "stdout": "{\"status\": \"success\", \"experiment_id\": \"EXP_004\", \"tool\": \"shift_and_compare\", \"arguments\": {\"dr\": -3, \"dc\": 2}, \"metrics\": {\"dr\": -3, \"dc\": 2, \"agreement\": 0.5370282288185075, \"agreement_all\": 0.6728152752489596, \"agreement_valid\": 0.5370282288185075, \"intersection\": 2996101, \"union\": 7401520, \"iou\": 0.40479536635718066, \"precision\": 0.5506198491396579, \"recall\": 0.6045039270245508, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}, \"scientific_metrics\": {\"metric_count\": 12, \"primary_metric\": \"agreement_valid\", \"primary_value\": 0.5370282288185075, \"values\": {\"dr\": -3, \"dc\": 2, \"agreement\": 0.5370282288185075, \"agreement_all\": 0.6728152752489596, \"agreement_valid\": 0.5370282288185075, \"intersection\": 2996101, \"union\": 7401520, \"iou\": 0.40479536635718066, \"precision\": 0.5506198491396579, \"recall\": 0.6045039270245508, \"valid_pixels\": 9515524, \"valid_fraction\": 0.6905844163384364}}, \"compute_metrics\": {\"wall_seconds\": 0.21028, \"cpu_seconds\": 0.210256, \"process_cpu_cumulative_seconds\": 1.284071, \"pid\": 310042, \"python_version\": \"3.12.3\", \"input_bytes\": 41337216, \"load_average_1m\": 0.2061, \"user_cpu_seconds\": 0.12187, \"system_cpu_seconds\": 0.088664, \"peak_rss_kib\": 160740, \"peak_rss_unit\": \"KiB (Linux ru_maxrss)\"}, \"site_profile\": {\"profile_version\": \"1\", \"site_id\": \"remote-7804a56a5c7636cc\", \"os_family\": \"linux\"}, \"elapsed_seconds\": 0.211}\n",
+  "stderr": ""
+}

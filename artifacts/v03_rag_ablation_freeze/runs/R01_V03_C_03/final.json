@@ -1,0 +1,37 @@
+{
+  "decision": "fault",
+  "fault_family": "orientation_axis_mapping_error",
+  "root_cause": "A systematic orientation/axis-mapping error exists between the Meteosat and EPIC cloud masks. Applying a 180-degree rotation to one mask raises agreement from 0.537 to 0.798, exceeding the 0.75 quality threshold.",
+  "confidence": 0.9,
+  "evidence_experiment_ids": [
+    "EXP_001",
+    "EXP_002",
+    "EXP_003",
+    "EXP_004",
+    "EXP_005"
+  ],
+  "recommended_repair": {
+    "action": "Apply a 180-degree rotation to one of the cloud masks before comparison, or correct the underlying axis/orientation mapping in the comparison pipeline.",
+    "expected_metric": 0.7982679671660752,
+    "threshold": 0.75
+  },
+  "remaining_uncertainty": [
+    "The exact source of the orientation error (e.g., which mask is inverted, or whether a transpose or flip is also needed) is not fully isolated; only rot180 was tested.",
+    "Whether the 0.798 agreement is the maximum achievable or whether other transformations (rot90, rot270, flips) yield even higher agreement remains untested."
+  ],
+  "evidence_summary": {
+    "experimental_evidence_ids": [
+      "E001",
+      "E002",
+      "E003",
+      "E004",
+      "E005"
+    ],
+    "knowledge_evidence_ids": [
+      "K001",
+      "K002",
+      "K003"
+    ],
+    "final_inference": "A systematic orientation/axis-mapping error exists between the Meteosat and EPIC cloud masks. Applying a 180-degree rotation to one mask raises agreement from 0.537 to 0.798, exceeding the 0.75 quality threshold."
+  }
+}
