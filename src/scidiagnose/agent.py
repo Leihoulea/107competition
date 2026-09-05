@@ -6,6 +6,7 @@ from typing import Any
 from urllib import error, request
 from .config import Settings
 from .models import AgentAction, DiagnosisState
+from .tool_specs import TOOL_SPECS, planner_tool_catalog
 
 SYSTEM_PROMPT = """You are an autonomous scientific computing diagnosis agent.
 
@@ -23,15 +24,10 @@ Never claim an experiment, metric, document, or evidence item that is not presen
 Only use evidence produced by executed experiments. Do not expose hidden reasoning.
 Return only concise structured scientific state updates or requested actions, matching the supplied schema."""
 
-PLANNER_TOOL_CATALOG = {
-    "inspect": {"arguments": {}},
-    "compare": {"arguments": {}},
-    "transform_and_compare": {"arguments": {"operation": ["identity", "flip_x", "flip_y", "rot90", "rot180", "rot270", "transpose"]}},
-    "shift_and_compare": {"arguments": {"dr": "integer [-5, 5]", "dc": "integer [-5, 5]"}},
-    "evaluate_candidate": {"arguments": {"pipeline": "0 to 4 steps; each step is transform(operation) or shift(dr, dc)"}},
-}
+PLANNER_TOOL_CATALOG = planner_tool_catalog()
 
 class AgentAPIError(RuntimeError): pass
+class StructuredOutputError(AgentAPIError): pass
 
 class OpenAICompatibleAgent:
     """Minimal stdlib client for school endpoints implementing /chat/completions."""
@@ -42,6 +38,21 @@ class OpenAICompatibleAgent:
         if not (self.settings.base_url and self.settings.model_name and self.settings.api_key):
             raise AgentAPIError("SCIDIAG_BASE_URL, SCIDIAG_MODEL_NAME, and SCIDIAG_API_KEY are required for API mode")
 
+    @staticmethod
+    def _unwrap_structured_response(value: Any) -> dict[str, Any]:
+        """Accept only explicit, provider-standard object envelopes."""
+        if not isinstance(value, dict):
+            raise StructuredOutputError("response must be a JSON object")
+        if value.get("type") == "json_object":
+            for key in ("obj", "data", "result", "response"):
+                if isinstance(value.get(key), dict):
+                    return value[key]
+        # Some compatible gateways use a single named payload wrapper.  Do not
+        # recursively unwrap arbitrary objects: that would hide schema errors.
+        if set(value) == {"output"} and isinstance(value["output"], dict):
+            return value["output"]
+        return value
+
     def _request_json(self, request_name: str, context: dict[str, Any], response_schema: dict[str, Any]) -> dict[str, Any]:
         """Send a concise structured cognitive request; hidden case files never enter context."""
         visible = {"request": request_name, "context": context, "response_schema": response_schema}
@@ -51,14 +62,7 @@ class OpenAICompatibleAgent:
             try:
                 with request.urlopen(req,timeout=self.timeout) as response: data=json.loads(response.read())
                 raw=data["choices"][0]["message"]["content"]
-                value=json.loads(raw)
-                if not isinstance(value,dict): raise ValueError("response must be a JSON object")
-                # School models sometimes wrap any structured payload in a generic envelope.
-                if value.get("type") == "json_object":
-                    for key in ("obj", "data", "result"):
-                        if isinstance(value.get(key), dict):
-                            value = value[key]
-                            break
+                value=self._unwrap_structured_response(json.loads(raw))
                 return value
             except error.HTTPError as exc:
                 if exc.code in {429,500,502,503,504} and attempt < self.max_retries:
@@ -68,8 +72,10 @@ class OpenAICompatibleAgent:
                 if attempt < self.max_retries:
                     time.sleep(self.retry_base_seconds * (2 ** attempt)); continue
                 raise AgentAPIError(f"School LLM API transport failed: {exc}") from exc
-            except (error.URLError,json.JSONDecodeError,KeyError,IndexError,TypeError,ValueError) as exc:
-                raise AgentAPIError(f"School LLM API returned invalid structured output: {exc}") from exc
+            except (error.URLError,json.JSONDecodeError,KeyError,IndexError,TypeError,ValueError,StructuredOutputError) as exc:
+                if attempt < self.max_retries:
+                    time.sleep(self.retry_base_seconds * (2 ** attempt)); continue
+                raise StructuredOutputError(f"School LLM API returned invalid structured output after {attempt + 1} attempts: {exc}") from exc
 
     @staticmethod
     def _hypotheses(value: dict[str, Any], existing: list[dict[str, Any]] | None = None, minimum: int = 2) -> list[dict[str, Any]]:
@@ -124,7 +130,7 @@ class OpenAICompatibleAgent:
                 candidates.append({"objective":str(candidate.get("objective",action.reason)),"diagnostic_rationale":str(candidate.get("diagnostic_rationale",candidate.get("objective",action.reason))),"predicted_observation":str(candidate.get("predicted_observation",candidate.get("expected_evidence","Measure evidence that distinguishes the target hypotheses."))),"target_hypotheses":targets,"tested_scope":[str(x) for x in scope if str(x).strip()],"tool":action.tool,"arguments":action.arguments,"expected_evidence":str(candidate.get("expected_evidence","Measure evidence that distinguishes the target hypotheses."))})
             return candidates, rejected
 
-        planner_context={**context, "tool_catalog": PLANNER_TOOL_CATALOG}
+        planner_context={**context, "tool_catalog": planner_tool_catalog(bool(context.get("knowledge_enabled", False)))}
         value=self._request_json("propose two or three ranked, cost-aware experiment candidates. Each must use the supplied neutral tool catalog, cover named hypotheses, and state a measurable scope. Avoid candidates equivalent or near-equivalent to executed experiments.",planner_context,schema)
         candidates, rejected=parse(value)
         if not candidates:
@@ -184,7 +190,8 @@ class OpenAICompatibleAgent:
         request_name=(
             "produce the final evidence-backed diagnosis. Claims must not exceed the scope of executed evidence; "
             "a failed candidate only weakens that tested candidate unless multiple independent experiments justify a broader claim. "
-            "Distinguish observed, supported, not supported, validated, and inconclusive evidence."
+            "Distinguish observed, supported, not supported, validated, and inconclusive evidence. "
+            "Separately state experimental evidence, documentary knowledge evidence, and the final inference."
         )
         if required in {"fault", "no_fault"}:
             request_name += f". The validation gate has accepted {required}; return exactly decision={required}."
@@ -234,7 +241,7 @@ class OpenAICompatibleAgent:
         kind=value.get("type")
         if kind in {"tool", "tool_call", "call_tool"}:
             tool=value.get("tool", value.get("tool_name")); args=value.get("arguments", value.get("args", {}))
-            if tool not in {"inspect","compare","transform_and_compare","shift_and_compare","evaluate_candidate"} or not isinstance(args,dict): raise ValueError("invalid tool action")
+            if tool not in TOOL_SPECS or not isinstance(args,dict): raise ValueError("invalid tool action")
             return AgentAction("tool_call",tool,OpenAICompatibleAgent._normalize_arguments(tool,args),str(value.get("reason","")))
         if kind in {"final", "diagnosis", "conclusion"}:
             final=value.get("final", value.get("final_diagnosis"))
@@ -246,6 +253,11 @@ class OpenAICompatibleAgent:
     @staticmethod
     def _normalize_arguments(tool:str, arguments:dict[str,Any])->dict[str,Any]:
         if tool in {"inspect","compare"}: return {}
+        if tool == "retrieve_scientific_knowledge":
+            query, top_k = arguments.get("query"), arguments.get("top_k", 5)
+            if not isinstance(query, str) or not query.strip(): raise ValueError("knowledge query must be a non-empty string")
+            if type(top_k) is not int or not 1 <= top_k <= 5: raise ValueError("knowledge top_k must be an integer in [1, 5]")
+            return {"query": query.strip(), "top_k": top_k}
         if tool == "transform_and_compare":
             operation=arguments.get("operation",arguments.get("transform",arguments.get("transformation")))
             if not isinstance(operation,str): raise ValueError("transform operation is required")

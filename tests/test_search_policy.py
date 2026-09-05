@@ -50,8 +50,8 @@ def test_planner_rejects_when_every_candidate_repeats_existing_probe():
             return {"candidate_plans": [{"target_hypotheses": ["H001"], "tested_scope": ["scope-a"], "tool": "compare", "arguments": {}}]}
     with TemporaryDirectory(dir=Path.cwd()) as directory:
         graph = DiagnosisGraph(RepeatAgent(), object(), Path(directory))
-        with pytest.raises(RuntimeError, match="no novel candidate"):
-            graph.plan(state([{"experiment_id": "EXP_1", "tool": "compare", "arguments": {}}]))
+        result = graph.plan(state([{"experiment_id": "EXP_1", "tool": "compare", "arguments": {}}]))
+    assert result == {"current_plan": None, "stop_reason": "no_affordable_novel_action"}
 
 
 def test_novelty_rejection_gets_one_graph_replan_and_trace_event():
@@ -177,7 +177,7 @@ def test_api_planner_receives_a_neutral_tool_catalog():
 
     agent._request_json = request
     agent.plan_experiment({"hypotheses": state()["hypotheses"]})
-    assert contexts[0]["tool_catalog"]["compare"] == {"arguments": {}}
+    assert contexts[0]["tool_catalog"]["compare"] == {"category": "compute_experiment", "cost": 1, "arguments": {}}
     assert contexts[0]["tool_catalog"]["shift_and_compare"]["arguments"]["dr"] == "integer [-5, 5]"
 
 

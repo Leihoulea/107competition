@@ -47,6 +47,8 @@ class DiagnosisGraphState(TypedDict, total=False):
     # Planner-visible aggregate of what has been tested and how informative it was.
     experiment_coverage: dict[str, Any]
     evidence: list[EvidenceItem]
+    # Experimental and retrieved documentary evidence are deliberately separate.
+    experimental_evidence: list[EvidenceItem]
     current_plan: dict[str, Any] | None
     budget_blocked: bool
     latest_result: dict[str, Any] | None
@@ -59,5 +61,8 @@ class DiagnosisGraphState(TypedDict, total=False):
     diagnosis_status: str
     validated_decision: Literal["fault", "no_fault", "inconclusive"] | None
     final_diagnosis: dict[str, Any] | None
+    stop_reason: Literal["max_steps_reached", "budget_exhausted", "no_affordable_novel_action", "provider_failure"] | None
+    latest_action_kind: Literal["compute_experiment", "knowledge_query"] | None
     knowledge_queries: list[dict[str, Any]]
     knowledge_evidence: list[dict[str, Any]]
+    knowledge_enabled: bool

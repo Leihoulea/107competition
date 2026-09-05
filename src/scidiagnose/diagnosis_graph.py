@@ -9,8 +9,11 @@ from typing import Any
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import END, START, StateGraph
 
-from .experiment_tools import COSTS, ExperimentTools
+from .agent import AgentAPIError
+from .experiment_tools import ExperimentTools
 from .graph_state import DiagnosisGraphState
+from .knowledge.tool import ScientificKnowledgeTool
+from .tool_specs import COSTS, TOOL_SPECS
 
 
 def agreement(metrics: dict[str, Any]) -> float | None:
@@ -48,6 +51,8 @@ def _system_tested_scope(tool: str, arguments: dict[str, Any]) -> dict[str, Any]
             elif step.get("type") == "shift":
                 steps.append(f"shift(dr={step.get('dr')},dc={step.get('dc')})")
         return {"kind": "pipeline", "signature": steps}
+    if tool == "retrieve_scientific_knowledge":
+        return {"kind": "knowledge", "signature": str(arguments.get("query", ""))}
     return {"kind": "observation", "signature": tool}
 
 
@@ -111,23 +116,24 @@ def _signature(tool: Any, arguments: Any) -> str:
 
 class DiagnosisGraph:
     """State transitions are auditable; model calls receive only public cognitive state."""
-    def __init__(self, agent: Any, tools: ExperimentTools, run_dir: Path) -> None:
-        self.agent, self.tools, self.run_dir = agent, tools, run_dir
+    def __init__(self, agent: Any, tools: ExperimentTools, run_dir: Path, knowledge_tool: ScientificKnowledgeTool | None = None) -> None:
+        self.agent, self.tools, self.run_dir, self.knowledge_tool = agent, tools, run_dir, knowledge_tool
         self.trace = run_dir / "trace.jsonl"
         self.checkpointer = InMemorySaver()
         graph = StateGraph(DiagnosisGraphState)
-        for name, node in (("observe", self.observe), ("hypothesize", self.hypothesize), ("plan", self.plan), ("budget_check", self.budget_check), ("execute", self.execute), ("extract_evidence", self.extract_evidence), ("update_hypotheses", self.update_hypotheses), ("reflect", self.reflect), ("validation_gate", self.validation_gate), ("finalize", self.finalize)):
+        for name, node in (("observe", self.observe), ("hypothesize", self.hypothesize), ("plan", self.plan), ("budget_check", self.budget_check), ("execute", self.execute), ("extract_evidence", self.extract_evidence), ("extract_knowledge_evidence", self.extract_knowledge_evidence), ("update_hypotheses", self.update_hypotheses), ("reflect", self.reflect), ("validation_gate", self.validation_gate), ("finalize", self.finalize)):
             graph.add_node(name, node)
         graph.add_edge(START, "observe")
         graph.add_edge("observe", "hypothesize")
         graph.add_edge("hypothesize", "plan")
         graph.add_edge("plan", "budget_check")
         graph.add_conditional_edges("budget_check", lambda s: "reflect" if s.get("budget_blocked") else "execute", {"reflect": "reflect", "execute": "execute"})
-        graph.add_edge("execute", "extract_evidence")
+        graph.add_conditional_edges("execute", lambda s: "extract_knowledge_evidence" if s.get("latest_action_kind") == "knowledge_query" else "extract_evidence", {"extract_evidence": "extract_evidence", "extract_knowledge_evidence": "extract_knowledge_evidence"})
         graph.add_edge("extract_evidence", "update_hypotheses")
+        graph.add_edge("extract_knowledge_evidence", "reflect")
         graph.add_edge("update_hypotheses", "reflect")
         graph.add_conditional_edges("reflect", lambda s: "plan" if s["diagnosis_status"] == "continue" else "validation_gate", {"plan": "plan", "validation_gate": "validation_gate"})
-        graph.add_conditional_edges("validation_gate", lambda s: "finalize" if s["diagnosis_status"] in {"accepted_fault", "accepted_no_fault", "budget_exhausted"} else "plan", {"finalize": "finalize", "plan": "plan"})
+        graph.add_conditional_edges("validation_gate", lambda s: "finalize" if s["diagnosis_status"] in {"accepted_fault", "accepted_no_fault", "max_steps_reached", "budget_exhausted", "no_affordable_novel_action", "provider_failure"} else "plan", {"finalize": "finalize", "plan": "plan"})
         graph.add_edge("finalize", END)
         self.app = graph.compile(checkpointer=self.checkpointer)
 
@@ -157,10 +163,10 @@ class DiagnosisGraph:
                 summary["informative_count"] += 1
         return {"tested_signatures": list(dict.fromkeys(signatures)), "families": families}
 
-    @classmethod
-    def _context(cls, s: DiagnosisGraphState) -> dict[str, Any]:
-        coverage = s.get("experiment_coverage") or cls._experiment_coverage(s)
-        return {"case_id": s["case_id"], "task": s["task"], "initial_observation": s["initial_observation"], "hypotheses": s.get("hypotheses", []), "evidence": s.get("evidence", []), "experiments": [{key: item.get(key) for key in ("experiment_id", "tool", "arguments", "cost", "result")} for item in s.get("experiments", [])], "experiment_coverage": coverage, "budget_total": s["budget_total"], "budget_remaining": s["budget_remaining"], "tool_costs": COSTS, "quality_threshold": s["quality_threshold"], "steps_used": s["steps_used"], "max_steps": s["max_steps"]}
+    def _context(self, s: DiagnosisGraphState) -> dict[str, Any]:
+        coverage = s.get("experiment_coverage") or self._experiment_coverage(s)
+        experimental = s.get("experimental_evidence", s.get("evidence", []))
+        return {"case_id": s["case_id"], "task": s["task"], "initial_observation": s["initial_observation"], "hypotheses": s.get("hypotheses", []), "experimental_evidence": experimental, "knowledge_evidence": s.get("knowledge_evidence", []), "evidence": experimental, "experiments": [{key: item.get(key) for key in ("experiment_id", "tool", "arguments", "cost", "result")} for item in s.get("experiments", [])], "knowledge_queries": s.get("knowledge_queries", []), "experiment_coverage": coverage, "budget_total": s["budget_total"], "budget_remaining": s["budget_remaining"], "tool_costs": COSTS, "knowledge_enabled": bool(self.knowledge_tool) and bool(s.get("knowledge_enabled", False)), "quality_threshold": s["quality_threshold"], "steps_used": s["steps_used"], "max_steps": s["max_steps"]}
 
     def observe(self, s: DiagnosisGraphState) -> dict[str, Any]:
         self.log("observe", initial=s["initial_observation"])
@@ -194,9 +200,12 @@ class DiagnosisGraph:
             candidates = value.get("candidate_plans") if isinstance(value.get("candidate_plans"), list) else [value]
             rejected: list[dict[str, Any]] = []
             for candidate in candidates[:3]:
+                tool = str(candidate.get("tool", ""))
+                if tool not in TOOL_SPECS or (TOOL_SPECS[tool].category == "knowledge_query" and not self._context(s)["knowledge_enabled"]):
+                    rejected.append({"reason": "unsupported or disabled diagnostic action"}); continue
                 targets = [item for item in candidate.get("target_hypotheses", []) if item in hypotheses]
                 model_scope = _scope(candidate.get("tested_scope", []))
-                system_scope = _system_tested_scope(str(candidate.get("tool")), candidate.get("arguments", {}))
+                system_scope = _system_tested_scope(tool, candidate.get("arguments", {}))
                 # Model text may explain diagnostic intent, but the executed
                 # action alone defines authoritative evidence provenance.
                 covered = targets if targets and system_scope.get("signature") else []
@@ -226,8 +235,8 @@ class DiagnosisGraph:
             rejected += retry_rejected
         if plan is None:
             self.log("plan_rejected", candidates=rejected)
-            raise RuntimeError("planner produced no novel candidate with testable hypothesis coverage")
-        plan_id = f"PLAN{len(s.get('experiments', [])) + 1:03d}"
+            return {"current_plan": None, "stop_reason": "no_affordable_novel_action"}
+        plan_id = f"PLAN{len(s.get('experiments', [])) + len(s.get('knowledge_queries', [])) + 1:03d}"
         pipeline = plan.get("arguments", {}).get("pipeline", [])
         estimated = COSTS[plan["tool"]] + (len(pipeline) if plan["tool"] == "evaluate_candidate" else 0)
         plan = {"plan_id": plan_id, **plan, "estimated_cost": estimated}
@@ -251,12 +260,27 @@ class DiagnosisGraph:
 
     def budget_check(self, s: DiagnosisGraphState) -> dict[str, Any]:
         plan = s["current_plan"] or {}
-        blocked = plan.get("estimated_cost", 0) > s["budget_remaining"] or s["steps_used"] >= s["max_steps"]
-        self.log("budget_check", plan_id=plan.get("plan_id"), estimated_cost=plan.get("estimated_cost", 0), budget_remaining=s["budget_remaining"], blocked=blocked)
-        return {"budget_blocked": blocked}
+        if s.get("stop_reason"):
+            reason = s["stop_reason"]
+        elif s["steps_used"] >= s["max_steps"]:
+            reason = "max_steps_reached"
+        elif plan.get("estimated_cost", 0) > s["budget_remaining"]:
+            reason = "budget_exhausted"
+        else:
+            reason = None
+        self.log("budget_check", plan_id=plan.get("plan_id"), estimated_cost=plan.get("estimated_cost", 0), budget_remaining=s["budget_remaining"], blocked=reason is not None, stop_reason=reason)
+        return {"budget_blocked": reason is not None, "stop_reason": reason}
 
     def execute(self, s: DiagnosisGraphState) -> dict[str, Any]:
         plan = s["current_plan"] or {}
+        if plan.get("tool") == "retrieve_scientific_knowledge":
+            if self.knowledge_tool is None:
+                raise RuntimeError("knowledge action selected while knowledge retrieval is disabled")
+            record = self.knowledge_tool.execute(plan["arguments"])
+            remaining = s["budget_remaining"] - record["cost"]
+            query = {"query_id": f"Q{len(s.get('knowledge_queries', [])) + 1:03d}", "plan_id": plan["plan_id"], **record}
+            self.log("execute_knowledge", plan_id=plan["plan_id"], query=query)
+            return {"knowledge_queries": s.get("knowledge_queries", []) + [query], "latest_result": query, "latest_action_kind": "knowledge_query", "budget_remaining": remaining, "steps_used": s["steps_used"] + 1}
         record = self.tools.execute(plan["tool"], plan["arguments"])
         remaining = s["budget_remaining"] - record["cost"]
         if remaining < 0: raise RuntimeError("budget guard failed before remote execution")
@@ -270,7 +294,7 @@ class DiagnosisGraph:
         }
         experiments = s.get("experiments", []) + [record]
         experiment_coverage = self._experiment_coverage({**s, "experiments": experiments})
-        return {"experiments": experiments, "latest_result": record, "experiment_coverage": experiment_coverage, "budget_remaining": remaining, "steps_used": s["steps_used"] + 1}
+        return {"experiments": experiments, "latest_result": record, "latest_action_kind": "compute_experiment", "experiment_coverage": experiment_coverage, "budget_remaining": remaining, "steps_used": s["steps_used"] + 1}
 
     def extract_evidence(self, s: DiagnosisGraphState) -> dict[str, Any]:
         record = s["latest_result"]
@@ -288,7 +312,22 @@ class DiagnosisGraph:
         system_scope = _system_tested_scope(record.get("tool", ""), record.get("arguments", {}))
         item = {"evidence_id": evidence_id, "experiment_id": record["experiment_id"], "baseline_metric": baseline, "observed_metric": observed, "delta": delta, "threshold": s["quality_threshold"], "residual_gap": residual, "valid_pixels": metrics.get("valid_pixels"), "valid_fraction": metrics.get("valid_fraction"), "interpretation": "Metric evidence pending hypothesis update.", "supports": [], "contradicts": [], "tested_hypotheses": tested_hypotheses, "system_tested_scope": system_scope, "diagnostic_rationale": record.get("diagnostic_rationale", ""), "predicted_observation": record.get("predicted_observation", "")}
         self.log("extract_evidence", evidence=item)
-        return {"evidence": s.get("evidence", []) + [item]}
+        experimental = s.get("evidence", []) + [item]
+        return {"evidence": experimental, "experimental_evidence": experimental}
+
+    def extract_knowledge_evidence(self, s: DiagnosisGraphState) -> dict[str, Any]:
+        query = s.get("latest_result") or {}
+        evidence = list(s.get("knowledge_evidence", []))
+        for hit in query.get("hits", []):
+            evidence.append({
+                "evidence_id": f"K{len(evidence) + 1:03d}", "kind": "knowledge",
+                "source": {key: hit.get(key) for key in ("source_id", "title", "authority", "section", "page")},
+                "claim": f"Retrieved documentary material relevant to: {query.get('query', '')}",
+                "supports_hypotheses": [], "contradicts_hypotheses": [], "validated": False,
+                "excerpt": hit.get("excerpt", ""), "retrieval_score": hit.get("retrieval_score"),
+            })
+        self.log("extract_knowledge_evidence", query_id=query.get("query_id"), evidence=evidence[len(s.get("knowledge_evidence", [])):])
+        return {"knowledge_evidence": evidence}
 
     def update_hypotheses(self, s: DiagnosisGraphState) -> dict[str, Any]:
         context = self._context(s)
@@ -348,15 +387,20 @@ class DiagnosisGraph:
                 "decision": decision,
                 "summary": f"{reflection.get('summary', '')} Initial quality already satisfies the no-fault evidence contract.",
             }
-        if s.get("budget_blocked") or s["budget_remaining"] <= 0 or s["steps_used"] >= s["max_steps"]:
+        stop_reason = s.get("stop_reason")
+        if stop_reason is None and s["steps_used"] >= s["max_steps"]:
+            stop_reason = "max_steps_reached"
+        elif stop_reason is None and s["budget_remaining"] <= 0:
+            stop_reason = "budget_exhausted"
+        if stop_reason:
             # A valid fault or a properly supported no-fault conclusion may still be
             # assessed by the gate at the limit.  An unsupported conclusion becomes
             # inconclusive rather than being silently accepted as no_fault.
-            status = decision if decision == "propose_fault" or (decision == "propose_no_fault" and self._no_fault_supported(s)) else "budget_exhausted"
+            status = decision if decision == "propose_fault" or (decision == "propose_no_fault" and self._no_fault_supported(s)) else stop_reason
         else:
             status = decision
         self.log("reflect", reflection=reflection, best_metric=best, status=status)
-        return {"reflection": reflection, "diagnosis_status": status, "budget_blocked": False}
+        return {"reflection": reflection, "diagnosis_status": status, "budget_blocked": False, "stop_reason": stop_reason}
 
     def validation_gate(self, s: DiagnosisGraphState) -> dict[str, Any]:
         best = max((item["observed_metric"] or 0.0 for item in s.get("evidence", [])), default=0.0)
@@ -368,10 +412,14 @@ class DiagnosisGraph:
             status = "accepted_fault" if validated_repairs else "continue"
         elif proposed == "propose_no_fault":
             status = "accepted_no_fault" if no_fault_supported else "continue"
+        elif proposed in {"max_steps_reached", "budget_exhausted", "no_affordable_novel_action", "provider_failure"}:
+            status = proposed
         else:
-            status = "budget_exhausted"
-        validated = {"accepted_fault": "fault", "accepted_no_fault": "no_fault", "budget_exhausted": "inconclusive"}.get(status)
-        self.log("validation_gate", proposed=proposed, best_metric=best, initial_metric=initial_metric, no_fault_supported=no_fault_supported, validated_repair_experiment_ids=validated_repairs, accepted=status, validated_decision=validated)
+            status = "continue"
+        validated = {"accepted_fault": "fault", "accepted_no_fault": "no_fault"}.get(status)
+        if status in {"max_steps_reached", "budget_exhausted", "no_affordable_novel_action", "provider_failure"}:
+            validated = "inconclusive"
+        self.log("validation_gate", proposed=proposed, best_metric=best, initial_metric=initial_metric, no_fault_supported=no_fault_supported, validated_repair_experiment_ids=validated_repairs, accepted=status, validated_decision=validated, stop_reason=s.get("stop_reason"))
         return {"diagnosis_status": status, "validated_decision": validated}
 
     def _validated_repairs(self, s: DiagnosisGraphState) -> list[str]:
@@ -412,10 +460,11 @@ class DiagnosisGraph:
         validated = s.get("validated_decision")
         if validated not in {"fault", "no_fault", "inconclusive"}:
             raise RuntimeError("finalize requires a validated_decision from validation_gate")
-        context.update({"reflection": s.get("reflection"), "best_experiment": best, "allowed_evidence_ids": [item["experiment_id"] for item in experiments], "validated_decision": validated})
+        context.update({"reflection": s.get("reflection"), "best_experiment": best, "allowed_evidence_ids": [item["experiment_id"] for item in experiments], "allowed_knowledge_evidence_ids": [item["evidence_id"] for item in s.get("knowledge_evidence", [])], "validated_decision": validated})
         if validated == "inconclusive":
             final = {"decision":"inconclusive","fault_family":None,"root_cause":"The available budget ended before either a fault repair or a scientifically supported no-fault conclusion was validated.","confidence":0.0,"evidence_experiment_ids":[item["experiment_id"] for item in experiments],"recommended_repair":{},"remaining_uncertainty":["Additional diagnostic experiments or explicit normal-range scientific evidence are required."]}
             self.log("finalize", final=final, validated_decision=validated)
+            final["evidence_summary"] = {"experimental_evidence_ids": [item["evidence_id"] for item in s.get("experimental_evidence", s.get("evidence", []))], "knowledge_evidence_ids": [item["evidence_id"] for item in s.get("knowledge_evidence", [])], "final_inference": final["root_cause"]}
             return {"final_diagnosis": final}
         final = self.agent.final_diagnosis(context)
         if final.get("decision") != validated:
@@ -441,8 +490,13 @@ class DiagnosisGraph:
                 ),
                 "recommended_repair": {},
             }
+        final["evidence_summary"] = {"experimental_evidence_ids": [item["evidence_id"] for item in s.get("experimental_evidence", s.get("evidence", []))], "knowledge_evidence_ids": [item["evidence_id"] for item in s.get("knowledge_evidence", [])], "final_inference": final.get("root_cause", "")}
         self.log("finalize", final=final, validated_decision=validated)
         return {"final_diagnosis": final}
 
     def run(self, state: DiagnosisGraphState) -> DiagnosisGraphState:
-        return self.app.invoke(state, {"configurable": {"thread_id": state["run_id"]}})
+        try:
+            return self.app.invoke(state, {"configurable": {"thread_id": state["run_id"]}})
+        except AgentAPIError as exc:
+            self.log("provider_failure", stop_reason="provider_failure", error=str(exc))
+            raise

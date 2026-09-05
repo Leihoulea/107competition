@@ -6,8 +6,8 @@ from typing import Any
 from .executor_base import ComputeExecutor
 from .models import ExperimentRequest
 from .ssh_executor import SSHDirectExecutor
+from .tool_specs import COSTS, TOOL_SPECS
 
-COSTS={"inspect":1,"compare":1,"transform_and_compare":4,"shift_and_compare":4,"evaluate_candidate":3}
 class ExperimentTools:
     def __init__(self, executor: ComputeExecutor, case_dir: Path, run_dir: Path) -> None:
         self.executor,self.case_dir,self.run_dir,self.count,self.uploaded=executor,case_dir,run_dir,0,False; (run_dir/"experiments").mkdir(parents=True,exist_ok=True)
@@ -64,7 +64,7 @@ class ExperimentTools:
         summary["site_profiles"] = [json.loads(item) for item in summary["site_profiles"]]
         (self.run_dir / "compute_summary.json").write_text(json.dumps(summary, indent=2))
     def execute(self, tool: str, arguments: dict[str,Any] | None=None) -> dict[str,Any]:
-        if tool not in COSTS: raise ValueError(f"Unsupported tool: {tool}")
+        if tool not in TOOL_SPECS or TOOL_SPECS[tool].category != "compute_experiment": raise ValueError(f"Unsupported compute tool: {tool}")
         if tool=="evaluate_candidate":
             pipeline=(arguments or {}).get("pipeline")
             if not isinstance(pipeline,list) or len(pipeline)>4: raise ValueError("pipeline must contain 0 to 4 steps")

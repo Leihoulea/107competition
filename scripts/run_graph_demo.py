@@ -14,6 +14,8 @@ from scidiagnose.agent import ManualAgent, OpenAICompatibleAgent
 from scidiagnose.config import Settings
 from scidiagnose.diagnosis_graph import DiagnosisGraph
 from scidiagnose.experiment_tools import ExperimentTools
+from scidiagnose.knowledge.tool import ScientificKnowledgeTool
+from scidiagnose.rag_ablation import rag_ablation_cohort
 from scidiagnose.run_artifacts import write_failure_artifact
 from scidiagnose.ssh_executor import SSHDirectExecutor
 
@@ -24,8 +26,14 @@ parser.add_argument("--case-dir", type=Path, help="public case directory outside
 parser.add_argument("--host")
 parser.add_argument("--agent", choices=["manual", "api"], default="manual")
 parser.add_argument("--max-steps", type=int, default=8)
+parser.add_argument("--knowledge", action="store_true", help="Enable the frozen local knowledge-query action (C cohort); omit for the no-RAG B cohort.")
+parser.add_argument("--rag-cohort", choices=["B", "C"], help="Explicit ablation cohort; C enables the same knowledge action as --knowledge.")
 parser.add_argument("--run-id", help="Optional stable run directory name under runs/.")
 args = parser.parse_args()
+if args.knowledge and args.rag_cohort == "B":
+    raise SystemExit("--knowledge conflicts with B no-RAG cohort")
+knowledge_enabled = args.knowledge or args.rag_cohort == "C"
+cohort = rag_ablation_cohort("C" if knowledge_enabled else "B")
 
 
 case = args.case_dir.resolve() if args.case_dir else ROOT / "cases" / args.case
@@ -55,8 +63,12 @@ try:
         "diagnosis_status": "new",
         "knowledge_queries": [],
         "knowledge_evidence": [],
+        "experimental_evidence": [],
+        "knowledge_enabled": knowledge_enabled,
+        "rag_ablation": cohort.to_dict(),
     }
-    result = DiagnosisGraph(agent, ExperimentTools(executor, case, run), run).run(state)
+    knowledge_tool = ScientificKnowledgeTool(ROOT / "knowledge") if knowledge_enabled else None
+    result = DiagnosisGraph(agent, ExperimentTools(executor, case, run), run, knowledge_tool=knowledge_tool).run(state)
     (run / "state.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
     (run / "final.json").write_text(json.dumps(result["final_diagnosis"], indent=2), encoding="utf-8")
 except BaseException as exc:

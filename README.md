@@ -79,12 +79,12 @@ The endpoint must implement `POST /chat/completions`. The agent receives only pu
 
 Alternatively, create a local `E:\107competition\.env` from `.env.example` and add the three model settings there. `.env` is ignored by Git and is read automatically; never send or commit it.
 
-## Knowledge-Grounded Diagnosis — v0.3 foundation
+## Knowledge-Grounded Diagnosis — v0.3
 
 SciDiagnose now includes a lightweight, local BM25 foundation for authoritative product manuals, algorithm documents, variable metadata, physical constraints, numerical-method documentation, and project scientific notes. Sources are manifest-declared with authority, publisher, version, retrieval date, SHA-256, domain, product, and usage note; MVP ingestion accepts only cleaned local `.txt`/`.md` sources, never LLM-generated content or raw PDFs.
 
 The first actual corpus contains three EUMETSAT MSG/SEVIRI documents (`official`) and Satpy reader documentation (`project_documentation`). Raw documents, page-marked normalized text, source inventory, chunks, index, and retrieval smoke-test artifacts remain under `knowledge/`. The corpus records product semantics only; historical repairs are experimental evidence and are intentionally excluded.
 
-Retrieval is deliberately separate from diagnosis: `retrieve_scientific_knowledge(...)` returns provenance-rich passages, and a caller must explicitly create `KnowledgeEvidence` before a claim can participate in a future diagnosis graph. The current frozen agent does not automatically receive corpus text or invoke retrieval. This keeps the foundation auditable while preserving a clean ablation boundary for later graph integration.
+`retrieve_scientific_knowledge(query, top_k)` is the only v0.3 knowledge action. It returns source provenance, section/page, excerpt, and retrieval score only; it never recommends a repair, cannot read evaluator-private material, and never uploads corpus content to `server-114`. The existing planner may choose it as a `Knowledge Query` diagnostic action when enabled with `scripts/run_graph_demo.py --knowledge` (C cohort); omitting that switch is the B no-RAG cohort. Both cohorts use the same planner, validation gate, tool costs, and budget accounting. Final artifacts retain experimental and knowledge evidence separately before recording the final inference.
 
 The persisted `knowledge/index/bm25.json` is intentionally the searchable chunk store, not a precomputed term-frequency table. BM25 document frequencies and length statistics are deterministically constructed at load/search time. This keeps the first corpus small, inspectable, and free of an additional database dependency.

@@ -21,6 +21,19 @@ def test_structured_envelopes_are_unwrapped(monkeypatch):
     assert agent._request_json("test", {}, {}) == {"answer": 1}
 
 
+def test_structured_output_retries_once_then_accepts_legal_output_wrapper(monkeypatch):
+    class Settings: base_url="http://example.invalid"; model_name="test"; api_key="test"; api_max_retries=1; api_retry_base_seconds=0
+    agent = OpenAICompatibleAgent(Settings())
+    payloads = [b'{"choices":[{"message":{"content":"[]"}}]}', b'{"choices":[{"message":{"content":"{\\"output\\":{\\"answer\\":1}}"}}]}']
+    class Response:
+        def __init__(self, payload): self.payload = payload
+        def __enter__(self): return self
+        def __exit__(self, *args): return False
+        def read(self): return self.payload
+    monkeypatch.setattr("scidiagnose.agent.request.urlopen", lambda *args, **kwargs: Response(payloads.pop(0)))
+    assert agent._request_json("test", {}, {}) == {"answer": 1}
+
+
 def test_reflection_decision_dialects_are_normalized():
     value, decision = OpenAICompatibleAgent._normalize_reflection(
         {"reflection": {"action": "needs more evidence", "summary": "not decisive"}}
